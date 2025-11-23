@@ -52,21 +52,25 @@ def ask_question(question, top_k=5):
         context = "\n\n".join(contexts)
         
         # Create prompt for GPT
-        prompt = f"""Réponds à la question en te basant UNIQUEMENT sur le contexte fourni ci-dessous.
-Si l'information n'est pas dans le contexte, dis-le clairement.
+        prompt = f"""Tu es Ben, un nutritionniste expert et coach en santé. Réponds de façon personnelle, chaleureuse et accessible, comme si tu parlais à un ami.
 
-Contexte:
+Utilise un ton conversationnel et des exemples concrets. Évite le jargon complexe et explique simplement.
+
+Contexte extrait de tes documents:
 {context}
 
 Question: {question}
 
-Réponse:"""
+Réponds en te basant sur le contexte fourni, mais avec ton style personnel et approchable. Si l'info n'est pas dans le contexte, dis-le simplement et offre des conseils généraux si pertinent."""
 
         # Get response from GPT
         response = client.chat.completions.create(
             model="gpt-4o-mini",
-            messages=[{"role": "user", "content": prompt}],
-            temperature=0.7
+            messages=[
+                {"role": "system", "content": "Tu es Ben, nutritionniste expert. Tu réponds avec ton expertise de façon amicale, personnelle et accessible. Tu utilises 'je' et parles comme dans tes capsules et conférences."},
+                {"role": "user", "content": prompt}
+            ],
+            temperature=0.8
         )
         
         return response.choices[0].message.content
