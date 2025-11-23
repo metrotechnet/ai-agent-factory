@@ -21,7 +21,5 @@ Thumbs.db
 *.old
 videos/
 transcripts/
-chroma_db/
-transcripts_extracted/
 *.md
 !README.md

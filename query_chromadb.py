@@ -14,10 +14,31 @@ def get_collection():
     global chroma_client, collection
     if collection is None:
         try:
-            chroma_client = chromadb.PersistentClient(path="./chroma_db")
+            import os
+            # Check if chroma_db directory exists
+            chroma_path = "./chroma_db"
+            print(f"Checking if {chroma_path} exists: {os.path.exists(chroma_path)}")
+            if os.path.exists(chroma_path):
+                print(f"Contents of {chroma_path}: {os.listdir(chroma_path)}")
+            
+            print(f"Attempting to connect to ChromaDB at {chroma_path}")
+            chroma_client = chromadb.PersistentClient(path=chroma_path)
+            print(f"ChromaDB client created successfully")
+            
+            # List available collections
+            collections = chroma_client.list_collections()
+            print(f"Available collections: {[c.name for c in collections]}")
+            
+            if not collections:
+                print("No collections found! ChromaDB database may be empty.")
+                return None
+            
             collection = chroma_client.get_collection(name="transcripts")
+            print(f"Collection 'transcripts' loaded with {collection.count()} documents")
         except Exception as e:
-            print(f"Warning: Could not connect to ChromaDB: {e}")
+            print(f"Error: Could not connect to ChromaDB: {e}")
+            import traceback
+            traceback.print_exc()
             return None
     return collection
 
