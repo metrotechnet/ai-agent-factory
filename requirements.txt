@@ -1,0 +1,12 @@
+fastapi
+uvicorn
+openai
+pinecone-client
+python-multipart
+ffmpeg-python
+pydub
+tqdm
+pillow
+pytesseract
+whisper
+python-dotenv
