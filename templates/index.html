@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personal AI Agent</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="header">
+        <h1>Personal AI Agent</h1>
+    </div>
+    
+    <div class="chat-container" id="chat-container">
+        <div class="empty-state" id="empty-state">
+            <div class="empty-state-icon">💬</div>
+            <h2>How can I help you today?</h2>
+            <div class="suggestions">
+                <div class="suggestion-card">
+                    <h3>📹 Video Content</h3>
+                    <p>What topics are covered in my videos?</p>
+                </div>
+                <div class="suggestion-card">
+                    <h3>🔍 Search</h3>
+                    <p>Find specific information from transcripts</p>
+                </div>
+                <div class="suggestion-card">
+                    <h3>📊 Summary</h3>
+                    <p>Summarize the main points from a video</p>
+                </div>
+                <div class="suggestion-card">
+                    <h3>❓ Questions</h3>
+                    <p>Ask anything about your video content</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="input-area">
+        <div class="input-wrapper">
+            <textarea 
+                id="input-box" 
+                class="input-box" 
+                placeholder="Send a message..." 
+                rows="1"
+            ></textarea>
+            <button id="send-button" class="send-button">
+                <svg viewBox="0 0 24 24">
+                    <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+    
+    <script src="/static/script.js"></script>
+</body>
+</html>

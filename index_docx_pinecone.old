@@ -1,0 +1,116 @@
+import os
+from dotenv import load_dotenv
+from docx import Document
+from pinecone import Pinecone
+from openai import OpenAI
+from config import PINECONE_API_KEY, INDEX_NAME
+
+load_dotenv()
+
+# Initialize clients
+pc = Pinecone(api_key=PINECONE_API_KEY)
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+
+# Create or get index
+if INDEX_NAME not in [idx.name for idx in pc.list_indexes()]:
+    print(f"Creating index {INDEX_NAME}...")
+    pc.create_index(
+        name=INDEX_NAME,
+        dimension=1536,  # text-embedding-3-large dimension
+        metric="cosine"
+    )
+else:
+    print(f"Using existing index {INDEX_NAME}")
+
+index = pc.Index(INDEX_NAME)
+
+def extract_text_from_docx(docx_path):
+    """Extract text from a Word document"""
+    doc = Document(docx_path)
+    full_text = []
+    for para in doc.paragraphs:
+        if para.text.strip():
+            full_text.append(para.text)
+    return '\n'.join(full_text)
+
+def get_embeddings(texts):
+    """Get embeddings from OpenAI"""
+    if isinstance(texts, str):
+        texts = [texts]
+    resp = client.embeddings.create(model="text-embedding-3-large", input=texts)
+    return [e.embedding for e in resp.data]
+
+def chunk_text(text, chunk_size=500, overlap=50):
+    """Split text into overlapping chunks"""
+    chunks = []
+    start = 0
+    while start < len(text):
+        end = start + chunk_size
+        chunk = text[start:end]
+        if chunk.strip():
+            chunks.append(chunk)
+        start = end - overlap
+    return chunks
+
+def index_docx_files(folder_path):
+    """Index all .docx files in the folder"""
+    docx_files = [f for f in os.listdir(folder_path) if f.endswith('.docx') and not f.startswith('~$')]
+    
+    print(f"Found {len(docx_files)} documents to index")
+    
+    for filename in docx_files:
+        file_path = os.path.join(folder_path, filename)
+        print(f"\nProcessing: {filename}")
+        
+        try:
+            # Extract text from document
+            text = extract_text_from_docx(file_path)
+            
+            if not text.strip():
+                print(f"  ⚠️ No text found in {filename}")
+                continue
+            
+            print(f"  Extracted {len(text)} characters")
+            
+            # Split into chunks
+            chunks = chunk_text(text, chunk_size=500, overlap=50)
+            print(f"  Created {len(chunks)} chunks")
+            
+            # Get embeddings for chunks (batch process)
+            batch_size = 100
+            for i in range(0, len(chunks), batch_size):
+                batch_chunks = chunks[i:i+batch_size]
+                embeddings = get_embeddings(batch_chunks)
+                
+                # Prepare vectors for Pinecone
+                vectors = []
+                for j, (chunk, embedding) in enumerate(zip(batch_chunks, embeddings)):
+                    vector_id = f"{filename}_chunk{i+j}"
+                    vectors.append({
+                        "id": vector_id,
+                        "values": embedding,
+                        "metadata": {
+                            "source": filename,
+                            "text": chunk[:1000],  # Store first 1000 chars of chunk
+                            "chunk_index": i+j
+                        }
+                    })
+                
+                # Upsert to Pinecone
+                index.upsert(vectors=vectors)
+                print(f"  ✓ Indexed batch {i//batch_size + 1}/{(len(chunks)-1)//batch_size + 1}")
+            
+            print(f"  ✅ Successfully indexed {filename}")
+            
+        except Exception as e:
+            print(f"  ❌ Error processing {filename}: {str(e)}")
+
+if __name__ == "__main__":
+    transcript_folder = r"transcripts\AI - Ben Nutritionniste"
+    
+    if not os.path.exists(transcript_folder):
+        print(f"Error: Folder '{transcript_folder}' not found")
+    else:
+        print(f"Starting indexing from folder: {transcript_folder}\n")
+        index_docx_files(transcript_folder)
+        print("\n✅ Indexing complete!")

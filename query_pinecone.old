@@ -1,0 +1,53 @@
+import os
+from dotenv import load_dotenv
+from openai import OpenAI
+from pinecone import Pinecone
+from config import PINECONE_API_KEY, PINECONE_ENV, INDEX_NAME
+
+load_dotenv()
+
+# Initialize clients with lazy loading
+pc = None
+index = None
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+
+def get_index():
+    global pc, index
+    if index is None:
+        try:
+            pc = Pinecone(api_key=PINECONE_API_KEY)
+            index = pc.Index(INDEX_NAME)
+        except Exception as e:
+            print(f"Warning: Could not connect to Pinecone: {e}")
+            return None
+    return index
+
+def ask_question(question, top_k=3):
+    idx = get_index()
+    
+    if idx is None:
+        return "Error: Pinecone index is not available. Please make sure you have created an index and added data to it."
+    
+    try:
+        # embed query
+        query_emb = client.embeddings.create(model="text-embedding-3-large", input=question).data[0].embedding
+        results = idx.query(vector=query_emb, top_k=top_k, include_metadata=True)
+        
+        if not results.get("matches"):
+            return "No relevant information found. Please make sure you have indexed some transcripts."
+        
+        context = "\n".join([match["metadata"]["source"] + ": " + match["id"] for match in results["matches"]])
+        prompt = f"Answer the question using ONLY the following context:\n{context}\n\nQuestion: {question}"
+
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[{"role": "user", "content": prompt}]
+        )
+        return response.choices[0].message.content
+    except Exception as e:
+        return f"Error processing your question: {str(e)}"
+
+if __name__ == "__main__":
+    while True:
+        q = input("Ask your AI agent: ")
+        print(ask_question(q))

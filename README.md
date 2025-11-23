@@ -5,7 +5,7 @@ A personal AI agent that transcribes videos, indexes transcripts, and allows que
 ## Features
 
 - Video transcription using OpenAI Whisper
-- Transcript indexing with Pinecone vector database
+- Transcript indexing with ChromaDB vector database (local storage)
 - Question answering using OpenAI GPT models
 - FastAPI REST API for easy integration
 
@@ -23,41 +23,50 @@ source venv/bin/activate      # Linux/Mac
 pip install -r requirements.txt
 ```
 
-3. Create a `config.py` file with your API keys and settings (see config.py for template)
+3. Create a `.env` file with your OpenAI API key:
+```
+OPENAI_API_KEY=your-key-here
+```
 
-4. Add videos to the `videos/` folder
+4. Add your Word documents (.docx) to the `transcripts/AI - Ben Nutritionniste/` folder
 
 ## Usage
 
-### Transcribe Videos
+### Extract Text from Documents
 ```bash
-python ingest.py
+python extract_docx.py
 ```
 
-### Index Transcripts
+### Index Documents
 ```bash
-python index.py
+python index_chromadb.py
 ```
 
-### Query the Agent
+### Query the Agent (Command Line)
 ```bash
-python query.py
+python query_chromadb.py
 ```
 
-### Run API Server
-```bash
-uvicorn app:app --reload
+### Run Web Interface
+```powershell
+.\start_server.ps1
+```
+Or on Windows CMD:
+```cmd
+start_server.bat
 ```
 
-Then access the API at http://localhost:8000
+Then access the web interface at http://localhost:8000
 
-## API Endpoints
+## Features
 
-- `GET /` - Health check
-- `POST /query?question=your_question` - Query the AI agent
+- 💬 ChatGPT-like interface for asking questions
+- 🗂️ Automatic document extraction from Word files
+- 🔍 Semantic search using ChromaDB (local vector database)
+- 🤖 GPT-4 powered answers based on your documents
+- 📊 842 chunks indexed from 15 documents
 
 ## Requirements
 
 - Python 3.12+
 - OpenAI API key
-- Pinecone API key

@@ -1,7 +1,6 @@
 fastapi
 uvicorn
 openai
-pinecone-client
 python-multipart
 ffmpeg-python
 pydub
@@ -10,3 +9,6 @@ pillow
 pytesseract
 whisper
 python-dotenv
+jinja2
+chromadb
+python-docx
