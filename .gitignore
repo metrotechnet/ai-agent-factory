@@ -24,6 +24,7 @@ build/
 # Deployment scripts with secrets
 deploy.bat
 deploy-only.bat
+build.bat
 
 # Data folders
 videos/
