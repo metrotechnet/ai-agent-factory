@@ -21,6 +21,10 @@ build/
 .env
 *.env
 
+# Deployment scripts with secrets
+deploy.bat
+deploy-only.bat
+
 # Data folders
 videos/
 transcripts/
