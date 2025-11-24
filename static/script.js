@@ -78,7 +78,8 @@ async function sendMessage() {
         isLoading = false;
         sendButton.disabled = false;
         inputBox.disabled = false;
-        inputBox.focus();
+        // Remove auto-focus to prevent keyboard from opening on mobile
+        // inputBox.focus();
     }
     
     // Scroll to bottom
@@ -89,7 +90,7 @@ function addMessage(text, role) {
     const messageDiv = document.createElement('div');
     messageDiv.className = `message ${role}`;
     messageDiv.innerHTML = `
-        <div class="message-icon">${role === 'user' ? 'U' : 'AI'}</div>
+        <div class="message-icon">${role === 'user' ? 'U' : 'Ben'}</div>
         <div class="message-content">${escapeHtml(text)}</div>
     `;
     chatContainer.appendChild(messageDiv);
@@ -102,7 +103,7 @@ function addLoadingMessage() {
     messageDiv.className = 'message assistant';
     messageDiv.id = 'loading-message';
     messageDiv.innerHTML = `
-        <div class="message-icon">AI</div>
+        <div class="message-icon">Ben</div>
         <div class="message-content">
             <div class="loading">
                 <div class="loading-dot"></div>
