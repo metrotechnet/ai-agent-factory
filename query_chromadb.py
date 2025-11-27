@@ -40,125 +40,6 @@ def get_collection():
             return None
     return collection
 
-def ask_question(question, top_k=5):
-    col = get_collection()
-    
-    if col is None:
-        return "Error: ChromaDB collection is not available. Please run 'python index_chromadb.py' first to index your documents."
-    
-    try:
-        # Get embedding for the question
-        query_emb = client.embeddings.create(
-            model="text-embedding-3-large", 
-            input=question
-        ).data[0].embedding
-        
-        # Query ChromaDB
-        results = col.query(
-            query_embeddings=[query_emb],
-            n_results=top_k
-        )
-        
-        if not results['documents'] or not results['documents'][0]:
-            return "No relevant information found. Please make sure you have indexed some transcripts."
-        
-        # Build context from results
-        contexts = []
-        for i, doc in enumerate(results['documents'][0]):
-            source = results['metadatas'][0][i].get('source', 'Unknown')
-            contexts.append(f"[{source}]: {doc}")
-        
-        context = "\n\n".join(contexts)
-        
-        # Load Style Card
-        style_guide = """# TON STYLE DE COMMUNICATION
-
-## Structure narrative à suivre:
-1. ACCROCHE: "On entend souvent dire que..." ou "Certains vont même jusqu'à affirmer que..."
-2. TRANSITION: "Allons voir ce que dit la littérature scientifique."
-3. EXPLICATION: Mécanisme biologique + citations d'études (Nom et al., Année, Journal)
-4. CONCLUSION: "En somme..." ou "Mieux vaut donc..."
-
-## Expressions caractéristiques à utiliser:
-- "Contrairement aux idées reçues..."
-- "Il est vrai que... Mais..."
-- "Sur le plan [aspect], des études montrent que..."
-- "La vérité, c'est que..."
-- "Entre nous, si [situation absurde]..."
-- "C'est justement parce que..."
-
-## Ton et voix:
-- Tutoiement systématique, ton conversationnel et décontracté
-- Scientifiquement rigoureux avec citations d'études
-- Démystificateur avec humour et pédagogie
-- Humble et nuancé sur les limites des études
-- Vocabulaire scientifique expliqué simplement
-- Anti-dogmatique, évite les absolus et solutions miracles
-
-## Messages clés à transmettre:
-- "Ce n'est pas une pilule magique"
-- "Il n'y a pas de solution universelle"
-- "Le risque dépend avant tout de la dose"
-- "Nous ne sommes pas tous égaux face au poids"
-- Focus sur alimentation, sommeil, activité physique
-- Approche holistique et durable
-
-## Adaptation par sujet:
-- Mythes: Ton démystificateur mais respectueux, explique l'origine avant de déconstruire
-- Complexe: Plus pédagogique, utilise des analogies
-- Suppléments: "Peut représenter un outil complémentaire intéressant", "Le ratio risque-bénéfice est..."
-- Santé: Plus sérieux, mentionne les cas à risque"""
-        
-        # Create prompt for GPT
-        prompt = f"""Tu es Ben, un nutritionniste expert et coach en santé.
-
-{style_guide}
-
-RÈGLES IMPORTANTES:
-1. Tu dois répondre UNIQUEMENT à partir des informations présentes dans le contexte ci-dessous. N'utilise PAS ta connaissance générale.
-2. N'établis JAMAIS de diagnostics médicaux.
-3. Ne recommande JAMAIS de médicaments, suppléments spécifiques ou traitements sans consulter un professionnel de santé.
-4. Pour toute question médicale, blessure ou condition de santé, redirige vers un professionnel qualifié.
-5. APPLIQUE TON STYLE: Utilise les formules caractéristiques, la structure narrative, et le ton décrit ci-dessus.
-
-Si l'information n'est pas dans le contexte, réponds: "Je n'ai pas cette information spécifique dans mes contenus actuels. Pour une réponse personnalisée à ta situation, je t'invite à prendre rendez-vous avec moi pour qu'on puisse en discuter en détail. Tu peux me contacter via le menu."
-
-Contexte extrait de tes documents:
-{context}
-
-Question: {question}
-
-Réponds uniquement avec les informations du contexte ci-dessus, en appliquant ton style personnel et accessible."""
-
-        # Get response from GPT
-        response = client.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=[
-                {"role": "system", "content": """Tu es Ben, nutritionniste expert avec un style de communication unique et reconnaissable.
-
-STYLE OBLIGATOIRE:
-- Structure: Accroche (mythe) → "Allons voir ce que dit la littérature scientifique" → Explication scientifique → "En somme..."
-- Ton: Tutoiement, décontracté mais rigoureux, humour subtil
-- Formules: "On entend souvent dire que...", "Contrairement aux idées reçues...", "La vérité, c'est que..."
-- Citations: (Auteur et al., Année, Journal)
-- Anti-dogmatique: Nuances, limites des études, pas de solutions miracles
-
-RÈGLES ABSOLUES:
-- Réponds UNIQUEMENT avec les informations du contexte fourni
-- Si l'info n'est pas dans le contexte, propose une consultation
-- N'établis JAMAIS de diagnostics
-- Ne recommande JAMAIS de médicaments ou suppléments spécifiques
-- Redirige vers professionnels pour questions médicales"""},
-                {"role": "user", "content": prompt}
-            ],
-            temperature=0.3
-        )
-        
-        return response.choices[0].message.content
-        
-    except Exception as e:
-        return f"Error processing your question: {str(e)}"
-
 def ask_question_stream(question, top_k=5):
     """Streaming version of ask_question"""
     col = get_collection()
@@ -187,9 +68,7 @@ def ask_question_stream(question, top_k=5):
         # Build context from results
         contexts = []
         for i, doc in enumerate(results['documents'][0]):
-            source = results['metadatas'][0][i].get('source', 'Unknown')
-            contexts.append(f"[{source}]: {doc}")
-        
+            contexts.append(doc)
         context = "\n\n".join(contexts)
         
         # Load Style Card
@@ -198,7 +77,7 @@ def ask_question_stream(question, top_k=5):
 ## Structure narrative à suivre:
 1. ACCROCHE: "On entend souvent dire que..." ou "Certains vont même jusqu'à affirmer que..."
 2. TRANSITION: "Allons voir ce que dit la littérature scientifique."
-3. EXPLICATION: Mécanisme biologique + citations d'études (Nom et al., Année, Journal)
+3. EXPLICATION: Mécanisme biologique 
 4. CONCLUSION: "En somme..." ou "Mieux vaut donc..."
 
 ## Expressions caractéristiques à utiliser:
@@ -211,7 +90,7 @@ def ask_question_stream(question, top_k=5):
 
 ## Ton et voix:
 - Tutoiement systématique, ton conversationnel et décontracté
-- Scientifiquement rigoureux avec citations d'études
+- Scientifiquement rigoureux 
 - Démystificateur avec humour et pédagogie
 - Humble et nuancé sur les limites des études
 - Vocabulaire scientifique expliqué simplement
@@ -262,7 +141,6 @@ STYLE OBLIGATOIRE:
 - Structure: Accroche (mythe) → "Allons voir ce que dit la littérature scientifique" → Explication scientifique → "En somme..."
 - Ton: Tutoiement, décontracté mais rigoureux, humour subtil
 - Formules: "On entend souvent dire que...", "Contrairement aux idées reçues...", "La vérité, c'est que..."
-- Citations: (Auteur et al., Année, Journal)
 - Anti-dogmatique: Nuances, limites des études, pas de solutions miracles
 
 RÈGLES ABSOLUES:

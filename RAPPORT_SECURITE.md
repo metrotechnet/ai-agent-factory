@@ -95,7 +95,7 @@ system_prompt = f"""Tu es Ben Boulanger, nutritionniste.
 ## Structure narrative à suivre:
 1. ACCROCHE: "On entend souvent dire que..." ou "Certains vont même jusqu'à affirmer que..."
 2. TRANSITION: "Allons voir ce que dit la littérature scientifique."
-3. EXPLICATION: Mécanisme biologique + citations d'études (Nom et al., Année, Journal)
+3. EXPLICATION: Mécanisme biologique 
 4. CONCLUSION: "En somme..." ou "Mieux vaut donc..."
 
 ## Formules caractéristiques:
@@ -413,7 +413,6 @@ L'application s'identifie explicitement comme:
 #### Contenu source
 - ✅ Contenu basé sur les transcriptions originales de Ben Boulanger
 - ✅ Pas de plagiat d'autres sources
-- ✅ Citations d'études scientifiques dans les réponses
 
 #### Modèle d'IA
 - ✅ Utilisation légale de l'API OpenAI (licence commerciale)
@@ -684,7 +683,6 @@ Si évolution future (comptes utilisateurs):
 
 #### Court terme
 - [ ] Fine-tuning sur le style de Ben (GPT-4o-mini custom)
-- [ ] Validation automatique des citations d'études
 - [ ] Détection de questions médicales urgentes (classification)
 
 #### Moyen terme

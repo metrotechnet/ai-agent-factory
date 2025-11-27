@@ -6,6 +6,8 @@
     <title>Ben - Nutritionniste | Assistant IA</title>
     <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
     <link rel="stylesheet" href="/static/style.css">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 </head>
 <body>
     <div class="sidebar" id="sidebar">
@@ -20,7 +22,7 @@
                 </svg>
                 Suivez-moi sur Instagram
             </a>
-            <a href="#" class="sidebar-link" id="appointment-link">
+            <a href="https://benoit-boulanger-dtp.square.site/" target="_blank" class="sidebar-link" id="appointment-link">
                 <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zM9 14H7v-2h2v2zm4 0h-2v-2h2v2zm4 0h-2v-2h2v2zm-8 4H7v-2h2v2zm4 0h-2v-2h2v2zm4 0h-2v-2h2v2z"/>
                 </svg>
@@ -43,55 +45,62 @@
     
     <div class="overlay" id="overlay"></div>
     
-    <div class="header">
+    <header>
         <button class="menu-toggle" id="menu-toggle">
             <span></span>
             <span></span>
             <span></span>
         </button>
-        <h1>Ben - Nutritionniste</h1>
-    </div>
-    
-    <div class="chat-container" id="chat-container">
-        <div class="empty-state" id="empty-state">
-            <img src="/static/ben.nutritioniste.jpg" alt="Ben Nutritionniste" class="profile-photo">
-            <h2>Salut ! Je m'appelle Ben et je suis nutritionniste</h2>
-            <p>Pose-moi tes questions sur la nutrition, les suppléments, l'entraînement ou la santé !</p>
-            <div class="suggestions">
-                <div class="suggestion-card">
-                    <h3>🥗 Nutrition</h3>
-                    <p>Conseils alimentaires et plans nutritionnels</p>
-                </div>
-                <div class="suggestion-card">
-                    <h3>💊 Suppléments</h3>
-                    <p>Questions sur les suppléments et leur utilisation</p>
-                </div>
-                <div class="suggestion-card">
-                    <h3>🏋️ Entraînement</h3>
-                    <p>Performance et récupération sportive</p>
-                </div>
-                <div class="suggestion-card">
-                    <h3>💡 Santé</h3>
-                    <p>Bien-être général et habitudes de vie</p>
+        <h2>Ben - Nutritionniste</h2>
+    </header>
+
+        <div class="content" id="chat-container">
+            <div class="empty-state" id="empty-state">
+                <img src="/static/ben.nutritioniste.jpg" alt="Ben Nutritionniste" class="profile-photo">
+                <h2>Salut ! Je m'appelle Ben et je suis nutritionniste</h2>
+                <p>Dans mes temps libres, j'entraîne des humains… et des IA. J'ai coaché cette machine pour qu'elle réponde à vos questions.</p>
+                <p>Elle apprend vite, mais souvenez-vous : elle ne remplacera jamais une vraie consultation. 💪</p>
+                <div class="suggestions">
+                    <div class="suggestion-card">
+                        <h3>🥗 Nutrition</h3>
+                        <p>Conseils alimentaires et nutrition</p>
+                    </div>
+                    <div class="suggestion-card">
+                        <h3>💊 Suppléments</h3>
+                        <p>Questions sur les suppléments et leur utilisation</p>
+                    </div>
+                    <div class="suggestion-card">
+                        <h3>🏋️ Entraînement</h3>
+                        <p>Performance et récupération sportive</p>
+                    </div>
+                    <div class="suggestion-card">
+                        <h3>💡 Santé</h3>
+                        <p>Bien-être général et habitudes de vie</p>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-    
-    <div class="input-area">
-        <div class="input-wrapper">
-            <textarea 
-                id="input-box" 
-                class="input-box" 
-                placeholder="Pose-moi une question..." 
-                rows="1"
-            ></textarea>
-            <button id="send-button" class="send-button">
-                <svg viewBox="0 0 24 24">
-                    <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
-                </svg>
-            </button>
-        </div>
+    <footer>
+            <div class="input-area">
+                <div class="input-wrapper">
+                    <textarea 
+                        id="input-box" 
+                        class="input-box" 
+                        placeholder="Pose-moi une question..." 
+                        rows="1"
+                    ></textarea>
+                    <button id="send-button" class="send-button">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+                        </svg>
+                    </button>
+                </div>
+                <div class="input-disclaimer">
+                    ⚠️ Peut contenir des erreurs. Ne remplace pas un avis professionnel.
+                </div>
+            </div>
+    </footer>
+
     </div>
     
     <!-- Cookie Consent Banner -->
