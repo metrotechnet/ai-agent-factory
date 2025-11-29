@@ -1,4 +1,121 @@
 // ===================================
+// INTERNATIONALIZATION SYSTEM
+// ===================================
+
+let translations = {};
+let currentLanguage = 'fr';
+
+/**
+ * Load translations from JSON file
+ */
+async function loadTranslations() {
+    try {
+        const response = await fetch('/static/translations.json');
+        translations = await response.json();
+        
+        // Detect browser language
+        const browserLang = navigator.language || navigator.userLanguage;
+        const langCode = browserLang.startsWith('en') ? 'en' : 'fr';
+        
+        // Check for stored language preference
+        const storedLang = localStorage.getItem('preferredLanguage');
+        currentLanguage = storedLang || langCode;
+        
+        // Apply translations
+        applyTranslations(currentLanguage);
+    } catch (error) {
+        console.error('Failed to load translations:', error);
+        currentLanguage = 'fr';
+    }
+}
+
+/**
+ * Apply translations to all elements with data-i18n attributes
+ */
+function applyTranslations(lang) {
+    const langData = translations[lang] || translations['fr'];
+    
+    // Update text content
+    document.querySelectorAll('[data-i18n]').forEach(element => {
+        const key = element.getAttribute('data-i18n');
+        const translation = getNestedValue(langData, key);
+        if (translation) {
+            element.textContent = translation;
+        }
+    });
+    
+    // Update placeholder attributes
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(element => {
+        const key = element.getAttribute('data-i18n-placeholder');
+        const translation = getNestedValue(langData, key);
+        if (translation) {
+            element.placeholder = translation;
+        }
+    });
+    
+    // Update title attributes
+    document.querySelectorAll('[data-i18n-title]').forEach(element => {
+        const key = element.getAttribute('data-i18n-title');
+        const translation = getNestedValue(langData, key);
+        if (translation) {
+            element.title = translation;
+        }
+    });
+    
+    // Update alt attributes
+    document.querySelectorAll('[data-i18n-alt]').forEach(element => {
+        const key = element.getAttribute('data-i18n-alt');
+        const translation = getNestedValue(langData, key);
+        if (translation) {
+            element.alt = translation;
+        }
+    });
+    
+    // Update document title
+    const titleElement = document.querySelector('title[data-i18n]');
+    if (titleElement) {
+        const key = titleElement.getAttribute('data-i18n');
+        const translation = getNestedValue(langData, key);
+        if (translation) {
+            document.title = translation;
+        }
+    }
+}
+
+/**
+ * Get nested value from object using dot notation
+ */
+function getNestedValue(obj, path) {
+    return path.split('.').reduce((current, key) => {
+        return current && current[key] !== undefined ? current[key] : null;
+    }, obj);
+}
+
+/**
+ * Switch language
+ */
+function switchLanguage(lang) {
+    currentLanguage = lang;
+    localStorage.setItem('preferredLanguage', lang);
+    applyTranslations(lang);
+}
+
+/**
+ * Get translation for a key
+ */
+function t(key) {
+    const langData = translations[currentLanguage] || translations['fr'];
+    return getNestedValue(langData, key) || key;
+}
+
+/**
+ * Get current language
+ */
+function getCurrentLanguage() {
+    return currentLanguage;
+}
+
+// ===================================
 // DOM ELEMENTS & GLOBAL STATE
 // ===================================
 
@@ -226,16 +343,16 @@ document.getElementById('legal-link').addEventListener('click', (e) => {
 function showLegalNotice() {
     const popup = document.createElement('div');
     popup.className = 'legal-popup';
+    
+    const langData = translations[currentLanguage] || translations['fr'];
+    const legalContent = langData.legal;
+    
     popup.innerHTML = `
         <div class="legal-popup-content">
             <button class="legal-popup-close">&times;</button>
-            <h2>Avertissements</h2>
+            <h2>${legalContent.title}</h2>
             <div class="legal-text">
-                <p>Les informations fournies par cet agent d'intelligence artificielle sont générées automatiquement à partir de contenus existants et peuvent comporter des erreurs, imprécisions ou omissions.</p>
-                <p>Elles sont communiquées à titre informatif uniquement et ne constituent en aucun cas des conseils médicaux, nutritionnels ou professionnels personnalisés.</p>
-                <p>L'utilisation des réponses fournies se fait sous votre seule responsabilité.</p>
-                <p>L'éditeur de l'agent et son créateur ne pourront être tenus responsables de tout dommage, direct ou indirect, résultant de l'utilisation des informations produites.</p>
-                <p>Pour toute décision liée à votre santé, votre nutrition, votre entraînement, vos blessures ou toute autre situation personnelle, veuillez consulter un professionnel qualifié.</p>
+                ${legalContent.content.map(line => line ? `<p>${line}</p>` : '').join('')}
             </div>
         </div>
     `;
@@ -345,7 +462,7 @@ async function sendMessage() {
         await handleStreamingResponse(question, contentDiv, actionsDiv);
     } catch (error) {
         console.error('Message sending error:', error);
-        contentDiv.textContent = 'Désolé, une erreur est survenue. Réessaie dans quelques instants.';
+        contentDiv.textContent = t('messages.error');
     } finally {
         // Clean up and restore UI state
         cleanupAfterMessage(messageDiv);
@@ -375,10 +492,10 @@ function createAssistantMessage() {
                 </div>
             </div>
             <div class="message-actions" style="display:none">
-                <button class="action-btn copy-btn" title="Copier" style="border-radius:50%;padding:8px;background:#f3f3f3;border:none;box-shadow:0 1px 4px rgba(0,0,0,0.07);margin-right:6px;cursor:pointer;">
+                <button class="action-btn copy-btn" title="" style="border-radius:50%;padding:8px;background:#f3f3f3;border:none;box-shadow:0 1px 4px rgba(0,0,0,0.07);margin-right:6px;cursor:pointer;">
                     <i class="bi bi-clipboard" style="font-size:1.3em;"></i>
                 </button>
-                <button class="action-btn share-btn" title="Partager" style="border-radius:50%;padding:8px;background:#f3f3f3;border:none;box-shadow:0 1px 4px rgba(0,0,0,0.07);cursor:pointer;">
+                <button class="action-btn share-btn" title="" style="border-radius:50%;padding:8px;background:#f3f3f3;border:none;box-shadow:0 1px 4px rgba(0,0,0,0.07);cursor:pointer;">
                     <i class="bi bi-share" style="font-size:1.3em;"></i>
                 </button>
             </div>
@@ -396,6 +513,10 @@ function createAssistantMessage() {
 function setupMessageActions(messageDiv, contentDiv) {
     const copyBtn = messageDiv.querySelector('.copy-btn');
     const shareBtn = messageDiv.querySelector('.share-btn');
+    
+    // Set translated titles
+    copyBtn.title = t('messages.copy');
+    shareBtn.title = t('messages.share');
     
     // Copy message text to clipboard
     copyBtn.addEventListener('click', () => {
@@ -435,8 +556,20 @@ function prepareUIForLoading() {
  * @param {HTMLElement} actionsDiv - Element containing action buttons
  */
 async function handleStreamingResponse(question, contentDiv, actionsDiv) {
-    const response = await fetch(`/query?question=${encodeURIComponent(question)}`, {
+    // Prepare request payload with language information
+    const requestData = {
+        question: question,
+        language: currentLanguage,
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC",
+        locale: navigator.language || (currentLanguage === 'en' ? 'en-US' : 'fr-FR')
+    };
+    
+    const response = await fetch('/query', {
         method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestData)
     });
     
     if (!response.ok) {
@@ -536,4 +669,35 @@ function escapeHtml(text) {
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
+}
+
+// ===================================
+// INITIALIZATION
+// ===================================
+
+/**
+ * Initialize the application
+ */
+document.addEventListener('DOMContentLoaded', function() {
+    // Load translations and set up internationalization
+    loadTranslations();
+    
+    // Check for cookie consent
+    checkCookieConsent();
+    
+    // Add language switcher for testing (comment out in production)
+    // addLanguageSwitcher();
+});
+
+/**
+ * Add language switcher to the interface (for development/testing)
+ */
+function addLanguageSwitcher() {
+    const switcher = document.createElement('div');
+    switcher.style.cssText = 'position:fixed;top:10px;right:10px;z-index:1000;background:white;padding:10px;border-radius:5px;box-shadow:0 2px 5px rgba(0,0,0,0.1);';
+    switcher.innerHTML = `
+        <button onclick="switchLanguage('fr')" style="margin-right:5px;padding:5px 10px;border:1px solid #ccc;background:#f9f9f9;cursor:pointer;">FR</button>
+        <button onclick="switchLanguage('en')" style="padding:5px 10px;border:1px solid #ccc;background:#f9f9f9;cursor:pointer;">EN</button>
+    `;
+    document.body.appendChild(switcher);
 }

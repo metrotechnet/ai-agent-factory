@@ -1,0 +1,158 @@
+{
+  "fr": {
+    "app": {
+      "title": "Ben - Nutritionniste | Assistant IA",
+      "description": "Assistant IA de Ben Boulanger, nutritionniste"
+    },
+    "header": {
+      "title": "Ben - Nutritionniste",
+      "menuButton": "Menu"
+    },
+    "sidebar": {
+      "title": "Ben - Nutritionniste",
+      "closeButton": "Fermer",
+      "instagram": "Suivez-moi sur Instagram",
+      "appointment": "Prenez un rendez-vous",
+      "contact": "Me rejoindre",
+      "legal": "Avertissements"
+    },
+    "intro": {
+      "title": "Salut ! Je m'appelle Ben et je suis nutritionniste",
+      "description": "Dans mes temps libres, j'entraîne des humains… et des IA. J'ai coaché cette machine pour qu'elle réponde à vos questions.",
+      "disclaimer": "Elle apprend vite, mais souvenez-vous : elle ne remplacera jamais une vraie consultation. 💪",
+      "profileAlt": "Ben Nutritionniste"
+    },
+    "suggestions": {
+      "nutrition": {
+        "title": "🥗 Nutrition",
+        "description": "Conseils alimentaires et nutrition"
+      },
+      "supplements": {
+        "title": "💊 Suppléments", 
+        "description": "Questions sur les suppléments et leur utilisation"
+      },
+      "training": {
+        "title": "🏋️ Entraînement",
+        "description": "Performance et récupération sportive"
+      },
+      "health": {
+        "title": "💡 Santé",
+        "description": "Bien-être général et habitudes de vie"
+      }
+    },
+    "input": {
+      "placeholder": "Pose-moi une question...",
+      "sendButton": "Envoyer",
+      "disclaimer": "⚠️ Peut contenir des erreurs. Ne remplace pas un avis professionnel."
+    },
+    "cookies": {
+      "title": "🍪 Cookies et confidentialité",
+      "message": "Ce site utilise des cookies essentiels pour assurer son bon fonctionnement. Aucune donnée personnelle n'est collectée à des fins publicitaires.",
+      "accept": "Accepter",
+      "decline": "Refuser"
+    },
+    "legal": {
+      "title": "⚠️ Avertissements importants",
+      "content": [
+        "Cet assistant virtuel est un outil d'information général basé sur le contenu éducatif de Ben Boulanger.",
+        "",
+        "❌ NE REMPLACE PAS une consultation médicale",
+        "❌ NE POSE PAS de diagnostic", 
+        "❌ NE PRESCRIT PAS de traitement",
+        "",
+        "Pour tout problème de santé:",
+        "✅ Consultez un professionnel de santé qualifié",
+        "✅ Ne modifiez pas votre traitement sans avis médical",
+        "✅ En cas d'urgence, contactez les services d'urgence",
+        "",
+        "Les informations fournies sont à but éducatif uniquement."
+      ]
+    },
+    "messages": {
+      "loading": "Chargement...",
+      "error": "Désolé, une erreur est survenue. Réessayez dans quelques instants.",
+      "copy": "Copier",
+      "share": "Partager",
+      "copied": "Copié !",
+      "shareNotSupported": "Le partage n'est pas supporté sur ce navigateur."
+    }
+  },
+  "en": {
+    "app": {
+      "title": "Ben - Nutritionist | AI Assistant",
+      "description": "AI Assistant of Ben Boulanger, nutritionist"
+    },
+    "header": {
+      "title": "Ben - Nutritionist",
+      "menuButton": "Menu"
+    },
+    "sidebar": {
+      "title": "Ben - Nutritionist",
+      "closeButton": "Close",
+      "instagram": "Follow me on Instagram",
+      "appointment": "Book an appointment",
+      "contact": "Contact me",
+      "legal": "Warnings"
+    },
+    "intro": {
+      "title": "Hi! I'm Ben and I'm a nutritionist",
+      "description": "In my free time, I train humans… and AIs. I coached this machine to answer your questions.",
+      "disclaimer": "It learns fast, but remember: it will never replace a real consultation. 💪",
+      "profileAlt": "Ben Nutritionist"
+    },
+    "suggestions": {
+      "nutrition": {
+        "title": "🥗 Nutrition",
+        "description": "Food advice and nutrition"
+      },
+      "supplements": {
+        "title": "💊 Supplements",
+        "description": "Questions about supplements and their use"
+      },
+      "training": {
+        "title": "🏋️ Training",
+        "description": "Performance and sports recovery"
+      },
+      "health": {
+        "title": "💡 Health",
+        "description": "General wellness and lifestyle habits"
+      }
+    },
+    "input": {
+      "placeholder": "Ask me a question...",
+      "sendButton": "Send",
+      "disclaimer": "⚠️ May contain errors. Does not replace professional advice."
+    },
+    "cookies": {
+      "title": "🍪 Cookies and privacy",
+      "message": "This site uses essential cookies to ensure proper functioning. No personal data is collected for advertising purposes.",
+      "accept": "Accept",
+      "decline": "Decline"
+    },
+    "legal": {
+      "title": "⚠️ Important warnings",
+      "content": [
+        "This virtual assistant is a general information tool based on Ben Boulanger's educational content.",
+        "",
+        "❌ DOES NOT REPLACE a medical consultation",
+        "❌ DOES NOT DIAGNOSE",
+        "❌ DOES NOT PRESCRIBE treatment",
+        "",
+        "For any health problem:",
+        "✅ Consult a qualified healthcare professional",
+        "✅ Do not modify your treatment without medical advice",
+        "✅ In case of emergency, contact emergency services",
+        "",
+        "The information provided is for educational purposes only."
+      ]
+    },
+    "messages": {
+      "loading": "Loading...",
+      "error": "Sorry, an error occurred. Please try again in a few moments.",
+      "copy": "Copy",
+      "share": "Share",
+      "copied": "Copied!",
+      "shareNotSupported": "Sharing is not supported on this browser."
+    }
+  }
+}
