@@ -1,78 +1,103 @@
+// ===================================
+// DOM ELEMENTS & GLOBAL STATE
+// ===================================
+
+// Chat interface elements
 const chatContainer = document.getElementById('chat-container');
 const inputBox = document.getElementById('input-box');
 const sendButton = document.getElementById('send-button');
 const emptyState = document.getElementById('empty-state');
+
+// Sidebar navigation elements
 const menuToggle = document.getElementById('menu-toggle');
 const sidebar = document.getElementById('sidebar');
 const closeSidebar = document.getElementById('close-sidebar');
 const overlay = document.getElementById('overlay');
+
+// Cookie consent elements
 const cookieBanner = document.getElementById('cookie-banner');
 const cookieAccept = document.getElementById('cookie-accept');
 const cookieDecline = document.getElementById('cookie-decline');
-let userMessageDiv = document.createElement('div');
 
-let isLoading = false;
+// Global state variables
+let userMessageDiv = document.createElement('div'); // Reference to current user message
+let isLoading = false; // Flag to prevent multiple simultaneous requests
 
-// Scroll input-area above mobile keyboard on focus
+// ===================================
+// MOBILE INPUT HANDLING
+// ===================================
+
+/**
+ * Handle input box focus on mobile devices
+ * Ensures the input remains visible above the virtual keyboard
+ */
 inputBox.addEventListener('focus', function() {
-    // On mobile, ensure input is visible above keyboard
     setTimeout(() => {
-        // Multiple scroll approaches for mobile compatibility
         try {
-            // Approach 1: scrollIntoView with different options
+            // Primary approach: Use scrollIntoView for input visibility
             this.scrollIntoView({ 
                 behavior: 'smooth', 
                 block: 'nearest',
                 inline: 'nearest'
             });
             
-            // Approach 2: Manual viewport adjustment
+            // Fallback approach: Manual viewport adjustment for mobile keyboards
             const rect = this.getBoundingClientRect();
             const viewportHeight = window.innerHeight;
-            const keyboardHeight = viewportHeight * 0.4; // Estimate keyboard height
+            const estimatedKeyboardHeight = viewportHeight * 0.4; // Approximate keyboard size
             
-            if (rect.bottom > viewportHeight - keyboardHeight) {
-                const scrollAmount = rect.bottom - (viewportHeight - keyboardHeight) + 20;
+            // Check if input will be hidden by keyboard
+            if (rect.bottom > viewportHeight - estimatedKeyboardHeight) {
+                const scrollAmount = rect.bottom - (viewportHeight - estimatedKeyboardHeight) + 20;
                 window.scrollBy(0, scrollAmount);
             }
-        } catch (e) {
-            console.log('Focus scroll failed:', e);
+        } catch (error) {
+            console.log('Input focus scroll failed:', error);
         }
-    }, 300);
+    }, 300); // Delay to allow keyboard animation
 });
 
-// Scroll back to show header when keyboard disappears
+/**
+ * Handle input box blur (when keyboard disappears)
+ * Restores normal view and scrolls to show latest messages
+ */
 inputBox.addEventListener('blur', function() {
-    // When keyboard disappears, scroll back to top to show header
     setTimeout(() => {
         try {
-            // Multiple approaches to scroll back to top
+            // Multiple approaches to ensure consistent scroll behavior across browsers
             document.documentElement.scrollTop = 0;
             document.body.scrollTop = 0;
             window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
             
-            // Also scroll the chat container to latest messages
-            const chatContainer = document.getElementById('chat-container');
+            // Scroll chat container to show latest messages
             if (chatContainer) {
                 chatContainer.scrollTo({
                     top: chatContainer.scrollHeight,
                     behavior: 'smooth'
                 });
-                setTimeout(() => {
-                    if(userMessageDiv)
-                        chatContainer.scrollTo({
-                            top: userMessageDiv.offsetTop-70,
-                            behavior: 'smooth'
-                        });
-                    }, 100);
+                
+                // If there's a user message, scroll to show it with some offset
+                if (userMessageDiv) {
+                    chatContainer.scrollTo({
+                        top: userMessageDiv.offsetTop - 70,
+                        behavior: 'smooth'
+                    });
+                }
             }
-        } catch (e) {
-            console.log('Blur scroll failed:', e);
+        } catch (error) {
+            console.log('Input blur scroll failed:', error);
         }
-    }, 300);
+    }, 300); // Delay to allow keyboard dismissal
 });
 
-// Scroll indicator
+// ===================================
+// SCROLL INDICATOR
+// ===================================
+
+/**
+ * Create and manage scroll indicator for chat container
+ * Shows when user needs to scroll down to see new messages
+ */
 const scrollIndicator = document.createElement('div');
 scrollIndicator.className = 'scroll-indicator';
 scrollIndicator.style.opacity = '0.5';
@@ -81,9 +106,14 @@ scrollIndicator.innerHTML = `
         <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
     </svg>
 `;
-// Append to main-container or body instead of chatContainer
-const mainContainer = document.querySelector('.content') ;
-mainContainer.appendChild(scrollIndicator);
+
+// Attach scroll indicator to main content area
+const mainContainer = document.querySelector('.content');
+if (mainContainer) {
+    mainContainer.appendChild(scrollIndicator);
+}
+
+// Handle scroll indicator click - scroll to bottom of chat
 scrollIndicator.addEventListener('click', () => {
     chatContainer.scrollTo({
         top: chatContainer.scrollHeight,
@@ -91,8 +121,14 @@ scrollIndicator.addEventListener('click', () => {
     });
 });
 
+/**
+ * Update scroll indicator visibility based on chat scroll position
+ * Hides indicator when user is near the bottom of the chat
+ */
 function updateScrollIndicator() {
-    const isNearBottom = chatContainer.scrollHeight - chatContainer.scrollTop - chatContainer.clientHeight < 100;
+    const threshold = 100; // Pixels from bottom to consider "near bottom"
+    const isNearBottom = chatContainer.scrollHeight - chatContainer.scrollTop - chatContainer.clientHeight < threshold;
+    
     if (isNearBottom) {
         scrollIndicator.classList.remove('visible');
     } else {
@@ -100,114 +136,93 @@ function updateScrollIndicator() {
     }
 }
 
-// Listen for scroll events on chatContainer
+// Set up scroll indicator event listeners
 chatContainer.addEventListener('scroll', updateScrollIndicator);
-// Also call once on load to set initial state
+// Initialize indicator state on page load
 updateScrollIndicator();
 
-// Cookie consent management
+// ===================================
+// COOKIE CONSENT MANAGEMENT
+// ===================================
+
+/**
+ * Check if user has previously given cookie consent
+ * Shows banner with delay if no consent found
+ */
 function checkCookieConsent() {
     const consent = localStorage.getItem('cookieConsent');
     if (!consent) {
+        // Show cookie banner after 1 second delay for better UX
         setTimeout(() => {
             cookieBanner.classList.add('show');
         }, 1000);
     }
 }
 
+// Handle cookie acceptance
 cookieAccept.addEventListener('click', () => {
     localStorage.setItem('cookieConsent', 'accepted');
     cookieBanner.classList.remove('show');
 });
 
+// Handle cookie decline
 cookieDecline.addEventListener('click', () => {
     localStorage.setItem('cookieConsent', 'declined');
     cookieBanner.classList.remove('show');
 });
 
-// Check consent on page load
+// Initialize cookie consent check on page load
 checkCookieConsent();
 
-// Force full screen at loading
-function forceFullScreen() {
-    // Multiple approaches for mobile scroll
-    try {
-        // Method 1: Force scroll with different approaches
-        document.documentElement.scrollTop = 0;
-        document.body.scrollTop = 0;
-        window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
-        
-        // Method 2: Force via CSS
-        document.body.style.overflow = 'hidden';
-        setTimeout(() => {
-            document.body.style.overflow = '';
-        }, 100);
-        
-        // Method 3: Hide address bar on mobile by adding temporary content
-        if (window.innerHeight < window.outerHeight) {
-            const tempDiv = document.createElement('div');
-            tempDiv.style.height = '200vh';
-            tempDiv.style.position = 'absolute';
-            tempDiv.style.top = '0';
-            tempDiv.style.left = '0';
-            tempDiv.style.width = '1px';
-            tempDiv.style.zIndex = '-1';
-            document.body.appendChild(tempDiv);
-            
-            setTimeout(() => {
-                window.scrollTo(0, 1);
-                setTimeout(() => {
-                    window.scrollTo(0, 0);
-                    // Safe removal check
-                    if (tempDiv && tempDiv.parentNode) {
-                        tempDiv.parentNode.removeChild(tempDiv);
-                    }
-                }, 50);
-            }, 50);
-        }
-    } catch (e) {
-        console.log('Scroll failed:', e);
-    }
-    
-    // Try to request fullscreen if supported
-    if (document.documentElement.requestFullscreen) {
-        document.documentElement.requestFullscreen().catch(() => {
-            // Fullscreen failed, that's OK
-        });
-    } else if (document.documentElement.webkitRequestFullscreen) {
-        document.documentElement.webkitRequestFullscreen().catch(() => {
-            // Fullscreen failed, that's OK
-        });
-    }
-}
 
-// Force fullscreen on page load
-window.addEventListener('load', forceFullScreen);
 
-// Sidebar toggle
+// ===================================
+// SIDEBAR NAVIGATION
+// ===================================
+
+/**
+ * Open sidebar menu and show overlay
+ */
 menuToggle.addEventListener('click', () => {
     sidebar.classList.add('open');
     overlay.classList.add('active');
 });
 
+/**
+ * Close sidebar menu using close button
+ */
 closeSidebar.addEventListener('click', () => {
     sidebar.classList.remove('open');
     overlay.classList.remove('active');
 });
 
+/**
+ * Close sidebar menu by clicking on overlay
+ */
 overlay.addEventListener('click', () => {
     sidebar.classList.remove('open');
     overlay.classList.remove('active');
 });
 
-// Placeholder handler for legal link
+// ===================================
+// LEGAL NOTICE POPUP
+// ===================================
+
+/**
+ * Handle legal notice link click
+ * Shows legal disclaimer popup and closes sidebar
+ */
 document.getElementById('legal-link').addEventListener('click', (e) => {
     e.preventDefault();
     showLegalNotice();
+    // Close sidebar after opening legal notice
     sidebar.classList.remove('open');
     overlay.classList.remove('active');
 });
 
+/**
+ * Create and display legal notice popup with disclaimer text
+ */
 function showLegalNotice() {
     const popup = document.createElement('div');
     popup.className = 'legal-popup';
@@ -227,12 +242,13 @@ function showLegalNotice() {
     
     document.body.appendChild(popup);
     
-    // Close popup handlers
+    // Set up close button handler
     const closeBtn = popup.querySelector('.legal-popup-close');
     closeBtn.addEventListener('click', () => {
         popup.remove();
     });
     
+    // Close popup when clicking outside content area
     popup.addEventListener('click', (e) => {
         if (e.target === popup) {
             popup.remove();
@@ -240,60 +256,114 @@ function showLegalNotice() {
     });
 }
 
-// Auto-resize textarea
+// ===================================
+// INPUT HANDLING & UI INTERACTIONS
+// ===================================
+
+/**
+ * Auto-resize textarea based on content
+ * Limits maximum height to prevent UI issues
+ */
 inputBox.addEventListener('input', function() {
     this.style.height = 'auto';
     this.style.height = Math.min(this.scrollHeight, 200) + 'px';
 });
 
-// Send message on Enter (Shift+Enter for new line)
+/**
+ * Handle keyboard input for sending messages
+ * Enter = send message, Shift+Enter = new line
+ */
 inputBox.addEventListener('keydown', function(e) {
     if (e.key === 'Enter' && !e.shiftKey) {
         e.preventDefault();
         sendMessage();
-        // Blur the input to trigger keyboard dismissal and scroll back
+        // Dismiss mobile keyboard and trigger scroll restoration
         this.blur();
     }
 });
 
-// Send button click
+/**
+ * Handle send button click
+ */
 sendButton.addEventListener('click', () => {
     console.log("Send button clicked");
     sendMessage();
-    // Blur the input to trigger keyboard dismissal and scroll back
+    // Dismiss mobile keyboard and trigger scroll restoration
     inputBox.blur();
 });
 
-// Suggestion cards click
+/**
+ * Handle suggestion card clicks
+ * Fills input with suggestion text and sends message
+ */
 document.querySelectorAll('.suggestion-card').forEach(card => {
     card.addEventListener('click', function() {
-        inputBox.value = this.querySelector('p').textContent;
+        const suggestionText = this.querySelector('p').textContent;
+        inputBox.value = suggestionText;
         sendMessage();
     });
 });
 
+// ===================================
+// MESSAGE SENDING & STREAMING
+// ===================================
+
+/**
+ * Main function to send user message and handle AI response
+ * Manages UI state, streaming response, and error handling
+ */
 async function sendMessage() {
     const question = inputBox.value.trim();
     
+    // Prevent sending empty messages or multiple simultaneous requests
     if (!question || isLoading) return;
     
-    // Hide empty state
+    // Hide welcome/empty state when first message is sent
     if (emptyState) {
         emptyState.style.display = 'none';
     }
     
-    // Get the previous assistant message (if exists) before adding new user message
-    const messages = chatContainer.querySelectorAll('.message.assistant');
-    
-    // Add user message
+    // Create and add user message to chat
     userMessageDiv = addMessage(question, 'user');
     
-    // Create assistant message container with loading spinner and padding to push question to top
+    // Create assistant message container with loading state
+    const messageDiv = createAssistantMessage();
+    chatContainer.appendChild(messageDiv);
+    
+    // Get message components for manipulation
+    const contentDiv = messageDiv.querySelector('.message-text');
+    const actionsDiv = messageDiv.querySelector('.message-actions');
+    
+    // Set up message action buttons (copy/share)
+    setupMessageActions(messageDiv, contentDiv);
+    
+    // Prepare UI for loading state
+    prepareUIForLoading();
+    
+    try {
+        // Send request to backend and handle streaming response
+        await handleStreamingResponse(question, contentDiv, actionsDiv);
+    } catch (error) {
+        console.error('Message sending error:', error);
+        contentDiv.textContent = 'Désolé, une erreur est survenue. Réessaie dans quelques instants.';
+    } finally {
+        // Clean up and restore UI state
+        cleanupAfterMessage(messageDiv);
+    }
+}
+
+/**
+ * Create assistant message container with loading spinner
+ * @returns {HTMLElement} The created message element
+ */
+function createAssistantMessage() {
     const messageDiv = document.createElement('div');
     messageDiv.className = 'message assistant';
-    // Add padding-bottom to create space that keeps question at top
+    
+    // Add padding to keep user question visible at top
     const containerHeight = chatContainer.clientHeight;
     messageDiv.style.paddingBottom = `${containerHeight - 50}px`;
+    
     messageDiv.innerHTML = `
         <div class="message-icon">Ben</div>
         <div class="message-content">
@@ -314,15 +384,25 @@ async function sendMessage() {
             </div>
         </div>
     `;
-    chatContainer.appendChild(messageDiv);
-    const contentDiv = messageDiv.querySelector('.message-text');
-    const actionsDiv = messageDiv.querySelector('.message-actions');
+    
+    return messageDiv;
+}
+
+/**
+ * Set up copy and share button functionality for a message
+ * @param {HTMLElement} messageDiv - The message container
+ * @param {HTMLElement} contentDiv - The message content element
+ */
+function setupMessageActions(messageDiv, contentDiv) {
     const copyBtn = messageDiv.querySelector('.copy-btn');
     const shareBtn = messageDiv.querySelector('.share-btn');
+    
+    // Copy message text to clipboard
     copyBtn.addEventListener('click', () => {
         navigator.clipboard.writeText(contentDiv.textContent);
     });
 
+    // Share message using Web Share API or fallback
     shareBtn.addEventListener('click', () => {
         if (navigator.share) {
             navigator.share({
@@ -332,84 +412,109 @@ async function sendMessage() {
             alert('Le partage n\'est pas supporté sur ce navigateur.');
         }
     });
-    
-    // Calculate scroll position to show the question without overlapping
-    // setTimeout(() => {
-    //     // Scroll to show the user message at the top
-    //     chatContainer.scrollTo({
-    //         top: userMessageDiv.offsetTop,
-    //         behavior: 'smooth'
-    //     });
-    // }, 100);
-    
-    // Clear input
+}
+
+/**
+ * Prepare UI for loading state during message sending
+ */
+function prepareUIForLoading() {
+    // Clear and reset input
     inputBox.value = '';
     inputBox.style.height = 'auto';
     
-    // Disable input
+    // Disable input controls during loading
     isLoading = true;
     sendButton.disabled = true;
     inputBox.disabled = true;
+}
+
+/**
+ * Handle streaming response from the server
+ * @param {string} question - The user's question
+ * @param {HTMLElement} contentDiv - Element to display response content
+ * @param {HTMLElement} actionsDiv - Element containing action buttons
+ */
+async function handleStreamingResponse(question, contentDiv, actionsDiv) {
+    const response = await fetch(`/query?question=${encodeURIComponent(question)}`, {
+        method: 'POST',
+    });
     
-    try {
-        // Send request to backend with streaming
-        const response = await fetch(`/query?question=${encodeURIComponent(question)}`, {
-            method: 'POST',
-        });
+    if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+    
+    // Process streaming response chunks
+    while (true) {
+        const { done, value } = await reader.read();
         
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+        if (done) {
+            // Streaming complete - show action buttons
+            actionsDiv.style.display = '';
+            break;
         }
         
-        const reader = response.body.getReader();
-        const decoder = new TextDecoder();
-        let buffer = '';
+        // Decode and process new data
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split('\n\n');
+        buffer = lines.pop() || ''; // Keep incomplete message in buffer
         
-        while (true) {
-            const { done, value } = await reader.read();
-            if (done) {
-                // Fin du streaming : afficher les contrôles
-                actionsDiv.style.display = '';
-                break;
-            }
-            buffer += decoder.decode(value, { stream: true });
-            const lines = buffer.split('\n\n');
-            // Keep the last incomplete message in buffer
-            buffer = lines.pop() || '';
-            for (const message of lines) {
-                if (!message.trim()) continue;
-                const dataMatch = message.match(/^data: (.+)$/m);
-                if (dataMatch) {
-                    try {
-                        const data = JSON.parse(dataMatch[1]);
-                        // Remove loading spinner on first chunk
-                        const loadingDiv = contentDiv.querySelector('.loading');
-                        if (loadingDiv) {
-                            contentDiv.textContent = '';
-                            // Keep padding - it will be filled by growing content
-                        }
-                        contentDiv.textContent += data.chunk;
-                        updateScrollIndicator();
-                    } catch (parseError) {
-                        console.error('Erreur de parsing:', parseError);
+        // Process each complete message line
+        for (const message of lines) {
+            if (!message.trim()) continue;
+            
+            const dataMatch = message.match(/^data: (.+)$/m);
+            if (dataMatch) {
+                try {
+                    const data = JSON.parse(dataMatch[1]);
+                    
+                    // Remove loading spinner on first content chunk
+                    const loadingDiv = contentDiv.querySelector('.loading');
+                    if (loadingDiv) {
+                        contentDiv.textContent = '';
                     }
+                    
+                    // Append new content chunk
+                    contentDiv.textContent += data.chunk;
+                    updateScrollIndicator();
+                } catch (parseError) {
+                    console.error('JSON parsing error:', parseError);
                 }
             }
         }
-        
-    } catch (error) {
-        console.error('Erreur:', error);
-        contentDiv.textContent = 'Désolé, une erreur est survenue. Réessaie dans quelques instants.';
-    } finally {
-        messageDiv.style.paddingBottom = `50px`;
-        // Re-enable input
-        isLoading = false;
-        sendButton.disabled = false;
-        inputBox.disabled = false;
-        updateScrollIndicator();
     }
 }
 
+/**
+ * Clean up UI state after message completion
+ * @param {HTMLElement} messageDiv - The message container to clean up
+ */
+function cleanupAfterMessage(messageDiv) {
+    // Restore normal padding
+    messageDiv.style.paddingBottom = '50px';
+    
+    // Re-enable input controls
+    isLoading = false;
+    sendButton.disabled = false;
+    inputBox.disabled = false;
+    
+    // Update scroll indicator
+    updateScrollIndicator();
+}
+
+// ===================================
+// UTILITY FUNCTIONS
+// ===================================
+
+/**
+ * Add a new message to the chat container
+ * @param {string} text - The message text content
+ * @param {string} role - Message role ('user' or 'assistant')
+ * @returns {HTMLElement} The created message element
+ */
 function addMessage(text, role) {
     const messageDiv = document.createElement('div');
     messageDiv.className = `message ${role}`;
@@ -418,12 +523,15 @@ function addMessage(text, role) {
         <div class="message-content">${escapeHtml(text)}</div>
     `;
     chatContainer.appendChild(messageDiv);
-    // Don't auto-scroll here, let sendMessage handle it
+    // Note: Scrolling is handled by the calling function for better control
     return messageDiv;
 }
 
-
-
+/**
+ * Escape HTML characters to prevent XSS attacks
+ * @param {string} text - Text to escape
+ * @returns {string} HTML-escaped text
+ */
 function escapeHtml(text) {
     const div = document.createElement('div');
     div.textContent = text;
