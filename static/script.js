@@ -9,9 +9,9 @@ const overlay = document.getElementById('overlay');
 const cookieBanner = document.getElementById('cookie-banner');
 const cookieAccept = document.getElementById('cookie-accept');
 const cookieDecline = document.getElementById('cookie-decline');
+let userMessageDiv = document.createElement('div');
 
 let isLoading = false;
-
 
 // Scroll input-area above mobile keyboard on focus
 inputBox.addEventListener('focus', function() {
@@ -41,29 +41,36 @@ inputBox.addEventListener('focus', function() {
     }, 300);
 });
 
-// // Scroll back to show header when keyboard disappears
-// inputBox.addEventListener('blur', function() {
-//     // When keyboard disappears, scroll back to top to show header
-//     setTimeout(() => {
-//         try {
-//             // Multiple approaches to scroll back to top
-//             document.documentElement.scrollTop = 0;
-//             document.body.scrollTop = 0;
-//             window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+// Scroll back to show header when keyboard disappears
+inputBox.addEventListener('blur', function() {
+    // When keyboard disappears, scroll back to top to show header
+    setTimeout(() => {
+        try {
+            // Multiple approaches to scroll back to top
+            document.documentElement.scrollTop = 0;
+            document.body.scrollTop = 0;
+            window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
             
-//             // Also scroll the chat container to latest messages
-//             const chatContainer = document.getElementById('chat-container');
-//             if (chatContainer) {
-//                 chatContainer.scrollTo({
-//                     top: chatContainer.scrollHeight,
-//                     behavior: 'smooth'
-//                 });
-//             }
-//         } catch (e) {
-//             console.log('Blur scroll failed:', e);
-//         }
-//     }, 300);
-// });
+            // Also scroll the chat container to latest messages
+            const chatContainer = document.getElementById('chat-container');
+            if (chatContainer) {
+                chatContainer.scrollTo({
+                    top: chatContainer.scrollHeight,
+                    behavior: 'smooth'
+                });
+                setTimeout(() => {
+                    if(userMessageDiv)
+                        chatContainer.scrollTo({
+                            top: userMessageDiv.offsetTop-70,
+                            behavior: 'smooth'
+                        });
+                    }, 100);
+            }
+        } catch (e) {
+            console.log('Blur scroll failed:', e);
+        }
+    }, 300);
+});
 
 // Scroll indicator
 const scrollIndicator = document.createElement('div');
@@ -243,19 +250,18 @@ inputBox.addEventListener('input', function() {
 inputBox.addEventListener('keydown', function(e) {
     if (e.key === 'Enter' && !e.shiftKey) {
         e.preventDefault();
-        // Blur the input to trigger keyboard dismissal and scroll back
-        // this.blur();
         sendMessage();
-        
+        // Blur the input to trigger keyboard dismissal and scroll back
+        this.blur();
     }
 });
 
 // Send button click
 sendButton.addEventListener('click', () => {
     console.log("Send button clicked");
-    // Blur the input to trigger keyboard dismissal and scroll back
-    // inputBox.blur();
     sendMessage();
+    // Blur the input to trigger keyboard dismissal and scroll back
+    inputBox.blur();
 });
 
 // Suggestion cards click
@@ -280,7 +286,7 @@ async function sendMessage() {
     const messages = chatContainer.querySelectorAll('.message.assistant');
     
     // Add user message
-    const userMessageDiv = addMessage(question, 'user');
+    userMessageDiv = addMessage(question, 'user');
     
     // Create assistant message container with loading spinner and padding to push question to top
     const messageDiv = document.createElement('div');
@@ -328,13 +334,13 @@ async function sendMessage() {
     });
     
     // Calculate scroll position to show the question without overlapping
-    setTimeout(() => {
-        // Scroll to show the user message at the top
-        chatContainer.scrollTo({
-            top: userMessageDiv.offsetTop-70,
-            behavior: 'smooth'
-        });
-    }, 100);
+    // setTimeout(() => {
+    //     // Scroll to show the user message at the top
+    //     chatContainer.scrollTo({
+    //         top: userMessageDiv.offsetTop,
+    //         behavior: 'smooth'
+    //     });
+    // }, 100);
     
     // Clear input
     inputBox.value = '';
