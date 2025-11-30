@@ -1,20 +1,15 @@
 from dotenv import load_dotenv
-from fastapi import FastAPI
-from fastapi.staticfiles import StaticFiles
-from fastapi.responses import HTMLResponse, StreamingResponse
-from fastapi.templating import Jinja2Templates
-from fastapi import Request
-from pydantic import BaseModel
-from core.query_chromadb import ask_question_stream
-import json
+from shared.core.base_agent import create_agent
+import os
 
 load_dotenv()
 
-app = FastAPI(title="Personal AI Agent")
+# Get agent name from environment or default to ben-nutritionist
+agent_name = os.getenv("AGENT_NAME", "ben-nutritionist")
 
-# Mount static files and templates
-app.mount("/static", StaticFiles(directory="static"), name="static")
-templates = Jinja2Templates(directory="templates")
+# Create the appropriate agent instance
+agent = create_agent(agent_name)
+app = agent.app
 
 class QueryRequest(BaseModel):
     question: str

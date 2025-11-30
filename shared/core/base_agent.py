@@ -82,6 +82,23 @@ class BaseAgent(ABC):
                 media_type="text/event-stream",
                 headers={"Cache-Control": "no-cache"}
             )
+        
+        @self.app.post("/update")
+        async def update_knowledge_base(limit: int = 10, enhance_with_ai: bool = False):
+            """Update agent's knowledge base with new content"""
+            try:
+                result = await self.update_knowledge_base(limit, enhance_with_ai)
+                return {
+                    "status": "success",
+                    "message": "Knowledge base updated successfully",
+                    **result
+                }
+            except Exception as e:
+                self.logger.error(f"Update failed: {e}")
+                return {
+                    "status": "error",
+                    "message": f"Failed to update knowledge base: {str(e)}"
+                }
     
     @abstractmethod
     async def process_query(self, question: str, language: str, context: Optional[Dict] = None) -> AsyncIterator[str]:
@@ -102,6 +119,14 @@ class BaseAgent(ABC):
     def get_features(self) -> List[str]:
         """Return list of agent features"""
         pass
+    
+    async def update_knowledge_base(self, limit: int = 10, enhance_with_ai: bool = False) -> Dict:
+        """Update agent's knowledge base - default implementation"""
+        return {
+            "processed_files": 0,
+            "new_documents": 0,
+            "message": "Update not implemented for this agent type"
+        }
 
 class NutritionAgent(BaseAgent):
     """Ben Nutritionist AI Agent"""
@@ -114,23 +139,56 @@ class NutritionAgent(BaseAgent):
     
     def _load_knowledge_base(self):
         """Load ChromaDB with nutrition documents"""
-        from core.query_chromadb import get_collection
-        self.collection = get_collection()
-        self.logger.info(f"Loaded nutrition knowledge base with {self.collection.count() if self.collection else 0} documents")
+        try:
+            import sys
+            sys.path.append(f"agents/{self.config.agent_name}")
+            from core.query_chromadb import get_collection
+            self.collection = get_collection()
+            self.logger.info(f"Loaded nutrition knowledge base with {self.collection.count() if self.collection else 0} documents")
+        except Exception as e:
+            self.logger.error(f"Failed to load knowledge base: {e}")
+            self.collection = None
     
     async def process_query(self, question: str, language: str, context: Optional[Dict] = None) -> AsyncIterator[str]:
         """Process nutrition query using ChromaDB and GPT-4"""
-        from core.query_chromadb import ask_question_stream
-        
-        async for chunk in ask_question_stream(question, language):
-            yield chunk
+        try:
+            import sys
+            sys.path.append(f"agents/{self.config.agent_name}")
+            from core.query_chromadb import ask_question_stream
+            
+            async for chunk in ask_question_stream(question, language):
+                yield chunk
+        except Exception as e:
+            yield f"Error processing query: {str(e)}"
     
     async def render_interface(self, request: Request):
         """Render nutrition interface"""
         return self.templates.TemplateResponse("index.html", {"request": request})
     
     def get_features(self) -> List[str]:
-        return ["nutrition_ai", "chromadb", "multilingual", "meal_planning"]
+        return ["nutrition_ai", "chromadb", "multilingual", "meal_planning", "document_updates"]
+    
+    async def update_knowledge_base(self, limit: int = 10, enhance_with_ai: bool = False) -> Dict:
+        """Update nutrition knowledge base with new documents"""
+        try:
+            import sys
+            sys.path.append(f"agents/{self.config.agent_name}")
+            from core.update_pipeline import run_update_pipeline
+            
+            result = await run_update_pipeline(limit=limit, enhance_with_ai=enhance_with_ai)
+            
+            # Reload the knowledge base after update
+            self._load_knowledge_base()
+            
+            return result
+        except Exception as e:
+            self.logger.error(f"Failed to update nutrition knowledge base: {e}")
+            return {
+                "processed_files": 0,
+                "new_documents": 0,
+                "errors": [str(e)],
+                "status": "failed"
+            }
 
 class FitnessAgent(BaseAgent):
     """Fitness Coach AI Agent"""

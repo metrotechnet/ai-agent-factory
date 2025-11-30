@@ -1,14 +1,44 @@
 #!/bin/bash
-# Ben Nutritionist AI Deployment Script for Linux/macOS
-# This script builds and deploys the Ben Nutritionist AI assistant to Google Cloud Run
 
-set -e  # Exit on any error
+# Universal deployment script for AI Agent Platform
+# Usage: ./deploy.sh <agent_name> <action>
 
-# Default configuration
-TAG=${TAG:-"latest"}
-PROJECT_ID=${PROJECT_ID:-"bennutritioniste-ai"}
-REGION=${REGION:-"us-east4"}
-SERVICE_NAME=${SERVICE_NAME:-"ben-nutritionist"}
+set -e
+
+# Color codes for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+# Print colored output
+print_status() {
+    echo -e "${BLUE}🚀 $1${NC}"
+}
+
+print_success() {
+    echo -e "${GREEN}✅ $1${NC}"
+}
+
+print_warning() {
+    echo -e "${YELLOW}⚠️  $1${NC}"
+}
+
+print_error() {
+    echo -e "${RED}❌ $1${NC}"
+}
+
+# Check if arguments are provided
+if [ $# -lt 2 ]; then
+    print_error "Usage: $0 <agent_name> <action>"
+    echo "Agent names: ben-nutritionist, fitness-coach, wellness-therapist, gateway"
+    echo "Actions: local, docker, build, gcp, test"
+    exit 1
+fi
+
+AGENT_NAME=$1
+ACTION=$2
 SKIP_BUILD=${SKIP_BUILD:-"false"}
 
 # Colors for output

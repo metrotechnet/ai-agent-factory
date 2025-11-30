@@ -1,0 +1,17 @@
+fastapi
+uvicorn
+openai
+python-multipart
+pydantic
+ffmpeg-python
+pydub
+tqdm
+pillow
+pytesseract
+whisper
+python-dotenv
+jinja2
+chromadb
+python-docx
+google-cloud-storage==2.10.0
+google-cloud-firestore==2.13.1
