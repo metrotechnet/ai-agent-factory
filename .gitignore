@@ -62,6 +62,9 @@ tmp/
 *.tfstate.*
 .terraform/
 .terraform.lock.hcl
+**/.terraform/**
+**/terraform-provider-*
+**/*.exe
 
 # Test artifacts
 test_*.txt
