@@ -18,8 +18,9 @@ ai-agent/
 ## 🤖 Available Agents
 
 ### 🥗 Ben Boulanger - Nutrition Expert
+- **Live URL**: https://ben-nutritionist-prod-159044106998.us-east4.run.app
 - **Expertise**: 842+ indexed nutrition documents
-- **Features**: ChromaDB vector search, multilingual support
+- **Features**: ChromaDB vector search, multilingual support  
 - **Specialties**: Meal planning, supplement advice, dietary restrictions
 
 ### 💪 Fitness Coach  

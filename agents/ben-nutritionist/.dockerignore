@@ -1,0 +1,14 @@
+# Exclude large database and document files from Docker build
+chroma_db/
+documents/
+tests/
+scripts/
+__pycache__/
+*.pyc
+.env
+.env.example
+startup.sh
+static/
+templates/
+config/
+core/__pycache__/

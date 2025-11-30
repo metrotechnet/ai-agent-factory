@@ -23,7 +23,7 @@ app.add_middleware(
 
 # Agent service URLs (from environment or config)
 AGENT_SERVICES = {
-    "nutrition": os.getenv("NUTRITION_SERVICE_URL", "https://ben-nutritionist.run.app"),
+    "nutrition": os.getenv("NUTRITION_SERVICE_URL", "https://ben-nutritionist-prod-159044106998.us-east4.run.app"),
     "fitness": os.getenv("FITNESS_SERVICE_URL", "https://fitness-coach.run.app"),
 }
 

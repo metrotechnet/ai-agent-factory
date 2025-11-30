@@ -4,15 +4,15 @@ variable "project_id" {
 }
 
 variable "region" {
-  description = "GCP region (ex: us-central1)"
+  description = "GCP region (ex: us-east4)"
   type        = string
-  default     = "us-central1"
+  default     = "us-east4"
 }
 
 variable "zone" {
   description = "GCP zone"
   type        = string
-  default     = "us-central1-a"
+  default     = "us-east4-a"
 }
 
 variable "env" {
@@ -22,7 +22,7 @@ variable "env" {
 }
 
 variable "container_image" {
-  description = "Full container image URL (Artifact Registry or gcr). Example: us-central1-docker.pkg.dev/<proj>/repo/image:tag"
+  description = "Full container image URL (Artifact Registry or gcr). Example: us-east4-docker.pkg.dev/<proj>/repo/image:tag"
   type        = string
   default     = ""
 }
@@ -35,7 +35,7 @@ variable "service_name" {
 variable "location_firestore" {
   description = "Firestore location (same as region best practice)"
   type        = string
-  default     = "us-central"
+  default     = "us-east4"
 }
 
 variable "openai_api_key" {
