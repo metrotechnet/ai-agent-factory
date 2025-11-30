@@ -207,7 +207,6 @@ Add your agent to the enum:
 class AgentType(Enum):
     NUTRITION = "nutrition"
     FITNESS = "fitness" 
-    WELLNESS = "wellness"
     YOUR_AGENT = "your_agent"  # Add your agent
 ```
 

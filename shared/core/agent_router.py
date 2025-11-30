@@ -50,26 +50,11 @@ async def ask_fitness_question_stream(question: str, language: str = "en") -> As
     except Exception as e:
         yield f"Error in fitness agent: {str(e)}"
 
-async def ask_wellness_question_stream(question: str, language: str = "en") -> AsyncIterator[str]:
-    """Import and call wellness agent dynamically"""
-    try:
-        import importlib.util
-        spec = importlib.util.spec_from_file_location(
-            "query_wellness", 
-            project_root / "agents" / "wellness-therapist" / "core" / "query_wellness.py"
-        )
-        module = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(module)
-        
-        async for chunk in module.ask_wellness_question_stream(question, language):
-            yield chunk
-    except Exception as e:
-        yield f"Error in wellness agent: {str(e)}"
+
 
 class AgentType(Enum):
     NUTRITION = "nutrition"
     FITNESS = "fitness"
-    WELLNESS = "wellness"
 
 class AgentRouter:
     """Routes user queries to appropriate specialized agents"""
@@ -77,8 +62,7 @@ class AgentRouter:
     def __init__(self):
         self.agent_handlers = {
             AgentType.NUTRITION: ask_nutrition_question_stream,
-            AgentType.FITNESS: ask_fitness_question_stream,
-            AgentType.WELLNESS: ask_wellness_question_stream
+            AgentType.FITNESS: ask_fitness_question_stream
         }
         
         # Keywords for automatic routing
@@ -92,11 +76,6 @@ class AgentRouter:
                 "workout", "exercise", "fitness", "training", "gym", "muscle",
                 "strength", "cardio", "running", "weight", "reps", "sets",
                 "sports", "athletic", "performance", "endurance"
-            ],
-            AgentType.WELLNESS: [
-                "stress", "anxiety", "depression", "mental health", "meditation",
-                "mindfulness", "therapy", "wellness", "self-care", "burnout",
-                "sleep", "relaxation", "breathing", "emotional", "mood"
             ]
         }
     

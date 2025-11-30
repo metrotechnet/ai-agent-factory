@@ -32,7 +32,7 @@ print_error() {
 # Check if arguments are provided
 if [ $# -lt 2 ]; then
     print_error "Usage: $0 <agent_name> <action>"
-    echo "Agent names: ben-nutritionist, fitness-coach, wellness-therapist, gateway"
+    echo "Agent names: ben-nutritionist, fitness-coach, gateway"
     echo "Actions: local, docker, build, gcp, test"
     exit 1
 fi

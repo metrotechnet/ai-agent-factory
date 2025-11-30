@@ -30,15 +30,6 @@ def get_agent_config(agent_name: str) -> Dict:
             "special_files": [],
             "docker_tag": "fitness-coach"
         },
-        "wellness-therapist": {
-            "display_name": "Wellness Therapist", 
-            "port": 8082,
-            "env_vars": {
-                "OPENAI_API_KEY": True,
-            },
-            "special_files": [],
-            "docker_tag": "wellness-therapist"
-        },
         "gateway": {
             "display_name": "API Gateway",
             "port": 8000,
@@ -228,7 +219,7 @@ def deploy_gcp(agent_name: str, config: Dict) -> None:
 def main():
     if len(sys.argv) < 3:
         print("Usage: python deploy.py <agent_name> <action>")
-        print("Agent names: ben-nutritionist, fitness-coach, wellness-therapist, gateway")
+        print("Agent names: ben-nutritionist, fitness-coach, gateway")
         print("Actions: local, docker, build, gcp")
         sys.exit(1)
     

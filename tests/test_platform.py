@@ -21,10 +21,8 @@ async def test_agent_router():
     test_queries = [
         ("What should I eat for breakfast?", AgentType.NUTRITION),
         ("I need a workout plan", AgentType.FITNESS),
-        ("I'm feeling stressed", AgentType.WELLNESS),
         ("How many calories in an apple?", AgentType.NUTRITION),
         ("Best exercises for abs", AgentType.FITNESS),
-        ("Meditation techniques", AgentType.WELLNESS),
     ]
     
     for query, expected_agent in test_queries:
@@ -64,7 +62,7 @@ async def test_gateway_api():
                 print(f"❌ Health check failed: {response.status_code}")
             
             # Test agent info endpoints
-            for agent_type in ["nutrition", "fitness", "wellness"]:
+            for agent_type in ["nutrition", "fitness"]:
                 response = await client.get(f"{base_url}/agents/{agent_type}")
                 if response.status_code == 200:
                     agent_info = response.json()

@@ -25,14 +25,12 @@ app.add_middleware(
 AGENT_SERVICES = {
     "nutrition": os.getenv("NUTRITION_SERVICE_URL", "https://ben-nutritionist.run.app"),
     "fitness": os.getenv("FITNESS_SERVICE_URL", "https://fitness-coach.run.app"),
-    "wellness": os.getenv("WELLNESS_SERVICE_URL", "https://wellness-therapist.run.app"),
 }
 
 # Agent routing logic
 AGENT_KEYWORDS = {
     "nutrition": ["nutrition", "food", "diet", "meal", "vitamin", "calorie", "recipe", "eating"],
     "fitness": ["workout", "exercise", "fitness", "training", "muscle", "cardio", "strength"],
-    "wellness": ["stress", "anxiety", "meditation", "sleep", "mental", "therapy", "mindfulness"],
 }
 
 def classify_query(question: str) -> str:

@@ -1,6 +1,6 @@
 # Multi-Agent AI Platform 🤖
 
-A scalable multi-agent architecture where specialized AI assistants can be deployed and managed independently while sharing common infrastructure. Currently featuring Ben Boulanger's nutrition expertise, fitness coaching, and wellness therapy.
+A scalable multi-agent architecture where specialized AI assistants can be deployed and managed independently while sharing common infrastructure. Currently featuring Ben Boulanger's nutrition expertise and fitness coaching.
 
 ## 🏗️ Architecture Overview
 
@@ -26,11 +26,6 @@ ai-agent/
 - **Expertise**: Workout planning and exercise guidance
 - **Features**: Progressive workout plans, form coaching
 - **Specialties**: Strength training, cardio, injury prevention
-
-### 🧘 Wellness Therapist
-- **Expertise**: Mental health and mindfulness
-- **Features**: Stress management, meditation guidance  
-- **Specialties**: Anxiety support, work-life balance, emotional wellness
 
 ## 🚀 **Quick Start**
 

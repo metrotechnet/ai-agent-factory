@@ -94,11 +94,6 @@ async def agent_info(agent_type: str):
             "name": "Fitness Coach",
             "description": "Professional fitness trainer specializing in workout plans and exercise guidance",
             "specialties": ["Workout planning", "Exercise techniques", "Injury prevention", "Fitness goals"]
-        },
-        "wellness": {
-            "name": "Wellness Therapist", 
-            "description": "Mental health and wellness specialist focused on stress management and mindfulness",
-            "specialties": ["Stress management", "Meditation guidance", "Mental health support", "Work-life balance"]
         }
     }
     
