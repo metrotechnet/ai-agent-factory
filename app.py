@@ -1,15 +1,20 @@
 from dotenv import load_dotenv
-from shared.core.base_agent import create_agent
-import os
+from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import HTMLResponse, StreamingResponse
+from fastapi.templating import Jinja2Templates
+from fastapi import Request
+from pydantic import BaseModel
+from core.query_chromadb import ask_question_stream
+import json
 
 load_dotenv()
 
-# Get agent name from environment or default to ben-nutritionist
-agent_name = os.getenv("AGENT_NAME", "ben-nutritionist")
+app = FastAPI(title="Personal AI Agent")
 
-# Create the appropriate agent instance
-agent = create_agent(agent_name)
-app = agent.app
+# Mount static files and templates
+app.mount("/static", StaticFiles(directory="static"), name="static")
+templates = Jinja2Templates(directory="templates")
 
 class QueryRequest(BaseModel):
     question: str
@@ -44,12 +49,7 @@ def home(request: Request):
 
 @app.get("/health")
 def health():
-    return {
-        "service": "ben-nutritionist-agent",
-        "status": "healthy", 
-        "version": "2.0.0",
-        "features": ["nutrition_ai", "chromadb", "multilingual"]
-    }
+    return {"status": "ok"}
 
 if __name__ == "__main__":
     import uvicorn

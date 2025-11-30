@@ -1,58 +1,24 @@
-# Multi-Agent AI Platform 🤖
+# Ben Boulanger AI Agent 🧠
 
-A scalable multi-agent architecture where specialized AI assistants can be deployed and managed independently while sharing common infrastructure. Currently featuring Ben Boulanger's nutrition expertise and fitness coaching.
+An intelligent personal AI assistant that processes transcripts and documents, providing expert nutritional and wellness guidance through advanced RAG (Retrieval Augmented Generation) technology.
 
-## 🏗️ Architecture Overview
+## 🚀 Features
+
+- 📄 **Document Processing**: Extract and index content from Word documents and transcripts
+- 🔍 **Semantic Search**: ChromaDB vector database for intelligent document retrieval
+- 🤖 **AI-Powered Responses**: GPT-4 integration with Ben Boulanger's expertise
+- 🌐 **Multilingual Support**: French and English interface and responses
+- ⚡ **Real-time Streaming**: FastAPI with Server-Sent Events for responsive chat
+- 🎨 **Modern UI**: Clean, intuitive web interface
+- 🔒 **Secure Configuration**: External JSON configs with protected access
+
+## 📁 Project Structure
 
 ```
-ai-agent/
-├── agents/                    # Individual AI agents
-│   ├── ben-nutritionist/     # Ben Boulanger nutrition expert
-│   ├── fitness-coach/        # Fitness and workout specialist  
-│   └── wellness-therapist/   # Mental health and wellness
-├── gateway/                  # API Gateway and routing
-├── shared/                   # Shared components
-└── infrastructure/           # Terraform and deployment
-```
-
-## 🤖 Available Agents
-
-### 🥗 Ben Boulanger - Nutrition Expert
-- **Live URL**: https://ben-nutritionist-prod-159044106998.us-east4.run.app
-- **Expertise**: 842+ indexed nutrition documents
-- **Features**: ChromaDB vector search, multilingual support  
-- **Specialties**: Meal planning, supplement advice, dietary restrictions
-
-### 💪 Fitness Coach  
-- **Expertise**: Workout planning and exercise guidance
-- **Features**: Progressive workout plans, form coaching
-- **Specialties**: Strength training, cardio, injury prevention
-
-## 🚀 **Quick Start**
-
-### **1. Environment Setup**
-```bash
-# Install dependencies
-pip install -r requirements.txt
-
-# Set environment variables
-export OPENAI_API_KEY="your-key"
-export GOOGLE_CLOUD_PROJECT="your-project"
-```
-
-### **2. Run API Gateway**
-```bash
-cd gateway
-python main.py
-```
-
-### **3. Run Individual Agent**
-```bash
-cd agents/ben-nutritionist
-python app.py
-```
-
-## 📁 **Project Structure**
+benboulanger.ai/
+├── core/                    # Core business logic
+│   └── query_chromadb.py   # Main AI processing engine
+├── tests/                  # Unit tests and validation
 ├── scripts/               # Utility scripts
 │   ├── extract_docx.py    # Document extraction
 │   ├── index_chromadb.py  # Database indexing
