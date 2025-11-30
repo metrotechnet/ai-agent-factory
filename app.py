@@ -49,7 +49,12 @@ def home(request: Request):
 
 @app.get("/health")
 def health():
-    return {"status": "ok"}
+    return {
+        "service": "ben-nutritionist-agent",
+        "status": "healthy", 
+        "version": "2.0.0",
+        "features": ["nutrition_ai", "chromadb", "multilingual"]
+    }
 
 if __name__ == "__main__":
     import uvicorn
