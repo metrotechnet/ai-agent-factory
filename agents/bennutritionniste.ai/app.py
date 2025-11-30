@@ -7,6 +7,8 @@ from fastapi import Request
 from pydantic import BaseModel
 from core.query_chromadb import ask_question_stream
 import json
+from core.pipeline import run_pipeline
+
 
 load_dotenv()
 
@@ -51,6 +53,10 @@ def home(request: Request):
 def health():
     return {"status": "ok"}
 
+@app.post("/update")
+def update_pipeline(limit: int = 5):
+    run_pipeline(limit=limit)
+    return {"status": "Pipeline exécuté, nouvelles vidéos indexées"}
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8001)

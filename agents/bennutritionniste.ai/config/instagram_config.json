@@ -1,0 +1,16 @@
+{
+  "instagram": {
+    "user": "ton_user",
+    "password": "ton_mdp",
+    "target_account": "compte_cible"
+  },
+  "openai": {
+    "api_key_env": "OPENAI_API_KEY",
+    "api_key_fallback": "TA_CLE_OPENAI"
+  },
+  "directories": {
+    "video_dir": "instagram_videos",
+    "transcripts_dir": "transcripts",
+    "chroma_db_dir": "chroma_db"
+  }
+}
