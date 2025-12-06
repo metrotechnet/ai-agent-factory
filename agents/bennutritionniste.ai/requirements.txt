@@ -13,3 +13,7 @@ python-dotenv
 jinja2
 chromadb
 python-docx
+instagrapi
+google-generativeai
+google-cloud-aiplatform
+google-cloud-storage

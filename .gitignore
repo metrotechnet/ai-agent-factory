@@ -26,6 +26,7 @@ deploy.bat
 deploy-only.bat
 build.bat
 
+
 # Data folders
 videos/
 transcripts/

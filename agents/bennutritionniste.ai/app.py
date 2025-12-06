@@ -5,18 +5,22 @@ from fastapi.responses import HTMLResponse, StreamingResponse
 from fastapi.templating import Jinja2Templates
 from fastapi import Request
 from pydantic import BaseModel
-from core.query_chromadb import ask_question_stream
+from core.query_chromadb import ask_question_stream, ask_question_stream_gemini
+from core.query_vertexaidb import ask_question_stream_vertex, ask_question_stream_vertex_gemini
 import json
-from core.pipeline import run_pipeline
+from pathlib import Path
+from core.pipeline_instagram import run_pipeline
 
-
-load_dotenv()
+# Load environment variables from the correct location
+PROJECT_ROOT = Path(__file__).parent
+env_path = PROJECT_ROOT / '.env'
+load_dotenv(dotenv_path=env_path)
 
 app = FastAPI(title="Personal AI Agent")
 
-# Mount static files and templates
-app.mount("/static", StaticFiles(directory="static"), name="static")
-templates = Jinja2Templates(directory="templates")
+# Mount static files and templates with absolute paths
+app.mount("/static", StaticFiles(directory=str(PROJECT_ROOT / "static")), name="static")
+templates = Jinja2Templates(directory=str(PROJECT_ROOT / "templates"))
 
 class QueryRequest(BaseModel):
     question: str
@@ -53,10 +57,26 @@ def home(request: Request):
 def health():
     return {"status": "ok"}
 
+@app.get("/api/get_config")
+def get_translations():
+    """Get translations for the frontend"""
+    try:
+        translations_path = Path(__file__).parent / "config" / "config.json"
+        with open(translations_path, 'r', encoding='utf-8') as f:
+            translations = json.load(f)
+        return translations
+    except FileNotFoundError:
+        return {"error": "config not found"}
+    except Exception as e:
+        return {"error": f"Error loading config: {str(e)}"}
+
 @app.post("/update")
 def update_pipeline(limit: int = 5):
     run_pipeline(limit=limit)
     return {"status": "Pipeline exécuté, nouvelles vidéos indexées"}
+
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8001)
+    import os
+    port = int(os.environ.get("PORT", 8080))
+    uvicorn.run(app, host="0.0.0.0", port=port)

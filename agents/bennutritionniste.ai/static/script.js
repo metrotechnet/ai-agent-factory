@@ -6,20 +6,40 @@ let translations = {};
 let currentLanguage = 'fr';
 
 /**
+ * Get URL parameter by name
+ */
+function getUrlParameter(name) {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get(name);
+}
+
+/**
  * Load translations from JSON file
  */
 async function loadTranslations() {
     try {
-        const response = await fetch('/static/translations.json');
+        const response = await fetch('/api/get_config');
         translations = await response.json();
         
-        // Detect browser language
+        // Language detection priority: URL parameter > browser language > stored preference
+        const urlLang = getUrlParameter('lang');
         const browserLang = navigator.language || navigator.userLanguage;
         const langCode = browserLang.startsWith('en') ? 'en' : 'fr';
-        
-        // Check for stored language preference
         const storedLang = localStorage.getItem('preferredLanguage');
-        currentLanguage = storedLang || langCode;
+        
+        // Validate URL language parameter
+        if (urlLang && (urlLang === 'en' || urlLang === 'fr')) {
+            currentLanguage = urlLang;
+            // Update stored preference when URL parameter is used
+            localStorage.setItem('preferredLanguage', urlLang);
+        } else {
+            // Favor browser language over stored preference when no URL argument
+            currentLanguage = langCode || storedLang;
+            // Ensure URL parameter is set even when using browser/stored preference
+            const url = new URL(window.location);
+            url.searchParams.set('lang', currentLanguage);
+            window.history.replaceState({}, '', url);
+        }
         
         // Apply translations
         applyTranslations(currentLanguage);
@@ -71,6 +91,15 @@ function applyTranslations(lang) {
         }
     });
     
+    // Update src attributes
+    document.querySelectorAll('[data-i18n-src]').forEach(element => {
+        const key = element.getAttribute('data-i18n-src');
+        const translation = getNestedValue(langData, key);
+        if (translation) {
+            element.src = translation;
+        }
+    });
+    
     // Update document title
     const titleElement = document.querySelector('title[data-i18n]');
     if (titleElement) {
@@ -97,6 +126,12 @@ function getNestedValue(obj, path) {
 function switchLanguage(lang) {
     currentLanguage = lang;
     localStorage.setItem('preferredLanguage', lang);
+    
+    // Update URL parameter
+    const url = new URL(window.location);
+    url.searchParams.set('lang', lang);
+    window.history.replaceState({}, '', url);
+    
     applyTranslations(lang);
 }
 

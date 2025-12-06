@@ -1,5 +1,9 @@
 import os
 from docx import Document
+from pathlib import Path
+
+# Get project root directory
+PROJECT_ROOT = Path(__file__).parent.parent
 
 def extract_text_from_docx(docx_path):
     """Extract text from a Word document"""
@@ -10,7 +14,7 @@ def extract_text_from_docx(docx_path):
             full_text.append(para.text)
     return '\n'.join(full_text)
 
-def extract_all_documents(folder_path, output_folder="transcripts_extracted"):
+def extract_all_documents(folder_path, output_folder=str(PROJECT_ROOT / "transcripts")):
     """Extract text from all .docx files and save as .txt"""
     os.makedirs(output_folder, exist_ok=True)
     
@@ -49,4 +53,4 @@ if __name__ == "__main__":
     else:
         print(f"Extracting documents from: {transcript_folder}\n")
         extract_all_documents(transcript_folder)
-        print("\n✅ Extraction complete! Check the 'transcripts_extracted' folder")
+        print("\n✅ Extraction complete! Check the 'transcripts' folder")

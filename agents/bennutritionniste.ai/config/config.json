@@ -5,7 +5,7 @@
       "description": "Assistant IA de Ben Boulanger, nutritionniste"
     },
     "header": {
-      "title": "Ben - Nutritionniste",
+      "title": "Ben - Nutritionniste (version démo)",
       "menuButton": "Menu"
     },
     "sidebar": {
@@ -20,7 +20,8 @@
       "title": "Salut ! Je m'appelle Ben et je suis nutritionniste",
       "description": "Dans mes temps libres, j'entraîne des humains… et des IA. J'ai coaché cette machine pour qu'elle réponde à vos questions.",
       "disclaimer": "Elle apprend vite, mais souvenez-vous : elle ne remplacera jamais une vraie consultation. 💪",
-      "profileAlt": "Ben Nutritionniste"
+      "profileAlt": "Ben Nutritionniste",
+      "profileImage": "/static/ben.nutritioniste.jpg"
     },
     "suggestions": {
       "nutrition": {
@@ -83,7 +84,7 @@
       "description": "AI Assistant of Ben Boulanger, nutritionist"
     },
     "header": {
-      "title": "Ben - Nutritionist",
+      "title": "Ben - Nutritionist (Demo Version)",
       "menuButton": "Menu"
     },
     "sidebar": {
@@ -98,7 +99,8 @@
       "title": "Hi! I'm Ben and I'm a nutritionist",
       "description": "In my free time, I train humans… and AIs. I coached this machine to answer your questions.",
       "disclaimer": "It learns fast, but remember: it will never replace a real consultation. 💪",
-      "profileAlt": "Ben Nutritionist"
+      "profileAlt": "Ben Nutritionist",
+      "profileImage": "/static/ben.nutritioniste.jpg"
     },
     "suggestions": {
       "nutrition": {

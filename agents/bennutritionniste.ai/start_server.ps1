@@ -2,19 +2,16 @@
 Write-Host "Starting Ben Boulanger AI Agent Server..." -ForegroundColor Green
 Write-Host ""
 
-# Check if env exists, fallback to venv
-$envPath = if (Test-Path ".\env\Scripts\python.exe") { ".\env" } else { ".\venv" }
+# Use the parent-level virtual environment that VS Code is configured to use
+$envPath = "..\..\\.venv"
 
 if (-Not (Test-Path "$envPath\Scripts\python.exe")) {
-    Write-Host "❌ Virtual environment not found. Creating..." -ForegroundColor Red
-    python -m venv env
-    $envPath = ".\env"
-    Write-Host "✅ Virtual environment created." -ForegroundColor Green
+    Write-Host "❌ Parent virtual environment not found at $envPath" -ForegroundColor Red
+    Write-Host "Please ensure the virtual environment is set up at the agent-factory level." -ForegroundColor Yellow
+    exit 1
 }
 
-# Activate virtual environment and install dependencies
-Write-Host "Activating virtual environment ($envPath)..." -ForegroundColor Cyan
-& "$envPath\Scripts\Activate.ps1"
+Write-Host "Using virtual environment: $envPath" -ForegroundColor Cyan
 
 # Check if dependencies are installed
 Write-Host "Checking dependencies..." -ForegroundColor Cyan
@@ -26,7 +23,7 @@ if ($uvicornCheck -ne "OK") {
 }
 
 # Start the server
-Write-Host "Starting uvicorn server on http://localhost:8001..." -ForegroundColor Cyan
+Write-Host "Starting uvicorn server on http://localhost:8080..." -ForegroundColor Cyan
 Write-Host ""
 & "$envPath\Scripts\python.exe" app.py
 

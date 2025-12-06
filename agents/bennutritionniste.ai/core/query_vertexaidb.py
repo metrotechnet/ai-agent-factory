@@ -4,12 +4,14 @@ from pathlib import Path
 from dotenv import load_dotenv
 from openai import OpenAI
 import chromadb
-from chromadb.config import Settings
 import google.generativeai as genai
 
 # Get project root directory
 PROJECT_ROOT = Path(__file__).parent.parent
-load_dotenv(dotenv_path=PROJECT_ROOT / '.env')
+
+# Load environment variables from the correct location
+env_path = PROJECT_ROOT / '.env'
+load_dotenv(dotenv_path=env_path, override=True)
 
 # Initialize ChromaDB client (local storage)
 chroma_client = None
@@ -17,7 +19,16 @@ collection = None
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 
+# Initialize Vertex AI
+project_id = os.getenv("GCP_PROJECT_ID")
+location = os.getenv("GCP_REGION")
+index_id = os.getenv("VERTEX_INDEX_ID")
+endpoint_id = os.getenv("VERTEX_ENDPOINT_ID")
+deployed_index_id=os.getenv("VERTEX_DEPLOYED_INDEX_ID")
 
+# Vertex AI Vector Search client (lazy initialization)
+vertex_ai_index = None
+vertex_ai_endpoint = None
 
 def load_style_guides():
     """Load style guides from JSON file"""
@@ -57,42 +68,77 @@ def load_system_prompts():
         print(f"Error loading system prompts: {e}")
         return {}
 
-def get_collection():
-    global chroma_client, collection
-    if collection is None:
-        try:
-            import os
-            chroma_path = str(PROJECT_ROOT / "chroma_db")
-            
-            # Create ChromaDB client with optimized settings for Cloud Run
-            chroma_client = chromadb.PersistentClient(
-                path=chroma_path,
-                settings=Settings(
-                    anonymized_telemetry=False,
-                    allow_reset=False
-                )
-            )
-            
-            # Get collection (will create if doesn't exist)
-            try:
-                collection = chroma_client.get_collection(name="transcripts")
-                print(f"Collection 'transcripts' loaded with {collection.count()} documents")
-            except:
-                print("Creating new transcripts collection...")
-                collection = chroma_client.create_collection(name="transcripts")
-                print("Empty collection created")
-                
-        except Exception as e:
-            print(f"ChromaDB error: {e}")
-            return None
-    return collection
 
-def ask_question_stream(question, language="fr", timezone="UTC", locale="fr-FR", top_k=5):
-    """Streaming version of ask_question with language support"""
-    col = get_collection()
+# ============================================================================
+# VERTEX AI VECTOR SEARCH FUNCTIONS
+# ============================================================================
+
+def get_vertex_ai_index():
+    """Initialize and return Vertex AI Vector Search index client."""
+    global vertex_ai_index, vertex_ai_endpoint
     
-    if col is None:
-        yield "Error: ChromaDB collection is not available. Please run 'python index_chromadb.py' first to index your documents."
+    if vertex_ai_index is None or vertex_ai_endpoint is None:
+        try:
+            from google.cloud import aiplatform
+            from google.cloud.aiplatform import MatchingEngineIndex, MatchingEngineIndexEndpoint
+            
+
+
+            
+            if not index_id or not endpoint_id:
+                print("Error: VERTEX_INDEX_ID and VERTEX_ENDPOINT_ID must be set in environment")
+                return None, None
+            
+            aiplatform.init(project=project_id, location=location)
+            
+            # Get index and endpoint
+            vertex_ai_index = MatchingEngineIndex(index_name=index_id)
+            vertex_ai_endpoint = MatchingEngineIndexEndpoint(index_endpoint_name=endpoint_id)
+            
+            print(f"Vertex AI Vector Search initialized: {index_id}")
+            
+        except Exception as e:
+            print(f"Vertex AI initialization error: {e}")
+            return None, None
+    
+    return vertex_ai_index, vertex_ai_endpoint
+
+
+def query_vertex_ai(query_embedding, top_k=5):
+    """Query Vertex AI Vector Search with an embedding vector."""
+    try:
+        _, endpoint = get_vertex_ai_index()
+        
+        if endpoint is None:
+            return None
+        
+        # Query the index
+        response = endpoint.find_neighbors(
+            deployed_index_id=deployed_index_id,
+            queries=[query_embedding],
+            num_neighbors=top_k
+        )
+        
+        # Extract documents from response
+        documents = []
+        for neighbor in response[0]:
+            # Assuming metadata contains the document text
+            doc_text = neighbor.id  # or neighbor.metadata.get('text', '')
+            documents.append(doc_text)
+        
+        return documents
+        
+    except Exception as e:
+        print(f"Vertex AI query error: {e}")
+        return None
+
+
+def ask_question_stream_vertex(question, language="fr", timezone="UTC", locale="fr-FR", top_k=5):
+    """Streaming version using Vertex AI Vector Search with OpenAI."""
+    _, endpoint = get_vertex_ai_index()
+    
+    if endpoint is None:
+        yield "Error: Vertex AI Vector Search is not available. Please configure VERTEX_INDEX_ID and VERTEX_ENDPOINT_ID."
         return
     
     try:
@@ -102,21 +148,15 @@ def ask_question_stream(question, language="fr", timezone="UTC", locale="fr-FR",
             input=question
         ).data[0].embedding
         
-        # Query ChromaDB
-        results = col.query(
-            query_embeddings=[query_emb],
-            n_results=top_k
-        )
+        # Query Vertex AI Vector Search
+        documents = query_vertex_ai(query_emb, top_k=top_k)
         
-        if not results['documents'] or not results['documents'][0]:
-            yield "No relevant information found. Please make sure you have indexed some transcripts."
+        if not documents or len(documents) == 0:
+            yield "No relevant information found in Vertex AI Vector Search."
             return
         
         # Build context from results
-        contexts = []
-        for i, doc in enumerate(results['documents'][0]):
-            contexts.append(doc)
-        context = "\n\n".join(contexts)
+        context = "\n\n".join(documents)
         
         # Load Style Card from JSON based on language
         style_guides, style_data = load_style_guides()
@@ -190,39 +230,33 @@ def ask_question_stream(question, language="fr", timezone="UTC", locale="fr-FR",
                     yield content
         
     except Exception as e:
-        yield f"Error processing your question: {str(e)}"
+        yield f"Error processing your question (Vertex AI): {str(e)}"
 
 
-def ask_question_stream_gemini(question, language="fr", timezone="UTC", locale="fr-FR", top_k=5, model_name="gemini-2.5-flash"):
-    """Streaming answer using Gemini, mirroring ask_question_stream flow."""
-    col = get_collection()
-
-    if col is None:
-        yield "Error: ChromaDB collection is not available. Please run 'python index_chromadb.py' first to index your documents."
+def ask_question_stream_vertex_gemini(question, language="fr", timezone="UTC", locale="fr-FR", top_k=5, model_name="gemini-2.5-flash"):
+    """Streaming version using Vertex AI Vector Search with Gemini."""
+    _, endpoint = get_vertex_ai_index()
+    
+    if endpoint is None:
+        yield "Error: Vertex AI Vector Search is not available. Please configure VERTEX_INDEX_ID and VERTEX_ENDPOINT_ID."
         return
-
+    
     try:
-        # Get embedding for the question using OpenAI (keeps Chroma flow unchanged)
+        # Get embedding for the question using OpenAI (for consistency)
         query_emb = client.embeddings.create(
             model="text-embedding-3-large",
             input=question
         ).data[0].embedding
 
-        # Query ChromaDB
-        results = col.query(
-            query_embeddings=[query_emb],
-            n_results=top_k
-        )
-
-        if not results['documents'] or not results['documents'][0]:
-            yield "No relevant information found. Please make sure you have indexed some transcripts."
+        # Query Vertex AI Vector Search
+        documents = query_vertex_ai(query_emb, top_k=top_k)
+        
+        if not documents or len(documents) == 0:
+            yield "No relevant information found in Vertex AI Vector Search."
             return
 
         # Build context from results
-        contexts = []
-        for i, doc in enumerate(results['documents'][0]):
-            contexts.append(doc)
-        context = "\n\n".join(contexts)
+        context = "\n\n".join(documents)
 
         # Load Style Card and system prompts
         style_guides, style_data = load_style_guides()
@@ -287,4 +321,5 @@ def ask_question_stream_gemini(question, language="fr", timezone="UTC", locale="
                     yield text
 
     except Exception as e:
-        yield f"Error processing your question (Gemini): {str(e)}"
+        yield f"Error processing your question (Vertex AI + Gemini): {str(e)}"
+

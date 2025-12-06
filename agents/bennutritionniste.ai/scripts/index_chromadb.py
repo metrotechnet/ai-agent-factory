@@ -3,11 +3,25 @@ from dotenv import load_dotenv
 import chromadb
 from chromadb.config import Settings
 from openai import OpenAI
+from pathlib import Path
 
-load_dotenv()
 
-# Initialize ChromaDB (stored locally)
-chroma_client = chromadb.PersistentClient(path="./chroma_db")
+# Get project root directory
+PROJECT_ROOT = Path(__file__).parent.parent
+# Load environment variables from the correct location
+env_path = PROJECT_ROOT / '.env'
+load_dotenv(dotenv_path=env_path, override=True)
+
+
+# Initialize ChromaDB (stored locally) with explicit settings
+chroma_path = str(PROJECT_ROOT / "chroma_db")
+chroma_client = chromadb.PersistentClient(
+    path=chroma_path,
+    settings=Settings(
+        anonymized_telemetry=False,
+        allow_reset=False
+    )
+)
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 # Get or create collection
@@ -36,7 +50,7 @@ def chunk_text(text, chunk_size=500, overlap=50):
         start = end - overlap
     return chunks
 
-def index_text_files(folder_path="transcripts_extracted"):
+def index_text_files(folder_path=str(PROJECT_ROOT / "transcripts")):
     """Index all .txt files from the extracted folder"""
     if not os.path.exists(folder_path):
         print(f"❌ Folder '{folder_path}' not found")
