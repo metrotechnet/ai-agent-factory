@@ -5,7 +5,7 @@
       "description": "Assistant IA de Ben Boulanger, nutritionniste"
     },
     "header": {
-      "title": "Ben - Nutritionniste (version démo)",
+      "title": "Ben - Nutritionniste",
       "menuButton": "Menu"
     },
     "sidebar": {
@@ -84,7 +84,7 @@
       "description": "AI Assistant of Ben Boulanger, nutritionist"
     },
     "header": {
-      "title": "Ben - Nutritionist (Demo Version)",
+      "title": "Ben - Nutritionist ",
       "menuButton": "Menu"
     },
     "sidebar": {
