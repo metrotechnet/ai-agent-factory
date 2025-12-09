@@ -29,9 +29,9 @@ def load_style_guides():
         formatted_guides = {}
         for lang, data in style_data.items():
             guide = f"# {data['title']}\n\n"
-            guide += f"## {data['narrative_structure']['title']}\n"
-            for i, step in enumerate(data['narrative_structure']['steps'], 1):
-                guide += f"{i}. {step}\n"
+            # guide += f"## {data['narrative_structure']['title']}\n"
+            # for i, step in enumerate(data['narrative_structure']['steps'], 1):
+            #     guide += f"{i}. {step}\n"
             guide += f"\n## {data['characteristic_expressions']['title']}\n"
             for phrase in data['characteristic_expressions']['phrases']:
                 guide += f"- \"{phrase}\"\n"
@@ -87,13 +87,17 @@ def get_collection():
             return None
     return collection
 
-def ask_question_stream(question, language="fr", timezone="UTC", locale="fr-FR", top_k=5):
-    """Streaming version of ask_question with language support"""
+def ask_question_stream(question, language="fr", timezone="UTC", locale="fr-FR", top_k=5, conversation_history=None):
+    """Streaming version of ask_question with language support and conversation history"""
     col = get_collection()
     
     if col is None:
         yield "Error: ChromaDB collection is not available. Please run 'python index_chromadb.py' first to index your documents."
         return
+    
+    # Use conversation_history if provided, otherwise empty list
+    if conversation_history is None:
+        conversation_history = []
     
     try:
         # Get embedding for the question
@@ -121,7 +125,7 @@ def ask_question_stream(question, language="fr", timezone="UTC", locale="fr-FR",
         # Load Style Card from JSON based on language
         style_guides, style_data = load_style_guides()
         style_guide = style_guides.get(language, style_guides.get("fr", ""))
-        
+
         # Get not found message for the language
         not_found_msg = style_data.get(language, {}).get('not_found_message', 
                                                         style_data.get('fr', {}).get('not_found_message', 
@@ -134,21 +138,33 @@ def ask_question_stream(question, language="fr", timezone="UTC", locale="fr-FR",
         base_prompt_fr = system_prompts_data.get('fr', {}).get('content', '')
         base_prompt_en = system_prompts_data.get('en', {}).get('content', '')
         
-        # Build full prompts with style guide and context
+        # Build conversation history string for context
+        history_text = ""
+        if conversation_history and len(conversation_history) > 1:  # More than just current question
+            history_text = "\n\nHISTORIQUE DE LA CONVERSATION:\n"
+            # Include last 6 messages (3 exchanges) for context
+            recent_history = conversation_history[-7:-1] if len(conversation_history) > 1 else []
+            for msg in recent_history:
+                role_label = "Utilisateur" if msg['role'] == 'user' else "Assistant"
+                history_text += f"{role_label}: {msg['content']}\n"
+        
+        # Build full prompts with style guide, context, and conversation history
         prompts = {
             "fr": f"""{base_prompt_fr}
-
+            
             {style_guide}
 
             CONTEXTE DISPONIBLE:
             {context}
+            {history_text}
 
             QUESTION DE L'UTILISATEUR: {question}
 
             INSTRUCTIONS SPÉCIALES:
             - Si l'information n'est pas disponible dans le contexte, réponds: "{not_found_msg}"
             - Applique rigoureusement ta structure narrative et tes expressions caractéristiques
-            - Reste dans ton rôle de Ben avec ton style unique et reconnaissable""",
+            - Reste dans ton rôle de Ben avec ton style unique et reconnaissable
+            - Utilise l'historique de conversation pour maintenir la cohérence et faire référence aux échanges précédents si pertinent""",
 
             "en": f"""{base_prompt_en}
 
@@ -156,13 +172,15 @@ def ask_question_stream(question, language="fr", timezone="UTC", locale="fr-FR",
 
             AVAILABLE CONTEXT:
             {context}
+            {history_text.replace('HISTORIQUE DE LA CONVERSATION:', 'CONVERSATION HISTORY:').replace('Utilisateur:', 'User:').replace('Assistant:', 'Assistant:')}
 
             USER QUESTION: {question}
 
             SPECIAL INSTRUCTIONS:
             - If information is not available in the context, respond: "{not_found_msg}"
             - Strictly apply your narrative structure and characteristic expressions
-            - Stay in your role as Ben with your unique and recognizable style"""
+            - Stay in your role as Ben with your unique and recognizable style
+            - Use conversation history to maintain coherence and reference previous exchanges if relevant"""
         }
         
         # Use French as fallback for unsupported languages
@@ -174,7 +192,7 @@ def ask_question_stream(question, language="fr", timezone="UTC", locale="fr-FR",
             messages=[
                 {"role": "user", "content": prompt}
             ],
-            temperature=0.3,
+            temperature=0.5,
             stream=True
         )
         

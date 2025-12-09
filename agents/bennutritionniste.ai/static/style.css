@@ -52,6 +52,10 @@ header {
     margin: 0 auto;
 }
 
+#chat-top-spacer {
+    display: none;
+}
+
 footer {
     background: #ffffff;
     border-top: 1px solid #e2e8f0;
@@ -385,7 +389,7 @@ footer {
 
 .input-box {
     width: 100%;
-    padding: 1rem 3rem 1rem 1rem;
+    padding: 1rem 5.5rem 1rem 1rem;
     background: #ffffff;
     border: 1px solid #cbd5e0;
     border-radius: 12px;
@@ -396,6 +400,7 @@ footer {
     outline: none;
     transition: border-color 0.2s, box-shadow 0.2s;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
 }
 
 .input-box::placeholder {
@@ -411,6 +416,61 @@ footer {
     .input-box {
         font-size: 16px;
     }
+}
+
+.voice-button {
+    position: absolute;
+    right: 3.5rem;
+    bottom: 0.75rem;
+    width: 32px;
+    height: 32px;
+    background: #10b981;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s, transform 0.1s;
+}
+
+.voice-button:hover:not(:disabled) {
+    background: #059669;
+    transform: scale(1.05);
+}
+
+.voice-button:active:not(:disabled) {
+    transform: scale(0.95);
+    background: #ef4444;
+}
+
+.voice-button.recording {
+    background: #ef4444 !important;
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+.voice-button.recording:hover {
+    background: #dc2626 !important;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.7;
+    }
+}
+
+.voice-button:disabled {
+    background: #cbd5e0;
+    cursor: not-allowed;
+}
+
+.voice-button svg {
+    width: 16px;
+    height: 16px;
+    fill: white;
 }
 
 .send-button {

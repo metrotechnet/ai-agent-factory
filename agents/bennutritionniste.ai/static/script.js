@@ -158,6 +158,7 @@ function getCurrentLanguage() {
 const chatContainer = document.getElementById('chat-container');
 const inputBox = document.getElementById('input-box');
 const sendButton = document.getElementById('send-button');
+const voiceButton = document.getElementById('voice-button');
 const emptyState = document.getElementById('empty-state');
 
 // Sidebar navigation elements
@@ -174,6 +175,11 @@ const cookieDecline = document.getElementById('cookie-decline');
 // Global state variables
 let userMessageDiv = document.createElement('div'); // Reference to current user message
 let isLoading = false; // Flag to prevent multiple simultaneous requests
+let sessionId = null; // Session ID for conversation context
+
+// Voice recording state
+let recognition = null;
+let isRecording = false;
 
 // ===================================
 // MOBILE INPUT HANDLING
@@ -210,32 +216,38 @@ inputBox.addEventListener('focus', function() {
 });
 
 /**
+ * Scroll all relevant containers and elements to the top and show latest messages
+ */
+function scrollAllToTheTop() {
+    // Multiple approaches to ensure consistent scroll behavior across browsers
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+    window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+    console.log('scrollAllToTheTop :');
+    // Scroll chat container to show latest messages
+    if (chatContainer) {
+        chatContainer.scrollTo({
+            top: chatContainer.scrollHeight,
+            behavior: 'smooth'
+        });
+        // If there's a user message, scroll to show it with some offset
+        if (userMessageDiv) {
+            chatContainer.scrollTo({
+                top: userMessageDiv.offsetTop - 70,
+                behavior: 'smooth'
+            });
+        }
+    }
+}
+
+/**
  * Handle input box blur (when keyboard disappears)
  * Restores normal view and scrolls to show latest messages
  */
 inputBox.addEventListener('blur', function() {
     setTimeout(() => {
         try {
-            // Multiple approaches to ensure consistent scroll behavior across browsers
-            document.documentElement.scrollTop = 0;
-            document.body.scrollTop = 0;
-            window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
-            
-            // Scroll chat container to show latest messages
-            if (chatContainer) {
-                chatContainer.scrollTo({
-                    top: chatContainer.scrollHeight,
-                    behavior: 'smooth'
-                });
-                
-                // If there's a user message, scroll to show it with some offset
-                if (userMessageDiv) {
-                    chatContainer.scrollTo({
-                        top: userMessageDiv.offsetTop - 70,
-                        behavior: 'smooth'
-                    });
-                }
-            }
+            scrollAllToTheTop();
         } catch (error) {
             console.log('Input blur scroll failed:', error);
         }
@@ -428,7 +440,9 @@ inputBox.addEventListener('input', function() {
 inputBox.addEventListener('keydown', function(e) {
     if (e.key === 'Enter' && !e.shiftKey) {
         e.preventDefault();
+
         sendMessage();
+
         // Dismiss mobile keyboard and trigger scroll restoration
         this.blur();
     }
@@ -439,9 +453,26 @@ inputBox.addEventListener('keydown', function(e) {
  */
 sendButton.addEventListener('click', () => {
     console.log("Send button clicked");
+
+    // Check if keyboard is likely visible (input is focused)
+    const isKeyboardVisible = document.activeElement === inputBox;
+
     sendMessage();
-    // Dismiss mobile keyboard and trigger scroll restoration
-    inputBox.blur();
+
+    // After sending, scroll the user message to the top of chat container
+    setTimeout(() => {
+        if (userMessageDiv && chatContainer) {
+            chatContainer.scrollTo({
+                top: userMessageDiv.offsetTop - chatContainer.offsetTop,
+                behavior: 'smooth'
+            });
+        }
+    }, 100);
+
+    // Only blur if keyboard is visible
+    if (isKeyboardVisible) {
+        inputBox.blur();
+    }
 });
 
 /**
@@ -470,17 +501,46 @@ async function sendMessage() {
     // Prevent sending empty messages or multiple simultaneous requests
     if (!question || isLoading) return;
     
+    // Stop voice recording if active
+    stopRecording();
+    
     // Hide welcome/empty state when first message is sent
     if (emptyState) {
         emptyState.style.display = 'none';
     }
-    
-    // Create and add user message to chat
+    //Removre previous spacer if any
+    const previousSpacer = document.getElementById('chat-bottom-spacer');
+    if (previousSpacer && previousSpacer.parentNode) {
+        previousSpacer.remove();
+    }
+        // Create and add user message to chat
     userMessageDiv = addMessage(question, 'user');
     
     // Create assistant message container with loading state
     const messageDiv = createAssistantMessage();
+    
+    // Append messages to the end
+    chatContainer.appendChild(userMessageDiv);
     chatContainer.appendChild(messageDiv);
+    
+    // Add bottom spacer to ensure content can scroll properly
+    const bottomSpacer = document.createElement('div');
+    bottomSpacer.id = 'chat-bottom-spacer';
+    const spacerHeight = chatContainer.clientHeight - userMessageDiv.offsetHeight - messageDiv.offsetHeight ;
+    bottomSpacer.style.height = (spacerHeight > 0 ? spacerHeight : 0) + 'px';
+    bottomSpacer.style.flexShrink = '0';
+    //bottomSpacer.style.border = 'red 1px solid '; // For debugging
+    chatContainer.appendChild(bottomSpacer);
+    
+    // Scroll to the end of the bottom spacer to position user message at top
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+            if (chatContainer && userMessageDiv) {
+                // Scroll to position the user message at the top of the chat container
+                chatContainer.scrollTop = userMessageDiv.offsetTop - chatContainer.offsetTop;
+            }
+        });
+    });
     
     // Get message components for manipulation
     const contentDiv = messageDiv.querySelector('.message-text');
@@ -512,9 +572,9 @@ function createAssistantMessage() {
     const messageDiv = document.createElement('div');
     messageDiv.className = 'message assistant';
     
-    // Add padding to keep user question visible at top
-    const containerHeight = chatContainer.clientHeight;
-    messageDiv.style.paddingBottom = `${containerHeight - 50}px`;
+    // Set initial minimal height to fit icon and small space (100px)
+    // messageDiv.style.paddingBottom = '50px';
+
     
     messageDiv.innerHTML = `
         <div class="message-icon">Ben</div>
@@ -574,14 +634,18 @@ function setupMessageActions(messageDiv, contentDiv) {
  * Prepare UI for loading state during message sending
  */
 function prepareUIForLoading() {
-    // Clear and reset input
-    inputBox.value = '';
-    inputBox.style.height = 'auto';
-    
     // Disable input controls during loading
     isLoading = true;
     sendButton.disabled = true;
     inputBox.disabled = true;
+    voiceButton.disabled = true;
+    
+    // Clear and reset input after a brief delay
+    setTimeout(() => {
+        inputBox.value = '';
+        inputBox.style.height = 'auto';
+        console.log('Input box cleared and resized');
+    }, 100);
 }
 
 /**
@@ -591,12 +655,13 @@ function prepareUIForLoading() {
  * @param {HTMLElement} actionsDiv - Element containing action buttons
  */
 async function handleStreamingResponse(question, contentDiv, actionsDiv) {
-    // Prepare request payload with language information
+    // Prepare request payload with language information and session_id
     const requestData = {
         question: question,
         language: currentLanguage,
         timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC",
-        locale: navigator.language || (currentLanguage === 'en' ? 'en-US' : 'fr-FR')
+        locale: navigator.language || (currentLanguage === 'en' ? 'en-US' : 'fr-FR'),
+        session_id: sessionId  // Include session_id to maintain conversation context
     };
     
     const response = await fetch('/query', {
@@ -639,6 +704,12 @@ async function handleStreamingResponse(question, contentDiv, actionsDiv) {
                 try {
                     const data = JSON.parse(dataMatch[1]);
                     
+                    // Store session_id from first chunk
+                    if (data.session_id && !sessionId) {
+                        sessionId = data.session_id;
+                        console.log('Session ID received:', sessionId);
+                    }
+                    
                     // Remove loading spinner on first content chunk
                     const loadingDiv = contentDiv.querySelector('.loading');
                     if (loadingDiv) {
@@ -646,7 +717,9 @@ async function handleStreamingResponse(question, contentDiv, actionsDiv) {
                     }
                     
                     // Append new content chunk
-                    contentDiv.textContent += data.chunk;
+                    if (data.chunk) {
+                        contentDiv.textContent += data.chunk;
+                    }
                     updateScrollIndicator();
                 } catch (parseError) {
                     console.error('JSON parsing error:', parseError);
@@ -662,12 +735,13 @@ async function handleStreamingResponse(question, contentDiv, actionsDiv) {
  */
 function cleanupAfterMessage(messageDiv) {
     // Restore normal padding
-    messageDiv.style.paddingBottom = '50px';
+    // messageDiv.style.paddingBottom = '50px';
     
     // Re-enable input controls
     isLoading = false;
     sendButton.disabled = false;
     inputBox.disabled = false;
+    voiceButton.disabled = false;
     
     // Update scroll indicator
     updateScrollIndicator();
@@ -690,7 +764,7 @@ function addMessage(text, role) {
         <div class="message-icon">${role === 'user' ? 'U' : 'Ben'}</div>
         <div class="message-content">${escapeHtml(text)}</div>
     `;
-    chatContainer.appendChild(messageDiv);
+
     // Note: Scrolling is handled by the calling function for better control
     return messageDiv;
 }
@@ -707,6 +781,123 @@ function escapeHtml(text) {
 }
 
 // ===================================
+// VOICE RECOGNITION
+// ===================================
+
+/**
+ * Initialize speech recognition
+ */
+function initSpeechRecognition() {
+    // Check for browser support
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    
+    if (!SpeechRecognition) {
+        console.warn('Speech recognition not supported in this browser');
+        voiceButton.style.display = 'none';
+        return;
+    }
+    
+    recognition = new SpeechRecognition();
+    recognition.continuous = false; // Disable continuous mode to prevent duplications
+    recognition.interimResults = true;
+    recognition.lang = currentLanguage === 'en' ? 'en-US' : 'fr-FR';
+    
+    let finalTranscript = '';
+    
+    recognition.onstart = function() {
+        isRecording = true;
+        voiceButton.classList.add('recording');
+        finalTranscript = '';
+        console.log('Voice recording onstart');
+    };
+    
+    recognition.onresult = function(event) {
+        let interimTranscript = '';
+        
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+            const transcript = event.results[i][0].transcript;
+            if (event.results[i].isFinal) {
+                finalTranscript += transcript + ' ';
+            } else {
+                interimTranscript += transcript;
+            }
+        }
+        
+        // Update input box with transcription
+        inputBox.value = finalTranscript + interimTranscript;
+        inputBox.style.height = 'auto';
+        inputBox.style.height = Math.min(inputBox.scrollHeight, 200) + 'px';
+    };
+    
+    recognition.onerror = function(event) {
+        console.error('Speech recognition error:', event.error);
+        stopRecording();
+    };
+    
+    recognition.onend = function() {
+        if (isRecording) {
+            // Restart recognition to continue capturing speech
+            try {
+                recognition.start();
+            } catch (error) {
+                console.log('Recognition restart error:', error);
+            }
+        }
+    };
+}
+
+/**
+ * Toggle voice recording
+ */
+function toggleRecording() {
+    if (!recognition) {
+        alert(currentLanguage === 'en' 
+            ? 'Speech recognition is not supported in your browser.' 
+            : 'La reconnaissance vocale n\'est pas supportée par votre navigateur.');
+        return;
+    }
+    
+    if (isRecording) {
+        sendMessage(); // Send message when stopping recording
+        stopRecording();
+    } else {
+        startRecording();
+    }
+}
+
+/**
+ * Start voice recording
+ */
+function startRecording() {
+    try {
+        recognition.lang = currentLanguage === 'en' ? 'en-US' : 'fr-FR';
+        recognition.start();
+        console.log('Voice recording started');
+    } catch (error) {
+        console.error('Failed to start recording:', error);
+    }
+}
+
+/**
+ * Stop voice recording and clear text area
+ */
+function stopRecording() {
+    if (recognition && isRecording) {
+        isRecording = false;
+        voiceButton.classList.remove('recording');
+        recognition.stop();
+        console.log('Voice recording stopped');
+        
+        // Clear the text area
+        inputBox.value = '';
+        inputBox.style.height = 'auto';
+    }
+}
+
+// Voice button click handler
+voiceButton.addEventListener('click', toggleRecording);
+
+// ===================================
 // INITIALIZATION
 // ===================================
 
@@ -719,6 +910,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Check for cookie consent
     checkCookieConsent();
+    
+    // Initialize speech recognition
+    initSpeechRecognition();
     
     // Add language switcher for testing (comment out in production)
     // addLanguageSwitcher();

@@ -55,6 +55,7 @@
     </header>
 
         <div class="content" id="chat-container">
+            <div id="chat-top-spacer" style="flex: 1; min-height: 0;"></div>
             <div class="empty-state" id="empty-state">
                 <img src="/static/ben.nutritioniste.jpg" alt="Ben Nutritionniste" data-i18n-alt="intro.profileAlt" data-i18n-src="intro.profileImage" class="profile-photo">
                 <h2 data-i18n="intro.title">Salut ! Je m'appelle Ben et je suis nutritionniste</h2>
@@ -90,6 +91,12 @@
                         data-i18n-placeholder="input.placeholder"
                         rows="1"
                     ></textarea>
+                    <button id="voice-button" class="voice-button" title="Enregistrer un message vocal" data-i18n-title="input.voiceButton">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/>
+                            <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
+                        </svg>
+                    </button>
                     <button id="send-button" class="send-button" title="" data-i18n-title="input.sendButton">
                         <svg viewBox="0 0 24 24">
                             <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>

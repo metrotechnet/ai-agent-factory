@@ -158,7 +158,7 @@ cd C:\Users\denis\OneDrive\Documents\Projets\agent-factory\agents\bennutritionni
 python app.py
 ```
 
-Access the application at **http://localhost:8001**
+Access the application at **http://localhost:8080**
 
 ### Test Vertex AI Queries
 
