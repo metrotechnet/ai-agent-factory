@@ -449,6 +449,31 @@ inputBox.addEventListener('keydown', function(e) {
 });
 
 /**
+ * Remove previous bottom spacer if it exists
+ */
+function removePreviousSpacer() {
+    const previousSpacer = document.getElementById('chat-bottom-spacer');
+    if (previousSpacer && previousSpacer.parentNode) {
+        previousSpacer.remove();
+    }
+}
+
+/**
+ * Create and add bottom spacer to chat container
+ * @param {HTMLElement} userMsgDiv - The user message element
+ * @param {HTMLElement} assistantMsgDiv - The assistant message element
+ */
+function createBottomSpacer(userMsgDiv, assistantMsgDiv) {
+    const bottomSpacer = document.createElement('div');
+    bottomSpacer.id = 'chat-bottom-spacer';
+    const spacerHeight = chatContainer.clientHeight - userMsgDiv.offsetHeight - assistantMsgDiv.offsetHeight - 50;
+    bottomSpacer.style.height = (spacerHeight > 0 ? spacerHeight : 0) + 'px';
+    bottomSpacer.style.flexShrink = '0';
+    //bottomSpacer.style.border = 'red 1px solid '; // For debugging
+    return bottomSpacer
+}
+
+/**
  * Handle send button click
  */
 sendButton.addEventListener('click', () => {
@@ -508,12 +533,11 @@ async function sendMessage() {
     if (emptyState) {
         emptyState.style.display = 'none';
     }
-    //Removre previous spacer if any
-    const previousSpacer = document.getElementById('chat-bottom-spacer');
-    if (previousSpacer && previousSpacer.parentNode) {
-        previousSpacer.remove();
-    }
-        // Create and add user message to chat
+    
+    // Remove previous spacer if any
+    removePreviousSpacer();
+    
+    // Create and add user message to chat
     userMessageDiv = addMessage(question, 'user');
     
     // Create assistant message container with loading state
@@ -524,23 +548,9 @@ async function sendMessage() {
     chatContainer.appendChild(messageDiv);
     
     // Add bottom spacer to ensure content can scroll properly
-    const bottomSpacer = document.createElement('div');
-    bottomSpacer.id = 'chat-bottom-spacer';
-    const spacerHeight = chatContainer.clientHeight - userMessageDiv.offsetHeight - messageDiv.offsetHeight ;
-    bottomSpacer.style.height = (spacerHeight > 0 ? spacerHeight : 0) + 'px';
-    bottomSpacer.style.flexShrink = '0';
-    //bottomSpacer.style.border = 'red 1px solid '; // For debugging
-    chatContainer.appendChild(bottomSpacer);
-    
-    // Scroll to the end of the bottom spacer to position user message at top
-    requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-            if (chatContainer && userMessageDiv) {
-                // Scroll to position the user message at the top of the chat container
-                chatContainer.scrollTop = userMessageDiv.offsetTop - chatContainer.offsetTop;
-            }
-        });
-    });
+    const spacerDiv = createBottomSpacer(userMessageDiv, messageDiv);
+    chatContainer.appendChild(spacerDiv);
+
     
     // Get message components for manipulation
     const contentDiv = messageDiv.querySelector('.message-text');
@@ -639,13 +649,7 @@ function prepareUIForLoading() {
     sendButton.disabled = true;
     inputBox.disabled = true;
     voiceButton.disabled = true;
-    
-    // Clear and reset input after a brief delay
-    setTimeout(() => {
-        inputBox.value = '';
-        inputBox.style.height = 'auto';
-        console.log('Input box cleared and resized');
-    }, 100);
+
 }
 
 /**
@@ -764,6 +768,9 @@ function addMessage(text, role) {
         <div class="message-icon">${role === 'user' ? 'U' : 'Ben'}</div>
         <div class="message-content">${escapeHtml(text)}</div>
     `;
+    // Clear the text area
+    inputBox.value = '';
+    inputBox.style.height = 'auto';
 
     // Note: Scrolling is handled by the calling function for better control
     return messageDiv;
@@ -888,9 +895,7 @@ function stopRecording() {
         recognition.stop();
         console.log('Voice recording stopped');
         
-        // Clear the text area
-        inputBox.value = '';
-        inputBox.style.height = 'auto';
+
     }
 }
 

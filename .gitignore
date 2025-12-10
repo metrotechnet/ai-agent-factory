@@ -21,6 +21,9 @@ build/
 .env
 *.env
 
+# Google Drive credentials
+./config/gdrive_credentials.json
+
 # Deployment scripts with secrets
 deploy.bat
 deploy-only.bat
@@ -32,6 +35,7 @@ videos/
 transcripts/
 transcripts_extracted/
 chroma_db/
+extracted_texts/
 
 # OS
 .DS_Store

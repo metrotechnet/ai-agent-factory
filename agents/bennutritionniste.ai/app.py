@@ -9,7 +9,7 @@ from core.query_chromadb import ask_question_stream, ask_question_stream_gemini
 from core.query_vertexaidb import ask_question_stream_vertex, ask_question_stream_vertex_gemini
 import json
 from pathlib import Path
-from core.pipeline_instagram import run_pipeline
+from core.pipeline_gdrive import run_pipeline
 from typing import List, Dict, Optional
 import uuid
 from datetime import datetime, timedelta
@@ -158,8 +158,8 @@ def get_session_info(session_id: str):
     return {"exists": False}
 
 @app.post("/update")
-def update_pipeline(limit: int = 5):
-    run_pipeline(limit=limit)
+def update_pipeline():
+    run_pipeline()
     return {"status": "Pipeline exécuté, nouvelles vidéos indexées"}
 
 if __name__ == "__main__":
