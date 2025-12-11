@@ -510,17 +510,20 @@ footer {
 }
 
 .loading {
-    display: flex;
+    display: flex !important;
     gap: 0.5rem;
     align-items: center;
+    justify-content: flex-start;
+    padding: 0.5rem 0;
 }
 
 .loading-dot {
-    width: 8px;
-    height: 8px;
+    width: 10px;
+    height: 10px;
     background: #6366f1;
     border-radius: 50%;
     animation: bounce 1.4s infinite ease-in-out both;
+    display: inline-block;
 }
 
 .loading-dot:nth-child(1) {

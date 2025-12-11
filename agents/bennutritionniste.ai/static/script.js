@@ -714,14 +714,13 @@ async function handleStreamingResponse(question, contentDiv, actionsDiv) {
                         console.log('Session ID received:', sessionId);
                     }
                     
-                    // Remove loading spinner on first content chunk
-                    const loadingDiv = contentDiv.querySelector('.loading');
-                    if (loadingDiv) {
-                        contentDiv.textContent = '';
-                    }
-                    
                     // Append new content chunk
                     if (data.chunk) {
+                        // Remove loading spinner on first content chunk
+                        const loadingDiv = contentDiv.querySelector('.loading');
+                        if (loadingDiv) {
+                            contentDiv.textContent = '';
+                        }
                         contentDiv.textContent += data.chunk;
                     }
                     updateScrollIndicator();
