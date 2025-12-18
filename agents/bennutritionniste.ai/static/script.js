@@ -73,6 +73,8 @@ function applyTranslations(lang) {
         }
     });
     
+
+    
     // Update title attributes
     document.querySelectorAll('[data-i18n-title]').forEach(element => {
         const key = element.getAttribute('data-i18n-title');
@@ -600,8 +602,11 @@ function createAssistantMessage() {
                 <button class="action-btn copy-btn" title="" style="border-radius:50%;padding:8px;background:#f3f3f3;border:none;box-shadow:0 1px 4px rgba(0,0,0,0.07);margin-right:6px;cursor:pointer;">
                     <i class="bi bi-clipboard" style="font-size:1.3em;"></i>
                 </button>
-                <button class="action-btn share-btn" title="" style="border-radius:50%;padding:8px;background:#f3f3f3;border:none;box-shadow:0 1px 4px rgba(0,0,0,0.07);cursor:pointer;">
+                <button class="action-btn share-btn" title="" style="border-radius:50%;padding:8px;background:#f3f3f3;border:none;box-shadow:0 1px 4px rgba(0,0,0,0.07);margin-right:6px;cursor:pointer;">
                     <i class="bi bi-share" style="font-size:1.3em;"></i>
+                </button>
+                <button class="action-btn comment-btn" title="Commentaire" style="border-radius:50%;padding:8px;background:#f3f3f3;border:none;box-shadow:0 1px 4px rgba(0,0,0,0.07);cursor:pointer;">
+                    <i class="bi bi-chat-dots" style="font-size:1.3em;"></i>
                 </button>
             </div>
         </div>
@@ -618,11 +623,13 @@ function createAssistantMessage() {
 function setupMessageActions(messageDiv, contentDiv) {
     const copyBtn = messageDiv.querySelector('.copy-btn');
     const shareBtn = messageDiv.querySelector('.share-btn');
-    
+    const commentBtn = messageDiv.querySelector('.comment-btn');
+
     // Set translated titles
     copyBtn.title = t('messages.copy');
     shareBtn.title = t('messages.share');
-    
+    if (commentBtn) commentBtn.title = t('messages.comment');
+
     // Copy message text to clipboard
     copyBtn.addEventListener('click', () => {
         navigator.clipboard.writeText(contentDiv.textContent);
@@ -635,9 +642,68 @@ function setupMessageActions(messageDiv, contentDiv) {
                 text: contentDiv.textContent
             });
         } else {
-            alert('Le partage n\'est pas supporté sur ce navigateur.');
+            alert(t('messages.shareNotSupported'));
         }
     });
+
+    // Comment button: open SweetAlert2 popup and send comment to server
+    if (commentBtn) {
+        commentBtn.addEventListener('click', async () => {
+            const questionId = commentBtn.dataset.questionId;
+            if (!questionId) {
+                console.assert.log(t('messages.error'));
+                return;
+            }
+
+            const { value: comment } = await Swal.fire({
+                title: t('messages.comment'),
+                input: 'textarea',
+                inputLabel: t('messages.comment_placeholder'),
+                inputPlaceholder: t('messages.comment_placeholder'),
+                inputAttributes: {
+                    'aria-label': t('messages.comment_placeholder')
+                },
+                showCancelButton: true,
+                confirmButtonText: t('messages.send'),
+                cancelButtonText: t('messages.cancel'),
+                inputValidator: (value) => {
+                    if (!value || !value.trim()) {
+                        return t('messages.comment_required');
+                    }
+                }
+            });
+            if (comment && comment.trim()) {
+                Swal.showLoading();
+                try {
+                    const res = await fetch('/api/add_comment', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ question_id: questionId, comment: comment.trim() })
+                    });
+                    const result = await res.json();
+                    if (result.status === 'success') {
+                        await Swal.fire({
+                            icon: 'success',
+                            title: t('messages.comment_success'),
+                            timer: 1500,
+                            showConfirmButton: false
+                        });
+                    } else {
+                        await Swal.fire({
+                            icon: 'error',
+                            title: t('messages.comment_error'),
+                            text: result.message || '',
+                        });
+                    }
+                } catch (e) {
+                    await Swal.fire({
+                        icon: 'error',
+                        title: t('messages.network_error')
+                    });
+                }
+            }
+        });
+    }
 }
 
 /**
@@ -667,7 +733,7 @@ async function handleStreamingResponse(question, contentDiv, actionsDiv) {
         locale: navigator.language || (currentLanguage === 'en' ? 'en-US' : 'fr-FR'),
         session_id: sessionId  // Include session_id to maintain conversation context
     };
-    
+
     const response = await fetch('/query', {
         method: 'POST',
         headers: {
@@ -675,45 +741,69 @@ async function handleStreamingResponse(question, contentDiv, actionsDiv) {
         },
         body: JSON.stringify(requestData)
     });
-    
+
     if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
     }
-    
+
     const reader = response.body.getReader();
     const decoder = new TextDecoder();
     let buffer = '';
-    
-    // Process streaming response chunks
+    let questionId = null;
+    let commentBtn = null;
+
+    // For markdown streaming, accumulate the full text and render as HTML
+    let fullText = '';
     while (true) {
         const { done, value } = await reader.read();
-        
+
         if (done) {
             // Streaming complete - show action buttons
             actionsDiv.style.display = '';
+            // Set questionId on comment button if available
+            if (questionId && commentBtn) {
+                commentBtn.dataset.questionId = questionId;
+            }
+            // Final markdown render
+            if (typeof marked !== 'undefined') {
+                contentDiv.innerHTML = marked.parse(fullText);
+            } else {
+                contentDiv.textContent = fullText;
+            }
             break;
         }
-        
+
         // Decode and process new data
         buffer += decoder.decode(value, { stream: true });
         const lines = buffer.split('\n\n');
         buffer = lines.pop() || ''; // Keep incomplete message in buffer
-        
+
         // Process each complete message line
         for (const message of lines) {
             if (!message.trim()) continue;
-            
+
             const dataMatch = message.match(/^data: (.+)$/m);
             if (dataMatch) {
                 try {
                     const data = JSON.parse(dataMatch[1]);
-                    
+
                     // Store session_id from first chunk
                     if (data.session_id && !sessionId) {
                         sessionId = data.session_id;
                         console.log('Session ID received:', sessionId);
                     }
-                    
+                    // Store question_id from first chunk
+                    if (data.question_id && !questionId) {
+                        questionId = data.question_id;
+                        // Find the comment button and set data-question-id
+                        if (!commentBtn && actionsDiv) {
+                            commentBtn = actionsDiv.querySelector('.comment-btn');
+                            if (commentBtn) {
+                                commentBtn.dataset.questionId = questionId;
+                            }
+                        }
+                    }
+
                     // Append new content chunk
                     if (data.chunk) {
                         // Remove loading spinner on first content chunk
@@ -721,7 +811,13 @@ async function handleStreamingResponse(question, contentDiv, actionsDiv) {
                         if (loadingDiv) {
                             contentDiv.textContent = '';
                         }
-                        contentDiv.textContent += data.chunk;
+                        fullText += data.chunk;
+                        // Live preview (optional): render markdown as HTML if marked is available
+                        if (typeof marked !== 'undefined') {
+                            contentDiv.innerHTML = marked.parse(fullText);
+                        } else {
+                            contentDiv.textContent = fullText;
+                        }
                     }
                     updateScrollIndicator();
                 } catch (parseError) {

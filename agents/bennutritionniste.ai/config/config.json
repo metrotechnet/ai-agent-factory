@@ -75,7 +75,16 @@
       "copy": "Copier",
       "share": "Partager",
       "copied": "Copié !",
-      "shareNotSupported": "Le partage n'est pas supporté sur ce navigateur."
+      "shareNotSupported": "Le partage n'est pas supporté sur ce navigateur.",
+      "comment": "Commentaire",
+      "comment_placeholder": "Votre commentaire...",
+      "send": "Envoyer",
+      "cancel": "Annuler",
+      "sending": "Envoi...",
+      "comment_success": "Commentaire ajouté !",
+      "comment_error": "Erreur lors de l'ajout du commentaire.",
+      "comment_required": "Veuillez entrer un commentaire.",
+      "network_error": "Erreur réseau."
     }
   },
   "en": {
@@ -154,7 +163,16 @@
       "copy": "Copy",
       "share": "Share",
       "copied": "Copied!",
-      "shareNotSupported": "Sharing is not supported on this browser."
+      "shareNotSupported": "Sharing is not supported on this browser.",
+      "comment": "Comment",
+      "comment_placeholder": "Your comment...",
+      "send": "Send",
+      "cancel": "Cancel",
+      "sending": "Sending...",
+      "comment_success": "Comment added!",
+      "comment_error": "Error adding comment.",
+      "comment_required": "Please enter a comment.",
+      "network_error": "Network error."
     }
   }
 }

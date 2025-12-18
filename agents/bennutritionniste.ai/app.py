@@ -1,5 +1,5 @@
 from dotenv import load_dotenv
-from fastapi import FastAPI
+from fastapi import FastAPI, Body
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, StreamingResponse
 from fastapi.templating import Jinja2Templates
@@ -13,6 +13,8 @@ from core.pipeline_gdrive import run_pipeline
 from typing import List, Dict, Optional
 import uuid
 from datetime import datetime, timedelta
+
+import threading
 
 # Load environment variables from the correct location
 PROJECT_ROOT = Path(__file__).parent
@@ -28,6 +30,55 @@ templates = Jinja2Templates(directory=str(PROJECT_ROOT / "templates"))
 # In-memory session storage (use Redis or database in production)
 conversation_sessions: Dict[str, Dict] = {}
 SESSION_TIMEOUT = timedelta(hours=2)
+
+# Path to question log file
+QUESTION_LOG_PATH = PROJECT_ROOT / "question_log.json"
+# Lock for thread-safe file access
+question_log_lock = threading.Lock()
+
+def save_question_response(question_id, question, response):
+    """Save question, response, and id to the log file."""
+    entry = {
+        "question_id": question_id,
+        "question": question,
+        "response": response,
+        "timestamp": datetime.now().isoformat(),
+        "comments": []
+    }
+    with question_log_lock:
+        try:
+            if QUESTION_LOG_PATH.exists():
+                with open(QUESTION_LOG_PATH, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+            else:
+                data = []
+        except Exception:
+            data = []
+        data.append(entry)
+        with open(QUESTION_LOG_PATH, 'w', encoding='utf-8') as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
+
+def add_comment_to_question(question_id, comment):
+    """Add a comment to a question by id."""
+    with question_log_lock:
+        try:
+            if QUESTION_LOG_PATH.exists():
+                with open(QUESTION_LOG_PATH, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+            else:
+                return False
+        except Exception:
+            return False
+        for entry in data:
+            if entry.get("question_id") == question_id:
+                entry.setdefault("comments", []).append({
+                    "comment": comment,
+                    "timestamp": datetime.now().isoformat()
+                })
+                with open(QUESTION_LOG_PATH, 'w', encoding='utf-8') as f:
+                    json.dump(data, f, ensure_ascii=False, indent=2)
+                return True
+        return False
 
 class QueryRequest(BaseModel):
     question: str
@@ -72,10 +123,11 @@ async def query_agent(request: QueryRequest):
     # Update last activity
     session['last_activity'] = datetime.now()
     
+    question_id = str(uuid.uuid4())
     def generate():
-        # Send session_id in first chunk
-        yield f"data: {json.dumps({'session_id': session_id, 'chunk': ''})}\n\n"
-        
+        # Send session_id and question_id in first chunk
+        yield f"data: {json.dumps({'session_id': session_id, 'question_id': question_id, 'chunk': ''})}\n\n"
+
         assistant_response = ""
         for chunk in ask_question_stream(
             request.question, 
@@ -86,7 +138,7 @@ async def query_agent(request: QueryRequest):
         ):
             assistant_response += chunk
             yield f"data: {json.dumps({'chunk': chunk})}\n\n"
-        
+
         # Add assistant response to history
         assistant_message = {
             'role': 'assistant',
@@ -94,7 +146,10 @@ async def query_agent(request: QueryRequest):
             'timestamp': datetime.now().isoformat()
         }
         conversation_history.append(assistant_message)
-    
+
+        # Save question, response, and id to file
+        save_question_response(question_id, request.question, assistant_response)
+
     return StreamingResponse(
         generate(), 
         media_type="text/event-stream",
@@ -104,6 +159,18 @@ async def query_agent(request: QueryRequest):
             "Connection": "keep-alive",
         }
     )
+
+# Endpoint to add a comment to a question by id
+@app.post("/api/add_comment")
+def add_comment_api(
+    question_id: str = Body(...),
+    comment: str = Body(...)
+):
+    success = add_comment_to_question(question_id, comment)
+    if success:
+        return {"status": "success", "message": "Comment added"}
+    else:
+        return {"status": "error", "message": "Question ID not found"}
 
 def _clean_old_sessions():
     """Remove sessions older than SESSION_TIMEOUT"""
