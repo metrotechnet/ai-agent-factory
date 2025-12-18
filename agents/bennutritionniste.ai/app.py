@@ -1,3 +1,6 @@
+# Endpoint to like or dislike an answer by question_id
+from fastapi import status
+
 from fastapi.responses import FileResponse
 
 from dotenv import load_dotenv
@@ -173,6 +176,34 @@ def add_comment_api(
         return {"status": "success", "message": "Comment added"}
     else:
         return {"status": "error", "message": "Question ID not found"}
+    
+@app.post("/api/like_answer")
+def like_answer(
+    question_id: str = Body(...),
+    like: bool = Body(...)
+):
+    """Add a like or dislike to a question by id. Stores as a list of likes/dislikes (for possible multiple votes)."""
+    with question_log_lock:
+        try:
+            if QUESTION_LOG_PATH.exists():
+                with open(QUESTION_LOG_PATH, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+            else:
+                return {"status": "error", "message": "Log file not found"}
+        except Exception:
+            return {"status": "error", "message": "Could not read log file"}
+        for entry in data:
+            if entry.get("question_id") == question_id:
+                if "likes" not in entry:
+                    entry["likes"] = []
+                entry["likes"].append({
+                    "like": like,
+                    "timestamp": datetime.now().isoformat()
+                })
+                with open(QUESTION_LOG_PATH, 'w', encoding='utf-8') as f:
+                    json.dump(data, f, ensure_ascii=False, indent=2)
+                return {"status": "success", "message": "Vote recorded"}
+        return {"status": "error", "message": "Question ID not found"}    
     
 # Endpoint to download the question_log.json file (protected by key in URL argument)
 from fastapi import Query

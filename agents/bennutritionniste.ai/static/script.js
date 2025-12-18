@@ -605,8 +605,11 @@ function createAssistantMessage() {
                 <button class="action-btn share-btn" title="" style="border-radius:50%;padding:8px;background:#f3f3f3;border:none;box-shadow:0 1px 4px rgba(0,0,0,0.07);margin-right:6px;cursor:pointer;">
                     <i class="bi bi-share" style="font-size:1.3em;"></i>
                 </button>
-                <button class="action-btn comment-btn" title="Commentaire" style="border-radius:50%;padding:8px;background:#f3f3f3;border:none;box-shadow:0 1px 4px rgba(0,0,0,0.07);cursor:pointer;">
-                    <i class="bi bi-chat-dots" style="font-size:1.3em;"></i>
+                <button class="action-btn like-btn" title="Like" style="border-radius:50%;padding:8px;background:#e6f9e6;border:none;box-shadow:0 1px 4px rgba(0,0,0,0.07);margin-left:6px;cursor:pointer;">
+                    <i class="bi bi-hand-thumbs-up" style="font-size:1.3em;"></i>
+                </button>
+                <button class="action-btn dislike-btn" title="Dislike" style="border-radius:50%;padding:8px;background:#f9e6e6;border:none;box-shadow:0 1px 4px rgba(0,0,0,0.07);margin-left:2px;cursor:pointer;">
+                    <i class="bi bi-hand-thumbs-down" style="font-size:1.3em;"></i>
                 </button>
             </div>
         </div>
@@ -624,6 +627,61 @@ function setupMessageActions(messageDiv, contentDiv) {
     const copyBtn = messageDiv.querySelector('.copy-btn');
     const shareBtn = messageDiv.querySelector('.share-btn');
     const commentBtn = messageDiv.querySelector('.comment-btn');
+    const likeBtn = messageDiv.querySelector('.like-btn');
+    const dislikeBtn = messageDiv.querySelector('.dislike-btn');
+    // Like/dislike buttons
+    if (likeBtn) {
+        likeBtn.addEventListener('click', async () => {
+            const questionId = likeBtn.dataset.questionId || (commentBtn && commentBtn.dataset.questionId);
+            if (!questionId) {
+                alert(t('messages.error'));
+                return;
+            }
+            likeBtn.disabled = true;
+            dislikeBtn && (dislikeBtn.disabled = true);
+            try {
+                const res = await fetch('/api/like_answer', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ question_id: questionId, like: true })
+                });
+                const result = await res.json();
+                if (result.status === 'success') {
+                    likeBtn.style.background = '#49fc49ff';
+                } else {
+                    alert(result.message || t('messages.error'));
+                }
+            } catch (e) {
+                alert(t('messages.network_error'));
+            }
+        });
+    }
+    if (dislikeBtn) {
+        dislikeBtn.addEventListener('click', async () => {
+            const questionId = dislikeBtn.dataset.questionId || (commentBtn && commentBtn.dataset.questionId);
+            if (!questionId) {
+                alert(t('messages.error'));
+                return;
+            }
+            dislikeBtn.disabled = true;
+            likeBtn && (likeBtn.disabled = true);
+            try {
+                const res = await fetch('/api/like_answer', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ question_id: questionId, like: false })
+                });
+                const result = await res.json();
+                if (result.status === 'success') {
+                    dislikeBtn.style.background = '#f86868ff';
+                } else {
+                    alert(result.message || t('messages.error'));
+                }
+            } catch (e) {
+                alert(t('messages.network_error'));
+            }
+        });
+    }
 
     // Set translated titles
     copyBtn.title = t('messages.copy');
@@ -751,6 +809,8 @@ async function handleStreamingResponse(question, contentDiv, actionsDiv) {
     let buffer = '';
     let questionId = null;
     let commentBtn = null;
+    let likeBtn = null;
+    let dislikeBtn = null;
 
     // For markdown streaming, accumulate the full text and render as HTML
     let fullText = '';
@@ -760,9 +820,14 @@ async function handleStreamingResponse(question, contentDiv, actionsDiv) {
         if (done) {
             // Streaming complete - show action buttons
             actionsDiv.style.display = '';
-            // Set questionId on comment button if available
-            if (questionId && commentBtn) {
-                commentBtn.dataset.questionId = questionId;
+            // Set questionId on comment, like, and dislike buttons if available
+            if (questionId) {
+                if (!commentBtn && actionsDiv) commentBtn = actionsDiv.querySelector('.comment-btn');
+                if (!likeBtn && actionsDiv) likeBtn = actionsDiv.querySelector('.like-btn');
+                if (!dislikeBtn && actionsDiv) dislikeBtn = actionsDiv.querySelector('.dislike-btn');
+                if (commentBtn) commentBtn.dataset.questionId = questionId;
+                if (likeBtn) likeBtn.dataset.questionId = questionId;
+                if (dislikeBtn) dislikeBtn.dataset.questionId = questionId;
             }
             // Final markdown render
             if (typeof marked !== 'undefined') {
@@ -795,13 +860,13 @@ async function handleStreamingResponse(question, contentDiv, actionsDiv) {
                     // Store question_id from first chunk
                     if (data.question_id && !questionId) {
                         questionId = data.question_id;
-                        // Find the comment button and set data-question-id
-                        if (!commentBtn && actionsDiv) {
-                            commentBtn = actionsDiv.querySelector('.comment-btn');
-                            if (commentBtn) {
-                                commentBtn.dataset.questionId = questionId;
-                            }
-                        }
+                        // Find the comment, like, and dislike buttons and set data-question-id
+                        if (!commentBtn && actionsDiv) commentBtn = actionsDiv.querySelector('.comment-btn');
+                        if (!likeBtn && actionsDiv) likeBtn = actionsDiv.querySelector('.like-btn');
+                        if (!dislikeBtn && actionsDiv) dislikeBtn = actionsDiv.querySelector('.dislike-btn');
+                        if (commentBtn) commentBtn.dataset.questionId = questionId;
+                        if (likeBtn) likeBtn.dataset.questionId = questionId;
+                        if (dislikeBtn) dislikeBtn.dataset.questionId = questionId;
                     }
 
                     // Append new content chunk
