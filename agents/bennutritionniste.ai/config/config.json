@@ -17,9 +17,9 @@
       "legal": "Avertissements"
     },
     "intro": {
-      "title": "Salut ! Je m'appelle Ben et je suis nutritionniste",
-      "description": "Dans mes temps libres, j'entraîne des humains… et des IA. J'ai coaché cette machine pour qu'elle réponde à vos questions.",
-      "disclaimer": "Elle apprend vite, mais souvenez-vous : elle ne remplacera jamais une vraie consultation. 💪",
+      "title": "Des questions sur la nutrition ?",
+      "description": "Posez-les à mon agent IA et obtenez des réponses claires instantanément. Luttons contre la désinformation, une question à la fois.",
+      "disclaimer": "Note : Cet agent IA fournit uniquement des informations. \nPour des conseils personnalisés, consultez un professionnel de santé qualifié.",
       "profileAlt": "Ben Nutritionniste",
       "profileImage": "/static/ben.nutritioniste.jpg"
     },
@@ -105,9 +105,9 @@
       "legal": "Warnings"
     },
     "intro": {
-      "title": "Hi! I'm Ben and I'm a nutritionist",
-      "description": "In my free time, I train humans… and AIs. I coached this machine to answer your questions.",
-      "disclaimer": "It learns fast, but remember: it will never replace a real consultation. 💪",
+      "title": "Questions about nutrition?",
+     "description": "Ask my AI agent and get clear answers instantly. Let’s fight misinformation, one question at a time.",
+      "disclaimer": "Note: This AI provides informational support only. For personalized advice, consult a qualified healthcare professional.",
       "profileAlt": "Ben Nutritionist",
       "profileImage": "/static/ben.nutritioniste.jpg"
     },

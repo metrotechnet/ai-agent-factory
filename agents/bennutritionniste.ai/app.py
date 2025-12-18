@@ -1,3 +1,5 @@
+from fastapi.responses import FileResponse
+
 from dotenv import load_dotenv
 from fastapi import FastAPI, Body
 from fastapi.staticfiles import StaticFiles
@@ -171,6 +173,20 @@ def add_comment_api(
         return {"status": "success", "message": "Comment added"}
     else:
         return {"status": "error", "message": "Question ID not found"}
+    
+# Endpoint to download the question_log.json file (protected by key in URL argument)
+from fastapi import Query
+@app.get("/api/download_log")
+def download_question_log(key: str = Query(...)):
+    if key != "dboubou363":
+        return {"status": "error", "message": "Unauthorized"}
+    if not QUESTION_LOG_PATH.exists():
+        return {"status": "error", "message": "Log file not found"}
+    return FileResponse(
+        path=str(QUESTION_LOG_PATH),
+        filename="question_log.json",
+        media_type="application/json"
+    )
 
 def _clean_old_sessions():
     """Remove sessions older than SESSION_TIMEOUT"""
