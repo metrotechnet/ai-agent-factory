@@ -1,17 +1,15 @@
 [
   {
-    "question_id": "6c15a84e-62be-429a-8b6b-ac439740fccd",
-    "question": "Conseils alimentaires et nutrition",
-    "response": "Salut ! Alors, tu cherches des conseils alimentaires et nutritionnels ? Super, je suis là pour ça, et je vais essayer de te rendre ça aussi simple que possible !\n\n**Structurer ton environnement, c’est la clé** ! Si tu veux intégrer des assiettes équilibrées sans trop de tracas, commence par te faire une liste d'aliments de base qui sont à la fois accessibles et peu chers. Par exemple, pense aux œufs, au tofu, aux pois chiches, ou encore à l'avoine. Ce sont des alliés nutritionnels qui ne te ruineront pas !\n\nLe **batch cooking**, c'est pas si compliqué que ça. Prépare des repas en avance, ça te fera gagner un temps fou dans la semaine. Tu peux cuisiner une grosse quantité de grains comme du riz ou des pâtes, et même des légumes congelés qui sont souvent plus nutritifs que des frais qui traînent trop longtemps dans le frigo.\n\n**Les collations prêtes**, c'est aussi une bonne stratégie. Prépare des portions de fruits ou de noix pour éviter de céder à la tentation du junk food quand la faim se fait sentir. Une banane ou une poignée de pois chiches grillés, c’est parfait !\n\nEt n’oublie pas que **frais ne rime pas toujours avec mieux**. Les légumes congelés ou les conserves peuvent être tout aussi nutritifs, et parfois même plus, car ils sont souvent congelés ou mis en conserve au sommet de leur fraîcheur.\n\nAlors, prêt à te lancer dans cette aventure alimentaire ? N’oublie pas, il n'y a pas de solution universelle, et l’important, c’est de trouver ce qui fonctionne pour toi tout en restant attentif à tes signaux de faim et de satiété. Si tu as besoin de conseils plus personnalisés ou spécifiques, je te recommande de consulter un professionnel !",
-    "timestamp": "2025-12-17T18:46:12.834957",
-    "comments": []
-  },
-  {
     "question_id": "2cbb0b8b-bd33-4294-82fd-c769b5ee6053",
     "question": "Conseils alimentaires et nutrition",
     "response": "Salut ! Alors, tu cherches des conseils alimentaires et nutritionnels ? Super, je suis là pour ça ! \n\nD'abord, structurer ton environnement, c'est vraiment la clé. Pense à remplir ton frigo et tes placards avec des aliments de base accessibles et peu chers. Par exemple, les œufs, le tofu, les pois chiches, l’avoine, le riz et les bananes sont des alliés formidables. Ils sont non seulement nutritifs, mais aussi hyper polyvalents dans la cuisine !\n\nPour éviter de se retrouver à sauter des repas ou à craquer sur des snacks junk, le batch cooking peut être un vrai game changer. C’est simple, pas besoin de faire des plats fancy ! Prépare des portions à l'avance, ça te permettra d'avoir des collations prêtes à l'emploi et de gagner du temps en semaine.\n\nAh, et n’oublie pas les légumes congelés ou même les conserves, comme le thon ou les soupes maison. Parfois, le frais n’est pas toujours le meilleur choix en matière de nutrition. Les aliments congelés peuvent être super nutritifs et pratiques !\n\nEnfin, reste bienveillant envers toi-même. Écoute tes signaux de faim et de satiété, et évite de te laisser emporter par la culpabilité alimentaire. C’est un vrai chemin vers une relation saine avec la nourriture. \n\nSi tu as besoin de conseils plus spécifiques ou d’un plan personnalisé, n’hésite pas à consulter un professionnel. Chaque corps est unique, et ce n’est pas une pilule magique ! À bientôt !",
     "timestamp": "2025-12-17T18:58:19.083339",
-    "comments": []
+    "comments": [
+      {
+        "comment": "comment",
+        "timestamp": "2025-12-18T19:40:16.804248"
+      }
+    ]
   },
   {
     "question_id": "bcb85962-eeed-4c44-b1a9-1293fe23effb",
@@ -20,8 +18,8 @@
     "timestamp": "2025-12-17T19:07:03.203807",
     "comments": [
       {
-        "comment": "test",
-        "timestamp": "2025-12-17T19:07:13.593772"
+        "comment": "ceci est un commentaire",
+        "timestamp": "2025-12-18T19:37:28.616904"
       }
     ]
   },

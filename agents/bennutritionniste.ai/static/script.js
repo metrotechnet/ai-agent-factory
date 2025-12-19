@@ -704,64 +704,7 @@ function setupMessageActions(messageDiv, contentDiv) {
         }
     });
 
-    // Comment button: open SweetAlert2 popup and send comment to server
-    if (commentBtn) {
-        commentBtn.addEventListener('click', async () => {
-            const questionId = commentBtn.dataset.questionId;
-            if (!questionId) {
-                console.assert.log(t('messages.error'));
-                return;
-            }
 
-            const { value: comment } = await Swal.fire({
-                title: t('messages.comment'),
-                input: 'textarea',
-                inputLabel: t('messages.comment_placeholder'),
-                inputPlaceholder: t('messages.comment_placeholder'),
-                inputAttributes: {
-                    'aria-label': t('messages.comment_placeholder')
-                },
-                showCancelButton: true,
-                confirmButtonText: t('messages.send'),
-                cancelButtonText: t('messages.cancel'),
-                inputValidator: (value) => {
-                    if (!value || !value.trim()) {
-                        return t('messages.comment_required');
-                    }
-                }
-            });
-            if (comment && comment.trim()) {
-                Swal.showLoading();
-                try {
-                    const res = await fetch('/api/add_comment', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ question_id: questionId, comment: comment.trim() })
-                    });
-                    const result = await res.json();
-                    if (result.status === 'success') {
-                        await Swal.fire({
-                            icon: 'success',
-                            title: t('messages.comment_success'),
-                            timer: 1500,
-                            showConfirmButton: false
-                        });
-                    } else {
-                        await Swal.fire({
-                            icon: 'error',
-                            title: t('messages.comment_error'),
-                            text: result.message || '',
-                        });
-                    }
-                } catch (e) {
-                    await Swal.fire({
-                        icon: 'error',
-                        title: t('messages.network_error')
-                    });
-                }
-            }
-        });
-    }
 }
 
 /**

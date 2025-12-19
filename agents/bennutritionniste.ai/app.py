@@ -1,7 +1,10 @@
 # Endpoint to like or dislike an answer by question_id
 from fastapi import status
 
+
 from fastapi.responses import FileResponse
+from fastapi.responses import HTMLResponse
+from fastapi import Query
 
 from dotenv import load_dotenv
 from fastapi import FastAPI, Body
@@ -76,10 +79,11 @@ def add_comment_to_question(question_id, comment):
             return False
         for entry in data:
             if entry.get("question_id") == question_id:
-                entry.setdefault("comments", []).append({
+                # Remplace tous les commentaires par le nouveau commentaire
+                entry["comments"] = [{
                     "comment": comment,
                     "timestamp": datetime.now().isoformat()
-                })
+                }]
                 with open(QUESTION_LOG_PATH, 'w', encoding='utf-8') as f:
                     json.dump(data, f, ensure_ascii=False, indent=2)
                 return True
@@ -218,6 +222,14 @@ def download_question_log(key: str = Query(...)):
         filename="question_log.json",
         media_type="application/json"
     )
+
+# Endpoint to serve log_report.html (requires ?key=...)
+@app.get("/log_report", response_class=HTMLResponse)
+def serve_log_report(request: Request, key: str = Query(...)):
+    # Only allow access if key is correct
+    if key != "dboubou363":
+        return HTMLResponse("<h3 style='color:red;text-align:center;margin-top:2em'>Unauthorized: Invalid key</h3>", status_code=401)
+    return templates.TemplateResponse("log_report.html", {"request": request})
 
 def _clean_old_sessions():
     """Remove sessions older than SESSION_TIMEOUT"""
