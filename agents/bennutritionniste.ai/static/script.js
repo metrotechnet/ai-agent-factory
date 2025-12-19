@@ -479,7 +479,7 @@ function createBottomSpacer(userMsgDiv, assistantMsgDiv) {
  * Handle send button click
  */
 sendButton.addEventListener('click', () => {
-    console.log("Send button clicked");
+
 
     // Check if keyboard is likely visible (input is focused)
     const isKeyboardVisible = document.activeElement === inputBox;
@@ -514,9 +514,7 @@ document.querySelectorAll('.suggestion-card').forEach(card => {
     });
 });
 
-// ===================================
-// MESSAGE SENDING & STREAMING
-// ===================================
+
 
 /**
  * Main function to send user message and handle AI response
@@ -1026,15 +1024,4 @@ document.addEventListener('DOMContentLoaded', function() {
     // addLanguageSwitcher();
 });
 
-/**
- * Add language switcher to the interface (for development/testing)
- */
-function addLanguageSwitcher() {
-    const switcher = document.createElement('div');
-    switcher.style.cssText = 'position:fixed;top:10px;right:10px;z-index:1000;background:white;padding:10px;border-radius:5px;box-shadow:0 2px 5px rgba(0,0,0,0.1);';
-    switcher.innerHTML = `
-        <button onclick="switchLanguage('fr')" style="margin-right:5px;padding:5px 10px;border:1px solid #ccc;background:#f9f9f9;cursor:pointer;">FR</button>
-        <button onclick="switchLanguage('en')" style="padding:5px 10px;border:1px solid #ccc;background:#f9f9f9;cursor:pointer;">EN</button>
-    `;
-    document.body.appendChild(switcher);
-}
+

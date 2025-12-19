@@ -1,27 +1,17 @@
-# Endpoint to like or dislike an answer by question_id
-from fastapi import status
 
-
-from fastapi.responses import FileResponse
-from fastapi.responses import HTMLResponse
-from fastapi import Query
-
-from dotenv import load_dotenv
-from fastapi import FastAPI, Body
+from fastapi import FastAPI, Body, Query, Request
+from fastapi.responses import FileResponse, HTMLResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import HTMLResponse, StreamingResponse
 from fastapi.templating import Jinja2Templates
-from fastapi import Request
 from pydantic import BaseModel
-from core.query_chromadb import ask_question_stream, ask_question_stream_gemini
-from core.query_vertexaidb import ask_question_stream_vertex, ask_question_stream_vertex_gemini
-import json
-from pathlib import Path
+from core.query_chromadb import ask_question_stream
 from core.pipeline_gdrive import run_pipeline
-from typing import List, Dict, Optional
+from dotenv import load_dotenv
+from pathlib import Path
+from typing import Dict, Optional
+import json
 import uuid
 from datetime import datetime, timedelta
-
 import threading
 
 # Load environment variables from the correct location
@@ -35,17 +25,13 @@ app = FastAPI(title="Personal AI Agent")
 app.mount("/static", StaticFiles(directory=str(PROJECT_ROOT / "static")), name="static")
 templates = Jinja2Templates(directory=str(PROJECT_ROOT / "templates"))
 
-# In-memory session storage (use Redis or database in production)
 conversation_sessions: Dict[str, Dict] = {}
 SESSION_TIMEOUT = timedelta(hours=2)
 
-# Path to question log file
 QUESTION_LOG_PATH = PROJECT_ROOT / "question_log.json"
-# Lock for thread-safe file access
 question_log_lock = threading.Lock()
 
 def save_question_response(question_id, question, response):
-    """Save question, response, and id to the log file."""
     entry = {
         "question_id": question_id,
         "question": question,
@@ -95,48 +81,29 @@ class QueryRequest(BaseModel):
     timezone: str = "UTC"
     locale: str = "fr-FR"
     session_id: Optional[str] = None
-    
-class Message(BaseModel):
-    role: str  # 'user' or 'assistant'
-    content: str
-    timestamp: str
 
 @app.post("/query")
 async def query_agent(request: QueryRequest):
-    # Get or create session
     session_id = request.session_id or str(uuid.uuid4())
-    print(f"Session ID: {session_id}")
-    # Clean old sessions
     _clean_old_sessions()
-    
-    # Initialize session if new
     if session_id not in conversation_sessions:
         conversation_sessions[session_id] = {
             'messages': [],
             'created_at': datetime.now(),
             'last_activity': datetime.now()
         }
-    
-    # Get conversation history
     session = conversation_sessions[session_id]
     conversation_history = session['messages']
-    
-    # Add user message to history
     user_message = {
         'role': 'user',
         'content': request.question,
         'timestamp': datetime.now().isoformat()
     }
     conversation_history.append(user_message)
-    
-    # Update last activity
     session['last_activity'] = datetime.now()
-    
     question_id = str(uuid.uuid4())
     def generate():
-        # Send session_id and question_id in first chunk
         yield f"data: {json.dumps({'session_id': session_id, 'question_id': question_id, 'chunk': ''})}\n\n"
-
         assistant_response = ""
         for chunk in ask_question_stream(
             request.question, 
@@ -147,18 +114,13 @@ async def query_agent(request: QueryRequest):
         ):
             assistant_response += chunk
             yield f"data: {json.dumps({'chunk': chunk})}\n\n"
-
-        # Add assistant response to history
         assistant_message = {
             'role': 'assistant',
             'content': assistant_response,
             'timestamp': datetime.now().isoformat()
         }
         conversation_history.append(assistant_message)
-
-        # Save question, response, and id to file
         save_question_response(question_id, request.question, assistant_response)
-
     return StreamingResponse(
         generate(), 
         media_type="text/event-stream",
@@ -169,7 +131,6 @@ async def query_agent(request: QueryRequest):
         }
     )
 
-# Endpoint to add a comment to a question by id
 @app.post("/api/add_comment")
 def add_comment_api(
     question_id: str = Body(...),
@@ -180,7 +141,6 @@ def add_comment_api(
         return {"status": "success", "message": "Comment added"}
     else:
         return {"status": "error", "message": "Question ID not found"}
-    
 @app.post("/api/like_answer")
 def like_answer(
     question_id: str = Body(...),
@@ -209,8 +169,6 @@ def like_answer(
                 return {"status": "success", "message": "Vote recorded"}
         return {"status": "error", "message": "Question ID not found"}    
     
-# Endpoint to download the question_log.json file (protected by key in URL argument)
-from fastapi import Query
 @app.get("/api/download_log")
 def download_question_log(key: str = Query(...)):
     if key != "dboubou363":
@@ -223,7 +181,6 @@ def download_question_log(key: str = Query(...)):
         media_type="application/json"
     )
 
-# Endpoint to serve log_report.html (requires ?key=...)
 @app.get("/log_report", response_class=HTMLResponse)
 def serve_log_report(request: Request, key: str = Query(...)):
     # Only allow access if key is correct
@@ -232,7 +189,6 @@ def serve_log_report(request: Request, key: str = Query(...)):
     return templates.TemplateResponse("log_report.html", {"request": request})
 
 def _clean_old_sessions():
-    """Remove sessions older than SESSION_TIMEOUT"""
     now = datetime.now()
     expired_sessions = [
         sid for sid, session in conversation_sessions.items()
