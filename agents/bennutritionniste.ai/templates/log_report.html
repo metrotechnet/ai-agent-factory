@@ -56,7 +56,7 @@
                     <div class="col-12 col-md-10" style="white-space:pre-wrap;">${entry.response || ''}</div>
                 </div>
                 <div class="row">
-                    <div class="col-12 col-md-2 qa-label">Like/Dislike</div>
+                    <div class="col-12 col-md-2 qa-label">User Like/Dislike</div>
                     <div class="col-12 col-md-10 qa-actions">
                         ${Array.isArray(entry.likes) && entry.likes.some(l=>l.like===true) ? '<i class="bi bi-hand-thumbs-up-fill like-icon text-success"></i>' : ''}
                         ${Array.isArray(entry.likes) && entry.likes.some(l=>l.like===false) ? '<i class="bi bi-hand-thumbs-down-fill dislike-icon text-danger"></i>' : ''}
