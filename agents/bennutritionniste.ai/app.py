@@ -4,7 +4,10 @@ from fastapi.responses import FileResponse, HTMLResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
-from core.query_chromadb import ask_question_stream
+from core.query_chromadb import ask_question_stream, get_collection, get_pmids_from_contexts, client
+# Route API pour obtenir les PMIDs pertinents à une question
+from fastapi import APIRouter
+
 from core.pipeline_gdrive import run_pipeline
 from dotenv import load_dotenv
 from pathlib import Path
@@ -75,6 +78,7 @@ def add_comment_to_question(question_id, comment):
                 return True
         return False
 
+
 class QueryRequest(BaseModel):
     question: str
     language: str = "fr"
@@ -82,6 +86,7 @@ class QueryRequest(BaseModel):
     locale: str = "fr-FR"
     session_id: Optional[str] = None
 
+# Store PMIDs per session/question for later retrieval
 @app.post("/query")
 async def query_agent(request: QueryRequest):
     session_id = request.session_id or str(uuid.uuid4())
@@ -90,9 +95,13 @@ async def query_agent(request: QueryRequest):
         conversation_sessions[session_id] = {
             'messages': [],
             'created_at': datetime.now(),
-            'last_activity': datetime.now()
+            'last_activity': datetime.now(),
+            'pmids': {},  # question_id -> pmid list
         }
     session = conversation_sessions[session_id]
+    # Ensure pmids dict exists for backward compatibility
+    if 'pmids' not in session:
+        session['pmids'] = {}
     conversation_history = session['messages']
     user_message = {
         'role': 'user',
@@ -106,11 +115,13 @@ async def query_agent(request: QueryRequest):
         yield f"data: {json.dumps({'session_id': session_id, 'question_id': question_id, 'chunk': ''})}\n\n"
         assistant_response = ""
         for chunk in ask_question_stream(
-            request.question, 
+            request.question,
             language=request.language,
             timezone=request.timezone,
             locale=request.locale,
-            conversation_history=conversation_history
+            conversation_history=conversation_history,
+            session=session,
+            question_id=question_id
         ):
             assistant_response += chunk
             yield f"data: {json.dumps({'chunk': chunk})}\n\n"
@@ -130,6 +141,38 @@ async def query_agent(request: QueryRequest):
             "Connection": "keep-alive",
         }
     )
+
+
+# Fetch PMIDs for a session/question if available, else fallback to old behavior
+@app.post("/api/pmids")
+def get_pmids_api(
+    session_id: str = Body(None),
+    question_id: str = Body(None),
+    question: str = Body(None),
+    top_k: int = 5
+):
+    # Try to fetch from session memory first
+    if session_id and question_id:
+        session = conversation_sessions.get(session_id)
+        if session and 'pmids' in session and question_id in session['pmids']:
+            return {"pmids": session['pmids'][question_id]}
+    # Fallback: recompute from question
+    if not question:
+        return {"pmids": []}
+    col = get_collection()
+    if col is None:
+        return {"error": "ChromaDB collection not available"}
+    query_emb = client.embeddings.create(
+        model="text-embedding-3-large",
+        input=question
+    ).data[0].embedding
+    results = col.query(
+        query_embeddings=[query_emb],
+        n_results=top_k
+    )
+    contexts = results['documents'][0] if results['documents'] and results['documents'][0] else []
+    pmids = get_pmids_from_contexts(contexts)
+    return {"pmids": pmids}
 
 @app.post("/api/add_comment")
 def add_comment_api(

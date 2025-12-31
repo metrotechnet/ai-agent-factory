@@ -776,6 +776,8 @@ async function handleStreamingResponse(question, contentDiv, actionsDiv) {
             } else {
                 contentDiv.textContent = fullText;
             }
+            // Call fetchAndDisplayPmids at the end of streaming
+            await fetchAndDisplayPmids(contentDiv);
             break;
         }
 
@@ -796,11 +798,13 @@ async function handleStreamingResponse(question, contentDiv, actionsDiv) {
                     // Store session_id from first chunk
                     if (data.session_id && !sessionId) {
                         sessionId = data.session_id;
+                        window.sessionId = sessionId; // Store globally for later use
                         console.log('Session ID received:', sessionId);
                     }
                     // Store question_id from first chunk
                     if (data.question_id && !questionId) {
                         questionId = data.question_id;
+                        window.questionId = questionId; // Store globally for later use
                         // Find the comment, like, and dislike buttons and set data-question-id
                         if (!commentBtn && actionsDiv) commentBtn = actionsDiv.querySelector('.comment-btn');
                         if (!likeBtn && actionsDiv) likeBtn = actionsDiv.querySelector('.like-btn');
@@ -825,12 +829,45 @@ async function handleStreamingResponse(question, contentDiv, actionsDiv) {
                             contentDiv.textContent = fullText;
                         }
                     }
+                  
                     updateScrollIndicator();
                 } catch (parseError) {
                     console.error('JSON parsing error:', parseError);
                 }
             }
         }
+    }
+}
+
+// Appelle l’API pour obtenir les PMIDs pertinents à la question et les affiche sous la réponse
+async function fetchAndDisplayPmids( container) {
+    try {
+        // Use sessionId and questionId if available for accurate retrieval
+        const payload = { };
+        if (window.sessionId && window.questionId) {
+            payload.session_id = window.sessionId;
+            payload.question_id = window.questionId;
+        }
+        const res = await fetch('/api/pmids', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (data.pmids && data.pmids.length > 0) {
+            const refsDiv = document.createElement('div');
+            refsDiv.className = 'pmid-refs';
+            refsDiv.innerHTML = `<strong>Références PubMed :</strong> ` +
+                data.pmids.map(pmid => {
+                    // Extraire juste le numéro
+                    const num = pmid.replace(/[^\d]/g, '');
+                    const url = `https://google.com/search?q=${pmid}`;
+                    return `<a href="${url}" target="_blank" rel="noopener">${pmid}</a>`;
+                }).join(', ');
+            container.appendChild(refsDiv);
+        }
+    } catch (e) {
+        console.error('Erreur lors de la récupération des PMIDs', e);
     }
 }
 

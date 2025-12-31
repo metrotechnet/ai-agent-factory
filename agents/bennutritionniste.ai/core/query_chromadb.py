@@ -1,5 +1,6 @@
 import os
 import json
+import re
 from pathlib import Path
 from dotenv import load_dotenv
 from openai import OpenAI
@@ -87,7 +88,17 @@ def get_collection():
             return None
     return collection
 
-def ask_question_stream(question, language="fr", timezone="UTC", locale="fr-FR", top_k=5, conversation_history=None):
+def extract_pmids_from_text(text):
+    """Extrait toutes les références PMID d'un texte."""
+    return re.findall(r'PMID:\s*\d+', text)
+
+def get_pmids_from_contexts(contexts):
+    pmids = set()
+    for doc in contexts:
+           pmids.update(extract_pmids_from_text(doc))
+    return list(pmids)
+
+def ask_question_stream(question, language="fr", timezone="UTC", locale="fr-FR", top_k=5, conversation_history=None, session=None, question_id=None):
     """Streaming version of ask_question with language support and conversation history"""
     col = get_collection()
     
@@ -99,6 +110,7 @@ def ask_question_stream(question, language="fr", timezone="UTC", locale="fr-FR",
     if conversation_history is None:
         conversation_history = []
     
+
     try:
         # Get embedding for the question
         query_emb = client.embeddings.create(
@@ -121,6 +133,14 @@ def ask_question_stream(question, language="fr", timezone="UTC", locale="fr-FR",
         for i, doc in enumerate(results['documents'][0]):
             contexts.append(doc)
         context = "\n\n".join(contexts)
+
+        # Extraire les PMIDs du contexte
+        pmids = get_pmids_from_contexts(contexts)
+        # Save PMIDs in session if provided
+        if session is not None and question_id is not None:
+            if 'pmids' not in session:
+                session['pmids'] = {}
+            session['pmids'][question_id] = pmids
         
  
         # Build conversation history string for context
@@ -217,6 +237,10 @@ def ask_question_stream(question, language="fr", timezone="UTC", locale="fr-FR",
         
         # Use French as fallback for unsupported languages
         prompt = prompts.get(language, prompts["fr"]) if language in ["fr", "en"] else prompts["fr"]
+        
+        #Save prompt for debugging
+        # with open("debug_prompt.txt", "w", encoding="utf-8") as f:
+        #     f.write(prompt)
 
         # Get streaming response from GPT
         stream = client.chat.completions.create(
@@ -229,6 +253,7 @@ def ask_question_stream(question, language="fr", timezone="UTC", locale="fr-FR",
         )
         
         first_chunk = True
+        answer = ""
         for chunk in stream:
             if chunk.choices[0].delta.content is not None:
                 content = chunk.choices[0].delta.content
@@ -236,8 +261,10 @@ def ask_question_stream(question, language="fr", timezone="UTC", locale="fr-FR",
                 if first_chunk:
                     content = content.lstrip()
                     first_chunk = False
-                if content:  # Only yield if not empty after stripping
+                if content:
+                    answer += content
                     yield content
+
         
     except Exception as e:
         yield f"Error processing your question: {str(e)}"
