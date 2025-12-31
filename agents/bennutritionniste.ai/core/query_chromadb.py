@@ -174,7 +174,7 @@ def ask_question_stream(question, language="fr", timezone="UTC", locale="fr-FR",
                 - "Le risque dépend avant tout de la dose"
                 - "Nous ne sommes pas tous égaux face au poids"
                 - "Focus sur alimentation, sommeil, activité physique"
-                - "Approche holistique et durable"
+                - "Approche globale et durable"
 
                 CONTEXTE DISPONIBLE:
                 {context}
@@ -214,7 +214,7 @@ def ask_question_stream(question, language="fr", timezone="UTC", locale="fr-FR",
                 - "Risk depends primarily on dosage"
                 - "We're not all equal when it comes to weight"
                 - "Focus on nutrition, sleep, physical activity"
-                - "Holistic and sustainable approach"
+                - "Global and sustainable approach"
 
                 AVAILABLE CONTEXT:
                 {context}

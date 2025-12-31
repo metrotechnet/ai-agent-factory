@@ -370,8 +370,9 @@ overlay.addEventListener('click', () => {
     overlay.classList.remove('active');
 });
 
+
 // ===================================
-// LEGAL NOTICE POPUP
+// LEGAL NOTICE & PRIVACY POPUP
 // ===================================
 
 /**
@@ -387,38 +388,76 @@ document.getElementById('legal-link').addEventListener('click', (e) => {
 });
 
 /**
+ * Handle privacy policy link click
+ * Shows privacy policy popup and closes sidebar
+ */
+document.getElementById('privacy-link').addEventListener('click', (e) => {
+    e.preventDefault();
+    showPrivacyPolicy();
+    sidebar.classList.remove('open');
+    overlay.classList.remove('active');
+});
+
+
+/**
  * Create and display legal notice popup with disclaimer text
  */
 function showLegalNotice() {
-    const popup = document.createElement('div');
-    popup.className = 'legal-popup';
-    
     const langData = translations[currentLanguage] || translations['fr'];
     const legalContent = langData.legal;
-    
-    popup.innerHTML = `
-        <div class="legal-popup-content">
-            <button class="legal-popup-close">&times;</button>
-            <h2>${legalContent.title}</h2>
-            <div class="legal-text">
-                ${legalContent.content.map(line => line ? `<p>${line}</p>` : '').join('')}
-            </div>
-        </div>
-    `;
-    
-    document.body.appendChild(popup);
-    
-    // Set up close button handler
-    const closeBtn = popup.querySelector('.legal-popup-close');
-    closeBtn.addEventListener('click', () => {
-        popup.remove();
+    let html = `<h2 style='margin-top:0;text-align:center;'>${legalContent.title}</h2>`;
+    html += legalContent.content.map(line => {
+            return `<p>${line}</p>`;
+    }).join('');
+
+    Swal.fire({
+        title: '',
+        html: `<div style="text-align:left;">${html}</div>`,
+        confirmButtonText: t('sidebar.closeButton') || 'Fermer',
+        customClass: {
+            popup: 'legal-popup-swal',
+            title: 'legal-popup-title',
+            content: 'legal-popup-content'
+        },
+        width: 700
     });
-    
-    // Close popup when clicking outside content area
-    popup.addEventListener('click', (e) => {
-        if (e.target === popup) {
-            popup.remove();
+}
+
+/**
+ * Create and display privacy policy popup
+ */
+function showPrivacyPolicy() {
+    const langData = translations[currentLanguage] || translations['fr'];
+    const privacy = langData.privacy;
+    let html = `<h2 style='margin-top:0;text-align:center;'>${privacy.title}</h2>`;
+    if (privacy.lastUpdate) {
+        html += `<p><em>${privacy.lastUpdate}</em></p>`;
+    }
+    html += privacy.content.map(line => {
+         if (/^\d+\./.test(line)) {
+            return `<h3>${line}</h3>`;
+        } else if (line.trim() === '') {
+            return '';
+        } else {
+            return `<p>${line}</p>`;
         }
+    }).join('');
+    // Regrouper les <li> dans des <ul> selon les sections
+    html = html.replace(/(<h3>[^<]+<\/h3>)(<li>.*?<\/li>)+/gs, function(match) {
+        const h3 = match.match(/<h3>[^<]+<\/h3>/)[0];
+        const lis = match.match(/<li>.*?<\/li>/gs).join('');
+        return h3 + '<ul >' + lis + '</ul>';
+    });
+    Swal.fire({
+        title: '',
+        html: `<div style="text-align:left;">${html}</div>`,
+        confirmButtonText: t('sidebar.closeButton') || 'Fermer',
+        customClass: {
+            popup: 'legal-popup-swal',
+            title: 'legal-popup-title',
+            content: 'legal-popup-content'
+        },
+        width: 700
     });
 }
 
