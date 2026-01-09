@@ -73,6 +73,13 @@ footer {
     padding: 1rem 2rem;
 }
 
+/* Disabled input-area style */
+.input-area.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+    filter: grayscale(0.7);
+}
+
 @media (max-width: 768px) {
     body {
         overscroll-behavior: auto;

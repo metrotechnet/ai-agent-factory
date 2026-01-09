@@ -1,13 +1,13 @@
 
-from fastapi import FastAPI, Body, Query, Request
+# =====================================================
+# Imports - Importations des modules nécessaires
+# =====================================================
+from fastapi import FastAPI, Body, Query, Request, APIRouter
 from fastapi.responses import FileResponse, HTMLResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
 from core.query_chromadb import ask_question_stream, get_collection, get_pmids_from_contexts, client
-# Route API pour obtenir les PMIDs pertinents à une question
-from fastapi import APIRouter
-
 from core.pipeline_gdrive import run_pipeline
 from dotenv import load_dotenv
 from pathlib import Path
@@ -17,7 +17,10 @@ import uuid
 from datetime import datetime, timedelta
 import threading
 
-# Load environment variables from the correct location
+ # Chargement des variables d'environnement depuis le bon emplacement
+# =====================================================
+# Configuration & Constantes
+# =====================================================
 PROJECT_ROOT = Path(__file__).parent
 env_path = PROJECT_ROOT / '.env'
 load_dotenv(dotenv_path=env_path)
@@ -31,10 +34,18 @@ templates = Jinja2Templates(directory=str(PROJECT_ROOT / "templates"))
 conversation_sessions: Dict[str, Dict] = {}
 SESSION_TIMEOUT = timedelta(hours=2)
 
+
 QUESTION_LOG_PATH = PROJECT_ROOT / "question_log.json"
 question_log_lock = threading.Lock()
 
+######################################################
+# Fonctions utilitaires
+######################################################
+
 def save_question_response(question_id, question, response):
+    """
+    Sauvegarde une question et sa réponse dans le fichier journal.
+    """
     entry = {
         "question_id": question_id,
         "question": question,
@@ -57,6 +68,9 @@ def save_question_response(question_id, question, response):
 
 def add_comment_to_question(question_id, comment):
     """Add a comment to a question by id."""
+    """
+    Ajoute un commentaire à une question par son identifiant.
+    """
     with question_log_lock:
         try:
             if QUESTION_LOG_PATH.exists():
@@ -79,6 +93,9 @@ def add_comment_to_question(question_id, comment):
         return False
 
 
+######################################################
+# Modèles de données
+######################################################
 class QueryRequest(BaseModel):
     question: str
     language: str = "fr"
@@ -86,8 +103,12 @@ class QueryRequest(BaseModel):
     locale: str = "fr-FR"
     session_id: Optional[str] = None
 
-# Store PMIDs per session/question for later retrieval
+######################################################
+# Endpoints API
+######################################################
+# Stocke les PMIDs par session/question pour une récupération ultérieure
 @app.post("/query")
+# Endpoint principal pour poser une question à l'agent et recevoir une réponse en streaming
 async def query_agent(request: QueryRequest):
     session_id = request.session_id or str(uuid.uuid4())
     _clean_old_sessions()
@@ -112,6 +133,7 @@ async def query_agent(request: QueryRequest):
     session['last_activity'] = datetime.now()
     question_id = str(uuid.uuid4())
     def generate():
+        # Génère la réponse de l'assistant en streaming (SSE)
         yield f"data: {json.dumps({'session_id': session_id, 'question_id': question_id, 'chunk': ''})}\n\n"
         assistant_response = ""
         for chunk in ask_question_stream(
@@ -145,6 +167,7 @@ async def query_agent(request: QueryRequest):
 
 # Fetch PMIDs for a session/question if available, else fallback to old behavior
 @app.post("/api/pmids")
+# Endpoint pour obtenir les PMIDs pertinents à une question
 def get_pmids_api(
     session_id: str = Body(None),
     question_id: str = Body(None),
@@ -175,6 +198,7 @@ def get_pmids_api(
     return {"pmids": pmids}
 
 @app.post("/api/add_comment")
+# Endpoint pour ajouter un commentaire à une question
 def add_comment_api(
     question_id: str = Body(...),
     comment: str = Body(...)
@@ -185,6 +209,7 @@ def add_comment_api(
     else:
         return {"status": "error", "message": "Question ID not found"}
 @app.post("/api/like_answer")
+# Endpoint pour liker ou disliker une réponse
 def like_answer(
     question_id: str = Body(...),
     like: bool = Body(...)
@@ -213,6 +238,7 @@ def like_answer(
         return {"status": "error", "message": "Question ID not found"}    
     
 @app.get("/api/download_log")
+# Endpoint pour télécharger le journal des questions (admin seulement)
 def download_question_log(key: str = Query(...)):
     if key != "dboubou363":
         return {"status": "error", "message": "Unauthorized"}
@@ -225,13 +251,20 @@ def download_question_log(key: str = Query(...)):
     )
 
 @app.get("/log_report", response_class=HTMLResponse)
+# Endpoint pour afficher le rapport du journal (admin seulement)
 def serve_log_report(request: Request, key: str = Query(...)):
     # Only allow access if key is correct
     if key != "dboubou363":
         return HTMLResponse("<h3 style='color:red;text-align:center;margin-top:2em'>Unauthorized: Invalid key</h3>", status_code=401)
     return templates.TemplateResponse("log_report.html", {"request": request})
 
+######################################################
+# Gestion des sessions
+######################################################
 def _clean_old_sessions():
+    """
+    Supprime les sessions de conversation expirées.
+    """
     now = datetime.now()
     expired_sessions = [
         sid for sid, session in conversation_sessions.items()
@@ -241,16 +274,27 @@ def _clean_old_sessions():
         del conversation_sessions[sid]
 
 @app.get("/", response_class=HTMLResponse)
+######################################################
+# Endpoints divers
+######################################################
 def home(request: Request):
+    """
+    Sert la page principale d'accueil.
+    """
     return templates.TemplateResponse("index.html", {"request": request})
 
 @app.get("/health")
 def health():
+    """
+    Endpoint de vérification de l'état de santé de l'application.
+    """
     return {"status": "ok"}
 
 @app.get("/api/get_config")
 def get_translations():
-    """Get translations for the frontend"""
+    """
+    Récupère les traductions pour le frontend.
+    """
     try:
         translations_path = Path(__file__).parent / "config" / "config.json"
         with open(translations_path, 'r', encoding='utf-8') as f:
@@ -262,6 +306,7 @@ def get_translations():
         return {"error": f"Error loading config: {str(e)}"}
 
 @app.post("/api/reset_session")
+# Endpoint pour réinitialiser une session de conversation
 def reset_session(session_id: str = None):
     """Reset a conversation session"""
     if session_id and session_id in conversation_sessions:
@@ -270,6 +315,7 @@ def reset_session(session_id: str = None):
     return {"status": "info", "message": "No active session to reset"}
 
 @app.get("/api/session_info")
+# Endpoint pour obtenir les informations d'une session
 def get_session_info(session_id: str):
     """Get information about a session"""
     if session_id in conversation_sessions:
@@ -283,6 +329,7 @@ def get_session_info(session_id: str):
     return {"exists": False}
 
 @app.post("/update")
+# Endpoint pour déclencher l'indexation des documents Google Drive
 def update_pipeline(request: Request):
     """
     Endpoint to trigger Google Drive document indexing pipeline.

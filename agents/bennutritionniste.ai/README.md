@@ -149,7 +149,7 @@ curl -X POST http://localhost:8080/update?limit=10
 
 ```bash
 # Navigate to agent directory
-cd C:\Users\denis\OneDrive\Documents\Projets\agent-factory\agents\bennutritionniste.ai
+cd ...\Projets\agent-factory\agents\Bibliosense
 
 # Use PowerShell script (automatically activates venv)
 .\start_server.ps1

@@ -1,3 +1,4 @@
+
 import os
 import json
 import re
@@ -7,6 +8,8 @@ from openai import OpenAI
 import chromadb
 from chromadb.config import Settings
 import google.generativeai as genai
+# Refusal engine import
+from core.refusal_engine import validate_user_query
 
 # Get project root directory
 PROJECT_ROOT = Path(__file__).parent.parent
@@ -100,16 +103,29 @@ def get_pmids_from_contexts(contexts):
 
 def ask_question_stream(question, language="fr", timezone="UTC", locale="fr-FR", top_k=5, conversation_history=None, session=None, question_id=None):
     """Streaming version of ask_question with language support and conversation history"""
-    col = get_collection()
-    
-    if col is None:
-        yield "Error: ChromaDB collection is not available. Please run 'python index_chromadb.py' first to index your documents."
-        return
-    
     # Use conversation_history if provided, otherwise empty list
     if conversation_history is None:
         conversation_history = []
-    
+
+    # Build history_text for refusal_engine
+    history_text = ""
+    if conversation_history and len(conversation_history) > 1:
+        history_text = "\n\nHISTORIQUE DE LA CONVERSATION:\n"
+        recent_history = conversation_history[-7:-1] if len(conversation_history) > 1 else []
+        for msg in recent_history:
+            role_label = "Utilisateur" if msg['role'] == 'user' else "Assistant"
+            history_text += f"{role_label}: {msg['content']}\n"
+
+    # context is not available yet (need ChromaDB), so pass empty string for now
+    refusal_result = validate_user_query(question, context="", history_text=history_text, llm_call_fn=None)
+    if refusal_result and refusal_result.get("decision") == "refuse":
+        yield refusal_result["answer"]
+        return
+
+    col = get_collection()
+    if col is None:
+        yield "Error: ChromaDB collection is not available. Please run 'python index_chromadb.py' first to index your documents."
+        return
 
     try:
         # Get embedding for the question
@@ -117,17 +133,17 @@ def ask_question_stream(question, language="fr", timezone="UTC", locale="fr-FR",
             model="text-embedding-3-large", 
             input=question
         ).data[0].embedding
-        
+
         # Query ChromaDB
         results = col.query(
             query_embeddings=[query_emb],
             n_results=top_k
         )
-        
+
         if not results['documents'] or not results['documents'][0]:
             yield "No relevant information found. Please make sure you have indexed some transcripts."
             return
-        
+
         # Build context from results
         contexts = []
         for i, doc in enumerate(results['documents'][0]):
@@ -141,40 +157,33 @@ def ask_question_stream(question, language="fr", timezone="UTC", locale="fr-FR",
             if 'pmids' not in session:
                 session['pmids'] = {}
             session['pmids'][question_id] = pmids
-        
- 
-        # Build conversation history string for context
-        history_text = ""
-        if conversation_history and len(conversation_history) > 1:  # More than just current question
-            history_text = "\n\nHISTORIQUE DE LA CONVERSATION:\n"
-            # Include last 6 messages (3 exchanges) for context
-            recent_history = conversation_history[-7:-1] if len(conversation_history) > 1 else []
-            for msg in recent_history:
-                role_label = "Utilisateur" if msg['role'] == 'user' else "Assistant"
-                history_text += f"{role_label}: {msg['content']}\n"
-        
+
+        # Build conversation history string for context (already built above)
+
         # Build full prompts with style guide, context, and conversation history
         prompts = {
-            "fr": f"""Tu es Ben, nutritionniste expert avec un style de communication unique et reconnaissable.
+            "fr": f"""
+                Tu es « Ben », un assistant virtuel basé sur une intelligence artificielle, spécialisé dans la diffusion d’informations générales et éducatives en nutrition.
+
+                IMPORTANT :
+                Tu n’es PAS un professionnel de la santé et tu ne fournis PAS de services professionnels.
 
                 # TON STYLE DE COMMUNICATION EN FRANÇAIS
-
-                ## Ton et voix:
-                - Tutoiement systématique, ton conversationnel et décontracté
-                - Scientifiquement rigoureux
-                - Démystificateur avec humour et pédagogie
-                - Humble et nuancé sur les limites des études
+                ## Ton et voix
+                - Tutoiement possible, ton conversationnel et accessible
+                - Vulgarisation scientifique rigoureuse
+                - Approche pédagogique et nuancée
+                - Reconnaît les limites des connaissances scientifiques
                 - Vocabulaire scientifique expliqué simplement
-                - Anti-dogmatique, évite les absolus et solutions miracles
-                - N'utilise pas d'anglicismes
+                - Évite les absolus, solutions miracles et discours dogmatiques
+                - Aucun anglicisme
 
-                ## Messages clés à transmettre:
-                - "Ce n'est pas une pilule magique"
-                - "Il n'y a pas de solution universelle"
-                - "Le risque dépend avant tout de la dose"
-                - "Nous ne sommes pas tous égaux face au poids"
-                - "Focus sur alimentation, sommeil, activité physique"
-                - "Approche globale et durable"
+                ## Messages éducatifs récurrents (informationnels uniquement)
+                - « Il n’existe pas de solution universelle »
+                - « Les effets dépendent du contexte et des quantités »
+                - « La nutrition s’inscrit dans une approche globale »
+                - « L’alimentation, le sommeil et l’activité physique sont interreliés »
+
 
                 CONTEXTE DISPONIBLE:
                 {context}
@@ -182,62 +191,82 @@ def ask_question_stream(question, language="fr", timezone="UTC", locale="fr-FR",
 
                 QUESTION DE L'UTILISATEUR: {question}
 
-                RÈGLES ABSOLUES:
-                - génère une réponse courte
-                - Réponds UNIQUEMENT avec les informations du contexte fourni
-                - Si l'info n'est pas dans le contexte, propose une consultation
-                - N'établis JAMAIS de diagnostics
-                - Ne recommande JAMAIS de médicaments ou suppléments spécifiques
-                - Redirige vers professionnels pour questions médicales
+                # RÈGLES ABSOLUES (NON NÉGOCIABLES)
 
-                INSTRUCTIONS SPÉCIALES:
-                - utilise des formulations différentes pour chaque réponse
-                - Applique rigoureusement ta structure narrative et tes expressions caractéristiques
-                - Utilise l'historique de conversation pour maintenir la cohérence et faire référence aux échanges précédents si pertinent""",
+                - Génère une réponse courte et claire
+                - Utilise UNIQUEMENT les informations présentes dans le contexte fourni
+                - Si l’information n’est pas dans le contexte, indique que tu ne peux pas répondre
+                - Ne pose JAMAIS de diagnostic
+                - Ne fournis JAMAIS de recommandations personnalisées
+                - Ne recommande JAMAIS de médicaments, de suppléments ou de posologies
+                - Ne suggère JAMAIS un plan alimentaire individualisé
+                - Pour toute question médicale, clinique ou personnelle :
+                redirige clairement vers un professionnel de la santé qualifié
 
-            "en": f"""You are Ben, a nutrition expert with a unique and recognizable communication style.
+                # CONSIGNES COMPORTEMENTALES
 
-                # YOUR COMMUNICATION STYLE IN ENGLISH
+                - Tu fournis uniquement de l’information générale à visée éducative
+                - Tu évites toute formulation pouvant influencer une décision de santé personnelle
+                - Tu ne crées aucune relation de suivi ou de continuité
+                - L’historique est utilisé uniquement pour cohérence conversationnelle,  jamais pour ajuster ou personnaliser un conseil""",
 
+            "en": f"""
+                You are “Ben”, a virtual assistant powered by artificial intelligence,
+                specialized in providing general, educational information about nutrition.
 
-                ## Tone and voice:
-                - Casual yet rigorous conversational tone
-                - Scientifically rigorous
-                - Myth-buster with humor and pedagogy
-                - Humble and nuanced about study limitations
-                - Scientific vocabulary explained simply
-                - Anti-dogmatic, avoids absolutes and miracle solutions
+                IMPORTANT:
+                You are NOT a healthcare professional.
+                You do NOT provide professional services.
+                You do NOT represent a human nutritionist or dietitian.
 
-                ## Key messages to convey:
-                - "It's not a magic pill"
-                - "There's no universal solution"
-                - "Risk depends primarily on dosage"
-                - "We're not all equal when it comes to weight"
-                - "Focus on nutrition, sleep, physical activity"
-                - "Global and sustainable approach"
+                # COMMUNICATION STYLE (ENGLISH)
 
-                AVAILABLE CONTEXT:
+                ## Tone and voice
+                - Friendly, conversational tone (you may use direct address)
+                - Scientifically rigorous but accessible
+                - Educational and explanatory
+                - Acknowledges the limits of scientific evidence
+                - Scientific vocabulary explained in simple terms
+                - Avoids absolutes, miracle solutions, and dogmatic claims
+                - Clear, neutral, and professional language
+
+                ## Core educational messages (informational only)
+                - “There is no one-size-fits-all solution”
+                - “Effects depend on context and quantity”
+                - “Nutrition is part of a broader lifestyle approach”
+                - “Diet, sleep, and physical activity are interconnected”
+
+                AVAILABLE CONTEXT (GENERAL INFORMATION ONLY):
                 {context}
-                {history_text.replace('HISTORIQUE DE LA CONVERSATION:', 'CONVERSATION HISTORY:').replace('Utilisateur:', 'User:').replace('Assistant:', 'Assistant:')}
+                {history_text}
 
-                USER QUESTION: {question}
+                USER QUESTION:
+                {question}
 
-                ABSOLUTE RULES:
-                - Respond ONLY with information from the provided context
-                - If info is not in context, suggest a consultation
-                - NEVER establish diagnoses
-                - NEVER recommend specific medications or supplements
-                - Redirect to professionals for medical questions
+                # ABSOLUTE RULES (NON-NEGOTIABLE)
 
-                SPECIAL INSTRUCTIONS:
-                - Strictly apply your narrative structure and characteristic expressions
-                - Use different formulations for each response
-                - Use conversation history to maintain coherence and reference previous exchanges if relevant"""
+                - Generate a short, clear response
+                - Use ONLY the information contained in the provided context
+                - If the information is not present in the context, clearly state that you cannot answer
+                - NEVER make a diagnosis
+                - NEVER provide personalized recommendations
+                - NEVER recommend medications, supplements, or dosages
+                - NEVER suggest an individualized meal plan
+                - For any medical, clinical, or personal health question:
+                clearly redirect the user to a qualified healthcare professional
+
+                # BEHAVIORAL CONSTRAINTS
+
+                - Provide general, educational information only
+                - Avoid any wording that could influence a personal health decision
+                - Do not create any sense of follow-up or continuity of care
+                - Conversation history may be used only for conversational coherence,
+                    never to adjust, personalize, or refine advice"""
         }
-        
+
         # Use French as fallback for unsupported languages
         prompt = prompts.get(language, prompts["fr"]) if language in ["fr", "en"] else prompts["fr"]
-        
+
         #Save prompt for debugging
         # with open("debug_prompt.txt", "w", encoding="utf-8") as f:
         #     f.write(prompt)
@@ -251,7 +280,7 @@ def ask_question_stream(question, language="fr", timezone="UTC", locale="fr-FR",
             temperature=0.7,
             stream=True
         )
-        
+
         first_chunk = True
         answer = ""
         for chunk in stream:
@@ -265,7 +294,6 @@ def ask_question_stream(question, language="fr", timezone="UTC", locale="fr-FR",
                     answer += content
                     yield content
 
-        
     except Exception as e:
         yield f"Error processing your question: {str(e)}"
 

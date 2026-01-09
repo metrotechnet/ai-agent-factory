@@ -1,0 +1,243 @@
+{
+  "fr": {
+    "app": {
+      "title": "Ben - Nutritionniste | Assistant IA",
+      "description": "Assistant IA de Ben Boulanger, nutritionniste"
+    },
+    "header": {
+      "title": "Ben - Nutritionniste",
+      "menuButton": "Menu"
+    },
+    "sidebar": {
+      "title": "Ben - Nutritionniste",
+      "closeButton": "Fermer",
+      "instagram": "Suivez-moi sur Instagram",
+      "appointment": "Prenez un rendez-vous",
+      "contact": "Me rejoindre",
+      "legal": "Avertissements"
+    },
+    "intro": {
+      "title": "Des questions sur la nutrition ?",
+      "description": "Posez-les à mon agent IA et obtenez des réponses claires instantanément. Luttons contre la désinformation, une question à la fois.",
+      "disclaimer": "Note : Cet agent IA fournit uniquement des informations. \nPour des conseils personnalisés, consultez un professionnel de santé qualifié.",
+      "profileAlt": "Ben Nutritionniste",
+      "profileImage": "/static/ben.nutritioniste.jpg"
+    },
+    "suggestions": {
+      "nutrition": {
+        "title": "🥗 Nutrition",
+        "description": "Conseils alimentaires et nutrition"
+      },
+      "supplements": {
+        "title": "💊 Suppléments", 
+        "description": "Questions sur les suppléments et leur utilisation"
+      },
+      "training": {
+        "title": "🏋️ Entraînement",
+        "description": "Performance et récupération sportive"
+      },
+      "health": {
+        "title": "💡 Santé",
+        "description": "Bien-être général et habitudes de vie"
+      }
+    },
+    "input": {
+      "placeholder": "Pose-moi une question...",
+      "sendButton": "Envoyer",
+      "disclaimer": "⚠️ Peut contenir des erreurs. Ne remplace pas un avis professionnel."
+    },
+    "cookies": {
+      "title": "🍪 Cookies et confidentialité",
+      "message": "Ce site utilise des cookies essentiels pour assurer son bon fonctionnement. Aucune donnée personnelle n'est collectée à des fins publicitaires.",
+      "accept": "Accepter",
+      "decline": "Refuser"
+    },
+    "legal": {
+      "title": "⚠️ Avertissements importants",
+      "content": [
+        "Cet assistant virtuel est un outil d'information général basé sur le contenu éducatif de Ben Boulanger.",
+        "",
+        " ❌ NE REMPLACE PAS une consultation médicale",
+        " ❌ NE POSE PAS de diagnostic", 
+        " ❌ NE PRESCRIT PAS de traitement",
+        "",
+        "Pour tout problème de santé:",
+        "✅ Consultez un professionnel de santé qualifié",
+        "✅ Ne modifiez pas votre traitement sans avis médical",
+        "✅ En cas d'urgence, contactez les services d'urgence",
+        "",
+        "Les informations fournies sont à but éducatif uniquement."
+      ]
+    },
+    "privacy": {
+      "title": "Politique de confidentialité",
+      "lastUpdate": "31 décembre 2025",
+      "content": [
+        "Votre vie privée est importante pour nous. Cette politique de confidentialité explique quelles données sont collectées, comment elles sont utilisées et protégées lorsque vous utilisez l’assistant Ben - Nutritionniste.",
+        "",
+        "1. Données collectées",
+        " - Informations fournies : Les questions que vous posez à l’assistant et les informations que vous saisissez.",
+        " - Données techniques : Informations sur l’appareil, le navigateur, l’adresse IP et les données de connexion.",
+        "",
+        "2. Utilisation des données",
+        " - Fournir et améliorer le service de l’assistant IA.",
+        " - Assurer la sécurité et prévenir les abus.",
+        " - Analyser l’utilisation de l’application pour améliorer l’expérience utilisateur.",
+        "",
+        "3. Partage des données",
+        " Vos données ne sont jamais vendues à des tiers. Elles peuvent être partagées uniquement dans les cas suivants :",
+        " - Respect des obligations légales.",
+        " - Protection contre la fraude ou les menaces à la sécurité.",
+        "",
+        "4. Sécurité",
+        "Nous mettons en œuvre des mesures de sécurité pour protéger vos données contre l’accès non autorisé, la modification ou la divulgation.",
+        "",
+        "5. Vos droits",
+        " - Accéder à vos données personnelles.",
+        " - Demander la correction ou la suppression de vos données.",
+        " - Retirer votre consentement à tout moment.",
+        "",
+        "6. Contact",
+        "Pour toute question concernant cette politique de confidentialité, contactez-nous à <a href=\"mailto:ben@benutritionniste.com\">ben@benutritionniste.com</a>."
+      ]
+    },
+    
+    "messages": {
+      "loading": "Chargement...",
+      "error": "Désolé, une erreur est survenue. Réessayez dans quelques instants.",
+      "copy": "Copier",
+      "share": "Partager",
+      "copied": "Copié !",
+      "shareNotSupported": "Le partage n'est pas supporté sur ce navigateur.",
+      "comment": "Commentaire",
+      "comment_placeholder": "Votre commentaire...",
+      "send": "Envoyer",
+      "cancel": "Annuler",
+      "sending": "Envoi...",
+      "comment_success": "Commentaire ajouté !",
+      "comment_error": "Erreur lors de l'ajout du commentaire.",
+      "comment_required": "Veuillez entrer un commentaire.",
+      "network_error": "Erreur réseau."
+    }
+  },
+  "en": {
+    "app": {
+      "title": "Ben - Nutritionist | AI Assistant",
+      "description": "AI Assistant of Ben Boulanger, nutritionist"
+    },
+    "header": {
+      "title": "Ben - Nutritionist ",
+      "menuButton": "Menu"
+    },
+    "sidebar": {
+      "title": "Ben - Nutritionist",
+      "closeButton": "Close",
+      "instagram": "Follow me on Instagram",
+      "appointment": "Book an appointment",
+      "contact": "Contact me",
+      "legal": "Warnings"
+    },
+    "intro": {
+      "title": "Questions about nutrition?",
+     "description": "Ask my AI agent and get clear answers instantly. Let’s fight misinformation, one question at a time.",
+      "disclaimer": "Note: This AI provides informational support only. For personalized advice, consult a qualified healthcare professional.",
+      "profileAlt": "Ben Nutritionist",
+      "profileImage": "/static/ben.nutritioniste.jpg"
+    },
+    "suggestions": {
+      "nutrition": {
+        "title": "🥗 Nutrition",
+        "description": "Food advice and nutrition"
+      },
+      "supplements": {
+        "title": "💊 Supplements",
+        "description": "Questions about supplements and their use"
+      },
+      "training": {
+        "title": "🏋️ Training",
+        "description": "Performance and sports recovery"
+      },
+      "health": {
+        "title": "💡 Health",
+        "description": "General wellness and lifestyle habits"
+      }
+    },
+    "input": {
+      "placeholder": "Ask me a question...",
+      "sendButton": "Send",
+      "disclaimer": "⚠️ May contain errors. Does not replace professional advice."
+    },
+    "cookies": {
+      "title": "🍪 Cookies and privacy",
+      "message": "This site uses essential cookies to ensure proper functioning. No personal data is collected for advertising purposes.",
+      "accept": "Accept",
+      "decline": "Decline"
+    },
+    "legal": {
+      "title": "⚠️ Important warnings",
+      "content": [
+        "This virtual assistant is a general information tool based on Ben Boulanger's educational content.",
+        "",
+        " ❌ DOES NOT REPLACE a medical consultation",
+        " ❌ DOES NOT DIAGNOSE",
+        " ❌ DOES NOT PRESCRIBE treatment",
+        "",
+        "For any health problem:",
+        "✅ Consult a qualified healthcare professional",
+        "✅ Do not modify your treatment without medical advice",
+        "✅ In case of emergency, contact emergency services",
+        "",
+        "The information provided is for educational purposes only."
+      ]
+    },
+    "privacy": {
+      "title": "Privacy Policy",
+      "lastUpdate": "December 31, 2025",
+      "content": [
+        "Your privacy is important to us. This privacy policy explains what data is collected, how it is used and protected when you use the Ben - Nutritionist assistant.",
+        "",
+        "1. Data collected",
+        " - Provided information: The questions you ask the assistant and the information you enter.",
+        " - Technical data: Information about the device, browser, IP address and connection data.",
+        "",
+        "2. Use of data",
+        " - Provide and improve the AI assistant service.",
+        " - Ensure security and prevent abuse.",
+        " - Analyze application usage to improve user experience.",
+        "",
+        "3. Data sharing",
+        " Your data is never sold to third parties. It may be shared only in the following cases:",
+        " - Compliance with legal obligations.",
+        " - Protection against fraud or security threats.",
+        "",
+        "4. Security",
+        "We implement security measures to protect your data against unauthorized access, modification or disclosure.",
+        "",
+        "5. Your rights",
+        " - Access your personal data.",
+        " - Request correction or deletion of your data.",
+        " - Withdraw your consent at any time.",
+        "",
+        "6. Contact",
+        "For any questions regarding this privacy policy, contact us at <a href=\"mailto:ben@benutritionniste.com\">ben@benutritionniste.com</a>."
+      ]
+    },
+    "messages": {
+      "loading": "Loading...",
+      "error": "Sorry, an error occurred. Please try again in a few moments.",
+      "copy": "Copy",
+      "share": "Share",
+      "copied": "Copied!",
+      "shareNotSupported": "Sharing is not supported on this browser.",
+      "comment": "Comment",
+      "comment_placeholder": "Your comment...",
+      "send": "Send",
+      "cancel": "Cancel",
+      "sending": "Sending...",
+      "comment_success": "Comment added!",
+      "comment_error": "Error adding comment.",
+      "comment_required": "Please enter a comment.",
+      "network_error": "Network error."
+    }
+  }
+}

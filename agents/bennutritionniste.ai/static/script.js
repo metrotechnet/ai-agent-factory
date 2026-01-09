@@ -1,4 +1,37 @@
 // ===================================
+// ENABLE/DISABLE INPUT-AREA BASED ON URL ARGUMENT
+// ===================================
+
+function setInputAreaEnabled(enabled) {
+    const inputArea = document.querySelector('.input-area');
+    if (!inputArea) return;
+    const textarea = inputArea.querySelector('textarea');
+    const sendBtn = inputArea.querySelector('#send-button');
+    const voiceBtn = inputArea.querySelector('#voice-button');
+    if (enabled) {
+        inputArea.classList.remove('disabled');
+        if (textarea) textarea.disabled = false;
+        if (sendBtn) sendBtn.disabled = false;
+        if (voiceBtn) voiceBtn.disabled = false;
+    } else {
+        inputArea.classList.add('disabled');
+        if (textarea) textarea.disabled = true;
+        if (sendBtn) sendBtn.disabled = true;
+        if (voiceBtn) voiceBtn.disabled = true;
+    }
+}
+
+function checkDemo4836Argument() {
+    // const urlParams = new URLSearchParams(window.location.search);
+    // const demoArg = urlParams.get('code');
+    // setInputAreaEnabled(demoArg === 'demo4836');
+    setInputAreaEnabled(true); // Always enable input area
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    checkDemo4836Argument();
+});
+// ===================================
 // INTERNATIONALIZATION SYSTEM
 // ===================================
 
@@ -43,10 +76,12 @@ async function loadTranslations() {
         
         // Apply translations
         applyTranslations(currentLanguage);
+
     } catch (error) {
         console.error('Failed to load translations:', error);
         currentLanguage = 'fr';
     }
+
 }
 
 /**
@@ -128,13 +163,12 @@ function getNestedValue(obj, path) {
 function switchLanguage(lang) {
     currentLanguage = lang;
     localStorage.setItem('preferredLanguage', lang);
-    
     // Update URL parameter
     const url = new URL(window.location);
     url.searchParams.set('lang', lang);
     window.history.replaceState({}, '', url);
-    
     applyTranslations(lang);
+    updateFooterFromConfig();
 }
 
 /**
@@ -398,6 +432,17 @@ document.getElementById('privacy-link').addEventListener('click', (e) => {
     overlay.classList.remove('active');
 });
 
+/**
+ * Handle about link click
+ * Shows about popup and closes sidebar
+ */
+document.getElementById('about-link').addEventListener('click', (e) => {
+    e.preventDefault();
+    showAbout();
+    sidebar.classList.remove('open');
+    overlay.classList.remove('active');
+});
+
 
 /**
  * Create and display legal notice popup with disclaimer text
@@ -460,6 +505,35 @@ function showPrivacyPolicy() {
         width: 700
     });
 }
+
+function showAbout() {
+
+        const langData = translations[currentLanguage] || translations['fr'];
+        const about = langData.about || {};
+        let html = `<h2 style='margin-top:0;text-align:center;'>${about.title}</h2>`;
+
+        // Si about.content est un tableau, afficher chaque ligne comme une puce
+        if (Array.isArray(about.content)) {
+            html += '<ul style="text-align:left;">';
+            about.content.forEach(line => {
+                if (line.trim() !== '') {
+                    html += `<li style="margin-bottom:8px;">${line}</li>`;
+                }
+            });
+            html += '</ul>';
+        } else if (typeof about.content === 'string') {
+            // Si c'est une string, afficher tel quel
+            html += `<div style="text-align:left;">${about.content}</div>`;
+        }
+
+        Swal.fire({
+            title:  '',
+            html: `<div style="text-align:left;">${html}</div>`,
+            icon: 'info',
+            confirmButtonText: about.closeButton || 'Fermer',
+            customClass: {popup: 'swal2-ben-about'}
+        });
+    }
 
 // ===================================
 // INPUT HANDLING & UI INTERACTIONS

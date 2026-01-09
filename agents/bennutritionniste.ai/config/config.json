@@ -1,27 +1,29 @@
 {
   "fr": {
     "app": {
-      "title": "Ben - Nutritionniste | Assistant IA",
-      "description": "Assistant IA de Ben Boulanger, nutritionniste"
+      "title": "Nutria | Assistant IA",
+      "description": "Assistant IA en nutrition d'IMX Technologie inc."
     },
     "header": {
-      "title": "Ben - Nutritionniste",
+      "title": "Nutria ",
       "menuButton": "Menu"
     },
     "sidebar": {
-      "title": "Ben - Nutritionniste",
+      "title": "Nutria ",
       "closeButton": "Fermer",
       "instagram": "Suivez-moi sur Instagram",
       "appointment": "Prenez un rendez-vous",
-      "contact": "Me rejoindre",
-      "legal": "Avertissements"
+      "contact": "Nous rejoindre",
+      "legal": "Avertissements",
+      "about": "À propos de l'application",
+      "privacy": "Politique de confidentialité"
     },
     "intro": {
       "title": "Des questions sur la nutrition ?",
-      "description": "Posez-les à mon agent IA et obtenez des réponses claires instantanément. Luttons contre la désinformation, une question à la fois.",
+      "description": "Posez-les à notre agent IA et obtenez des réponses claires instantanément. Luttons contre la désinformation, une question à la fois.",
       "disclaimer": "Note : Cet agent IA fournit uniquement des informations. \nPour des conseils personnalisés, consultez un professionnel de santé qualifié.",
-      "profileAlt": "Ben Nutritionniste",
-      "profileImage": "/static/ben.nutritioniste.jpg"
+      "profileAlt": "Nutria",
+      "profileImage": "/static/logo-nutria.png"
     },
     "suggestions": {
       "nutrition": {
@@ -29,7 +31,7 @@
         "description": "Conseils alimentaires et nutrition"
       },
       "supplements": {
-        "title": "💊 Suppléments", 
+        "title": "💊 Suppléments",
         "description": "Questions sur les suppléments et leur utilisation"
       },
       "training": {
@@ -44,7 +46,7 @@
     "input": {
       "placeholder": "Pose-moi une question...",
       "sendButton": "Envoyer",
-      "disclaimer": "⚠️ Peut contenir des erreurs. Ne remplace pas un avis professionnel."
+      "disclaimer": "⚠️ Peut contenir des erreurs. Ne remplace pas l’avis d’un professionnel."
     },
     "cookies": {
       "title": "🍪 Cookies et confidentialité",
@@ -55,25 +57,25 @@
     "legal": {
       "title": "⚠️ Avertissements importants",
       "content": [
-        "Cet assistant virtuel est un outil d'information général basé sur le contenu éducatif de Ben Boulanger.",
+        "Cet assistant virtuel est une intelligence artificielle offrant des informations générales à caractère éducatif, basées sur du contenu non personnalisé.",
         "",
-        " ❌ NE REMPLACE PAS une consultation médicale",
+        " ❌ NE REMPLACE PAS une consultation médicale ou nutritionnelle",
         " ❌ NE POSE PAS de diagnostic", 
-        " ❌ NE PRESCRIT PAS de traitement",
+        " ❌ NE PRESCRIT PAS de traitement ou de plan nutritionnel",
         "",
         "Pour tout problème de santé:",
-        "✅ Consultez un professionnel de santé qualifié",
-        "✅ Ne modifiez pas votre traitement sans avis médical",
-        "✅ En cas d'urgence, contactez les services d'urgence",
+        "✅ Consultez un professionnel de la santé ou de la nutrition qualifié",
+        "✅ Ne modifiez jamais un traitement ou une prise en charge sans avis professionnel",
+        "✅ En cas d’urgence, contactez les services d’urgence",
         "",
-        "Les informations fournies sont à but éducatif uniquement."
+        "Les informations fournies sont à des fins éducatives uniquement et ne constituent pas un acte professionnel."
       ]
     },
     "privacy": {
       "title": "Politique de confidentialité",
       "lastUpdate": "31 décembre 2025",
       "content": [
-        "Votre vie privée est importante pour nous. Cette politique de confidentialité explique quelles données sont collectées, comment elles sont utilisées et protégées lorsque vous utilisez l’assistant Ben - Nutritionniste.",
+        "Votre vie privée est importante pour nous. Cette politique de confidentialité explique quelles données sont collectées, comment elles sont utilisées et protégées lorsque vous utilisez l’assistant  Nutria.",
         "",
         "1. Données collectées",
         " - Informations fournies : Les questions que vous posez à l’assistant et les informations que vous saisissez.",
@@ -98,7 +100,7 @@
         " - Retirer votre consentement à tout moment.",
         "",
         "6. Contact",
-        "Pour toute question concernant cette politique de confidentialité, contactez-nous à <a href=\"mailto:ben@benutritionniste.com\">ben@benutritionniste.com</a>."
+        "Pour toute question concernant cette politique de confidentialité, contactez-nous à <a href=\"mailto:denis@imxtech.ca\">denis@imxtech.ca</a>."
       ]
     },
     
@@ -118,31 +120,43 @@
       "comment_error": "Erreur lors de l'ajout du commentaire.",
       "comment_required": "Veuillez entrer un commentaire.",
       "network_error": "Erreur réseau."
-    }
+    },
+  "about": {
+    "title": "À propos de l'application",
+    "content": ["Nutria est une application web expérimentale utilisant une intelligence artificielle afin de diffuser de l’information générale en nutrition et en alimentation.:",
+                "L’objectif de l’outil est de favoriser la compréhension et l’éducation du public, tout en respectant les limites entre information générale et services professionnels réglementés.",
+                "L’application n’est pas affiliée à l’Ordre des diététistes-nutritionnistes du Québec (ODNQ) et n’offre aucun service professionnel au sens de la Loi."],
+    "closeButton": "Fermer"
+  },
+  "footer": {
+    "content": "© IMX Technologie inc. – Assistant IA en information nutritionnelle\nOutil éducatif | Non professionnel | Non affilié à un ordre professionnel"
+  }
   },
   "en": {
     "app": {
-      "title": "Ben - Nutritionist | AI Assistant",
-      "description": "AI Assistant of Ben Boulanger, nutritionist"
+      "title": "Nutria | AI Assistant",
+      "description": "AI Assistant of IMX Technologie inc. - nutrition information"
     },
     "header": {
-      "title": "Ben - Nutritionist ",
+      "title": "Nutria ",
       "menuButton": "Menu"
     },
     "sidebar": {
-      "title": "Ben - Nutritionist",
+      "title": "Nutria ",
       "closeButton": "Close",
       "instagram": "Follow me on Instagram",
       "appointment": "Book an appointment",
       "contact": "Contact me",
-      "legal": "Warnings"
+      "legal": "Warnings",
+      "about": "About the application",
+      "privacy": "Privacy Policy"
     },
     "intro": {
       "title": "Questions about nutrition?",
-     "description": "Ask my AI agent and get clear answers instantly. Let’s fight misinformation, one question at a time.",
+     "description": "Ask our AI agent and get clear answers instantly. Let’s fight misinformation, one question at a time.",
       "disclaimer": "Note: This AI provides informational support only. For personalized advice, consult a qualified healthcare professional.",
-      "profileAlt": "Ben Nutritionist",
-      "profileImage": "/static/ben.nutritioniste.jpg"
+      "profileAlt": "Nutria",
+      "profileImage": "/static/logo-nutria.png"
     },
     "suggestions": {
       "nutrition": {
@@ -176,25 +190,25 @@
     "legal": {
       "title": "⚠️ Important warnings",
       "content": [
-        "This virtual assistant is a general information tool based on Ben Boulanger's educational content.",
+        "This virtual assistant is an artificial intelligence offering general information for educational purposes, based on non-personalized content.",
         "",
-        " ❌ DOES NOT REPLACE a medical consultation",
+        " ❌ DOES NOT REPLACE a medical or nutritional consultation",
         " ❌ DOES NOT DIAGNOSE",
-        " ❌ DOES NOT PRESCRIBE treatment",
+        " ❌ DOES NOT PRESCRIBE treatment or nutrition plan",
         "",
         "For any health problem:",
-        "✅ Consult a qualified healthcare professional",
-        "✅ Do not modify your treatment without medical advice",
+        "✅ Consult a qualified healthcare or nutrition professional",
+        "✅ Never modify a treatment or care plan without professional advice",
         "✅ In case of emergency, contact emergency services",
         "",
-        "The information provided is for educational purposes only."
+        "The information provided is for educational purposes only and does not constitute a professional act."
       ]
     },
     "privacy": {
       "title": "Privacy Policy",
       "lastUpdate": "December 31, 2025",
       "content": [
-        "Your privacy is important to us. This privacy policy explains what data is collected, how it is used and protected when you use the Ben - Nutritionist assistant.",
+        "Your privacy is important to us. This privacy policy explains what data is collected, how it is used and protected when you use the Nutria assistant.",
         "",
         "1. Data collected",
         " - Provided information: The questions you ask the assistant and the information you enter.",
@@ -219,7 +233,7 @@
         " - Withdraw your consent at any time.",
         "",
         "6. Contact",
-        "For any questions regarding this privacy policy, contact us at <a href=\"mailto:ben@benutritionniste.com\">ben@benutritionniste.com</a>."
+        "For any questions regarding this privacy policy, contact us at <a href=\"mailto:denis@imxtech.ca\">denis@imxtech.ca</a>."
       ]
     },
     "messages": {
@@ -238,6 +252,14 @@
       "comment_error": "Error adding comment.",
       "comment_required": "Please enter a comment.",
       "network_error": "Network error."
-    }
+    },
+  "about": {
+    "title": "About the application ",
+    "content": "Nutria is an experimental web application using artificial intelligence to share general information about nutrition and food.\n\nThe goal of this tool is to promote public understanding and education, while respecting the boundaries between general information and regulated professional services.\n\nThis application is not affiliated with the Ordre des diététistes-nutritionnistes du Québec (ODNQ) and does not offer any professional services as defined by law.",
+    "closeButton": "Close"
+  },
+  "footer": {
+    "content": "© IMX Technologie inc. – Assistant IA en information nutritionnelle\nOutil éducatif | Non professionnel | Non affilié à un ordre professionnel"
+  }
   }
 }
