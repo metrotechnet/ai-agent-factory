@@ -1,15 +1,15 @@
 {
   "fr": {
     "app": {
-      "title": "Nutria | Assistant IA",
+      "title": "Nutr-IA | Assistant IA",
       "description": "Assistant IA en nutrition d'IMX Technologie inc."
     },
     "header": {
-      "title": "Nutria ",
+      "title": "Nutr-IA ",
       "menuButton": "Menu"
     },
     "sidebar": {
-      "title": "Nutria ",
+      "title": "Nutr-IA ",
       "closeButton": "Fermer",
       "instagram": "Suivez-moi sur Instagram",
       "appointment": "Prenez un rendez-vous",
@@ -22,7 +22,7 @@
       "title": "Des questions sur la nutrition ?",
       "description": "Posez-les à notre agent IA et obtenez des réponses claires instantanément. Luttons contre la désinformation, une question à la fois.",
       "disclaimer": "Note : Cet agent IA fournit uniquement des informations. \nPour des conseils personnalisés, consultez un professionnel de santé qualifié.",
-      "profileAlt": "Nutria",
+      "profileAlt": "Nutr-IA",
       "profileImage": "/static/logo-nutria.png"
     },
     "suggestions": {
@@ -75,7 +75,7 @@
       "title": "Politique de confidentialité",
       "lastUpdate": "31 décembre 2025",
       "content": [
-        "Votre vie privée est importante pour nous. Cette politique de confidentialité explique quelles données sont collectées, comment elles sont utilisées et protégées lorsque vous utilisez l’assistant  Nutria.",
+        "Votre vie privée est importante pour nous. Cette politique de confidentialité explique quelles données sont collectées, comment elles sont utilisées et protégées lorsque vous utilisez l’assistant  Nutr-IA.",
         "",
         "1. Données collectées",
         " - Informations fournies : Les questions que vous posez à l’assistant et les informations que vous saisissez.",
@@ -123,7 +123,7 @@
     },
   "about": {
     "title": "À propos de l'application",
-    "content": ["Nutria est une application web expérimentale utilisant une intelligence artificielle afin de diffuser de l’information générale en nutrition et en alimentation.:",
+    "content": ["Nutr-IA est une application web expérimentale utilisant une intelligence artificielle afin de diffuser de l’information générale en nutrition et en alimentation.:",
                 "L’objectif de l’outil est de favoriser la compréhension et l’éducation du public, tout en respectant les limites entre information générale et services professionnels réglementés.",
                 "L’application n’est pas affiliée à l’Ordre des diététistes-nutritionnistes du Québec (ODNQ) et n’offre aucun service professionnel au sens de la Loi."],
     "closeButton": "Fermer"
@@ -134,15 +134,15 @@
   },
   "en": {
     "app": {
-      "title": "Nutria | AI Assistant",
+      "title": "Nutr-IA | AI Assistant",
       "description": "AI Assistant of IMX Technologie inc. - nutrition information"
     },
     "header": {
-      "title": "Nutria ",
+      "title": "Nutr-IA ",
       "menuButton": "Menu"
     },
     "sidebar": {
-      "title": "Nutria ",
+      "title": "Nutr-IA ",
       "closeButton": "Close",
       "instagram": "Follow me on Instagram",
       "appointment": "Book an appointment",
@@ -155,7 +155,7 @@
       "title": "Questions about nutrition?",
      "description": "Ask our AI agent and get clear answers instantly. Let’s fight misinformation, one question at a time.",
       "disclaimer": "Note: This AI provides informational support only. For personalized advice, consult a qualified healthcare professional.",
-      "profileAlt": "Nutria",
+      "profileAlt": "Nutr-IA",
       "profileImage": "/static/logo-nutria.png"
     },
     "suggestions": {
@@ -208,7 +208,7 @@
       "title": "Privacy Policy",
       "lastUpdate": "December 31, 2025",
       "content": [
-        "Your privacy is important to us. This privacy policy explains what data is collected, how it is used and protected when you use the Nutria assistant.",
+        "Your privacy is important to us. This privacy policy explains what data is collected, how it is used and protected when you use the Nutr-IA assistant.",
         "",
         "1. Data collected",
         " - Provided information: The questions you ask the assistant and the information you enter.",
@@ -255,7 +255,7 @@
     },
   "about": {
     "title": "About the application ",
-    "content": "Nutria is an experimental web application using artificial intelligence to share general information about nutrition and food.\n\nThe goal of this tool is to promote public understanding and education, while respecting the boundaries between general information and regulated professional services.\n\nThis application is not affiliated with the Ordre des diététistes-nutritionnistes du Québec (ODNQ) and does not offer any professional services as defined by law.",
+    "content": "Nutr-IA is an experimental web application using artificial intelligence to share general information about nutrition and food.\n\nThe goal of this tool is to promote public understanding and education, while respecting the boundaries between general information and regulated professional services.\n\nThis application is not affiliated with the Ordre des diététistes-nutritionnistes du Québec (ODNQ) and does not offer any professional services as defined by law.",
     "closeButton": "Close"
   },
   "footer": {
