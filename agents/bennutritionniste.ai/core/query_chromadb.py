@@ -179,8 +179,9 @@ def ask_question_stream(question, language="fr", timezone="UTC", locale="fr-FR",
             history_text += f"{role_label}: {msg['content']}\n"
 
     # context is not available yet (need ChromaDB), so pass empty string for now
-    refusal_result = validate_user_query(question, context="", history_text=history_text, llm_call_fn=None, language=language)
+    refusal_result = validate_user_query(question, llm_call_fn=None, language=language)
     if refusal_result and refusal_result.get("decision") == "refuse":
+        yield "__REFUSAL__"
         yield refusal_result["answer"]
         return
 

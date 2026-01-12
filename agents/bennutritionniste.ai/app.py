@@ -136,6 +136,7 @@ async def query_agent(request: QueryRequest):
         # Génère la réponse de l'assistant en streaming (SSE)
         yield f"data: {json.dumps({'session_id': session_id, 'question_id': question_id, 'chunk': ''})}\n\n"
         assistant_response = ""
+        is_refusal = False
         for chunk in ask_question_stream(
             request.question,
             language=request.language,
@@ -145,15 +146,28 @@ async def query_agent(request: QueryRequest):
             session=session,
             question_id=question_id
         ):
+            # Detect refusal marker
+            if chunk == "__REFUSAL__":
+                is_refusal = True
+                continue  # Don't include marker in response
             assistant_response += chunk
             yield f"data: {json.dumps({'chunk': chunk})}\n\n"
-        assistant_message = {
-            'role': 'assistant',
-            'content': assistant_response,
-            'timestamp': datetime.now().isoformat()
-        }
-        conversation_history.append(assistant_message)
+        
+        # Save question and response to log (including refused ones)
         save_question_response(question_id, request.question, assistant_response)
+        
+        # Only add to history if not a refusal
+        if not is_refusal:
+            assistant_message = {
+                'role': 'assistant',
+                'content': assistant_response,
+                'timestamp': datetime.now().isoformat()
+            }
+            conversation_history.append(assistant_message)
+        else:
+            # Remove the user message from history since it was refused
+            conversation_history.pop()
+
     return StreamingResponse(
         generate(), 
         media_type="text/event-stream",

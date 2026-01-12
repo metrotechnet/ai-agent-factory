@@ -1,4 +1,56 @@
 {
+  "common_questions": [
+    {
+      "id": 1,
+      "question": "Qu'est-ce que la vitamine D et à quoi sert-elle ?",
+      "category": "general_education"
+    },
+    {
+      "id": 2,
+      "question": "Quelles sont les principales sources de protéines végétales ?",
+      "category": "food_sources"
+    },
+    {
+      "id": 3,
+      "question": "Pourquoi l'hydratation est-elle importante ?",
+      "category": "general_principles"
+    },
+    {
+      "id": 4,
+      "question": "Quelle est la différence entre les glucides simples et complexes ?",
+      "category": "nutrition_concepts"
+    },
+    {
+      "id": 5,
+      "question": "Comment la qualité du sommeil influence-t-elle l'appétit ?",
+      "category": "lifestyle_factors"
+    },
+    {
+      "id": 6,
+      "question": "Quels sont les bienfaits des oméga-3 selon la recherche ?",
+      "category": "scientific_evidence"
+    },
+    {
+      "id": 7,
+      "question": "Qu'est-ce que l'indice glycémique ?",
+      "category": "nutrition_concepts"
+    },
+    {
+      "id": 8,
+      "question": "Pourquoi dit-on que les fibres sont importantes pour la santé digestive ?",
+      "category": "general_principles"
+    },
+    {
+      "id": 9,
+      "question": "Quelles sont les différences entre les gras saturés et insaturés ?",
+      "category": "nutrition_concepts"
+    },
+    {
+      "id": 10,
+      "question": "Comment le stress peut-il affecter l'alimentation ?",
+      "category": "lifestyle_factors"
+    }
+  ],
   "trap_questions": [
     {
       "id": 1,

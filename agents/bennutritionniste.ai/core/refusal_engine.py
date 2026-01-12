@@ -79,13 +79,14 @@ def _match_patterns(text: str, patterns: List[str]) -> List[str]:
     return hits
 
 
-def refusal_engine(question: str, history_text: str = "", context: str = "", language: str = "fr") -> RefusalResult:
+def refusal_engine(question: str, language: str = "fr") -> RefusalResult:
     """
     Decide whether to refuse before calling the LLM.
     - question/history/context are used ONLY for risk detection (not for generating advice).
     - language: "fr" or "en" for response language and pattern matching
     """
-    combined = f"{question}\n{history_text}\n{context}".strip()
+    print(f"[REFUSAL_ENGINE] Analyzing question (lang={language}): {question}...")
+    combined = question.strip()
 
     matched: Dict[str, List[str]] = {}
     reasons: List[str] = []
@@ -98,9 +99,17 @@ def refusal_engine(question: str, history_text: str = "", context: str = "", lan
         hits = _match_patterns(combined, pats)
         if hits:
             matched[category] = hits
+    
+    if matched:
+        print(f"[REFUSAL_ENGINE] Matched categories: {list(matched.keys())}")
+        for category, patterns_matched in matched.items():
+            print(f"[REFUSAL_ENGINE]   - {category}: {patterns_matched}")
+    else:
+        print(f"[REFUSAL_ENGINE] No risk patterns detected")
 
     # Decision logic (keep it deterministic and auditable)
     if "medication" in matched:
+        print(f"[REFUSAL_ENGINE] ❌ REFUSED - Medication question detected")
         return RefusalResult(
             decision=Decision.REFUSE,
             reasons=["Medication / clinical compatibility question"],
@@ -110,6 +119,7 @@ def refusal_engine(question: str, history_text: str = "", context: str = "", lan
         )
 
     if "minor" in matched and ("personalized_request" in matched or "meal_plan" in matched):
+        print(f"[REFUSAL_ENGINE] ❌ REFUSED - Minor with personalized request")
         return RefusalResult(
             decision=Decision.REFUSE,
             reasons=["Minor + weight/plan/personalized request"],
@@ -119,6 +129,7 @@ def refusal_engine(question: str, history_text: str = "", context: str = "", lan
         )
 
     if "possible_emergency" in matched:
+        print(f"[REFUSAL_ENGINE] ❌ REFUSED - Possible emergency detected")
         return RefusalResult(
             decision=Decision.REFUSE,
             reasons=["Possible emergency / urgent situation"],
@@ -129,6 +140,7 @@ def refusal_engine(question: str, history_text: str = "", context: str = "", lan
 
     # Clinical conditions (diabetes, renal, etc.) => refuse to avoid clinical advice
     if "clinical_condition" in matched:
+        print(f"[REFUSAL_ENGINE] ❌ REFUSED - Clinical condition mentioned")
         return RefusalResult(
             decision=Decision.REFUSE,
             reasons=["Clinical condition mentioned"],
@@ -139,6 +151,7 @@ def refusal_engine(question: str, history_text: str = "", context: str = "", lan
 
     # Meal plans or personal targets => refuse
     if "meal_plan" in matched:
+        print(f"[REFUSAL_ENGINE] ❌ REFUSED - Meal plan request")
         return RefusalResult(
             decision=Decision.REFUSE,
             reasons=["Meal plan request"],
@@ -148,6 +161,7 @@ def refusal_engine(question: str, history_text: str = "", context: str = "", lan
         )
 
     if "personalized_request" in matched:
+        print(f"[REFUSAL_ENGINE] ❌ REFUSED - Personalized request")
         return RefusalResult(
             decision=Decision.REFUSE,
             reasons=["Personalized recommendation request"],
@@ -159,6 +173,7 @@ def refusal_engine(question: str, history_text: str = "", context: str = "", lan
     # Supplements are tricky: your prompt says never recommend specific supplements/dosages.
     # Here we choose ALLOW_WITH_CONSTRAINTS (let LLM explain general info but avoid recommendation).
     if "supplement" in matched:
+        print(f"[REFUSAL_ENGINE] ⚠️ ALLOWED WITH CONSTRAINTS - Supplement mentioned")
         return RefusalResult(
             decision=Decision.ALLOW_WITH_CONSTRAINTS,
             reasons=["Supplement mentioned (allow general info only)"],
@@ -169,6 +184,7 @@ def refusal_engine(question: str, history_text: str = "", context: str = "", lan
 
     # Numeric targets in the user text (optional policy choice)
     if "numeric_targets" in matched:
+        print(f"[REFUSAL_ENGINE] ⚠️ ALLOWED WITH CONSTRAINTS - Numeric targets")
         return RefusalResult(
             decision=Decision.ALLOW_WITH_CONSTRAINTS,
             reasons=["Numeric targets mentioned (avoid numbers in reply)"],
@@ -177,6 +193,7 @@ def refusal_engine(question: str, history_text: str = "", context: str = "", lan
             metadata={"matched_categories": list(matched.keys())}
         )
 
+    print(f"[REFUSAL_ENGINE] ✅ ALLOWED - No risk detected")
     return RefusalResult(
         decision=Decision.ALLOW,
         reasons=[],
@@ -187,12 +204,12 @@ def refusal_engine(question: str, history_text: str = "", context: str = "", lan
 
 
 # Example integration point:
-def validate_user_query(question: str, context: str, history_text: str, llm_call_fn, language: str = "fr"):
+def validate_user_query(question: str, llm_call_fn, language: str = "fr"):
     """
     llm_call_fn should be your function that calls OpenAI with your system prompt.
     language: "fr" or "en" for response language
     """
-    risk = refusal_engine(question=question, history_text=history_text, context=context, language=language)
+    risk = refusal_engine(question=question, language=language)
 
     # If refuse, return template immediately (no LLM call)
     if risk.decision == Decision.REFUSE:
