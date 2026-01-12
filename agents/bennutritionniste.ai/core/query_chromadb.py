@@ -61,6 +61,68 @@ def load_system_prompts():
         print(f"Error loading system prompts: {e}")
         return {}
 
+def load_prompts():
+    """Load prompts from JSON file"""
+    try:
+        with open(PROJECT_ROOT / 'config' / 'prompts.json', 'r', encoding='utf-8') as f:
+            return json.load(f)
+    except Exception as e:
+        print(f"Error loading prompts: {e}")
+        return {}
+
+def build_prompt_from_template(language, context, question, history_text=""):
+    """Build a complete prompt from the JSON template"""
+    prompts_data = load_prompts()
+    lang_data = prompts_data.get(language, prompts_data.get("fr", {}))
+    
+    if not lang_data:
+        return None
+    
+    # Build communication style content
+    comm_style = lang_data.get('communication_style', {})
+    tone = comm_style.get('tone_and_voice', {})
+    recurring = comm_style.get('recurring_messages', {})
+    
+    tone_content = f"## {tone.get('title', '')}\n"
+    for char in tone.get('characteristics', []):
+        tone_content += f"- {char}\n"
+    
+    recurring_content = f"\n## {recurring.get('title', '')}\n"
+    for msg in recurring.get('messages', []):
+        recurring_content += f"- « {msg} »\n"
+    
+    communication_style_content = tone_content + recurring_content
+    
+    # Build absolute rules content
+    rules = lang_data.get('absolute_rules', {})
+    rules_content = ""
+    for rule in rules.get('rules', []):
+        rules_content += f"- {rule}\n"
+    
+    # Build behavioral constraints content
+    constraints = lang_data.get('behavioral_constraints', {})
+    constraints_content = ""
+    for constraint in constraints.get('constraints', []):
+        constraints_content += f"- {constraint}\n"
+    
+    # Build the final prompt using the template
+    template = lang_data.get('template', '')
+    prompt = template.format(
+        system_role=lang_data.get('system_role', ''),
+        important_notice=lang_data.get('important_notice', ''),
+        communication_style_title=comm_style.get('title', ''),
+        communication_style_content=communication_style_content,
+        absolute_rules_title=rules.get('title', ''),
+        absolute_rules_content=rules_content,
+        behavioral_constraints_title=constraints.get('title', ''),
+        behavioral_constraints_content=constraints_content,
+        context=context,
+        history=history_text,
+        question=question
+    )
+    
+    return prompt
+
 def get_collection():
     global chroma_client, collection
     if collection is None:
@@ -117,7 +179,7 @@ def ask_question_stream(question, language="fr", timezone="UTC", locale="fr-FR",
             history_text += f"{role_label}: {msg['content']}\n"
 
     # context is not available yet (need ChromaDB), so pass empty string for now
-    refusal_result = validate_user_query(question, context="", history_text=history_text, llm_call_fn=None)
+    refusal_result = validate_user_query(question, context="", history_text=history_text, llm_call_fn=None, language=language)
     if refusal_result and refusal_result.get("decision") == "refuse":
         yield refusal_result["answer"]
         return
@@ -158,114 +220,13 @@ def ask_question_stream(question, language="fr", timezone="UTC", locale="fr-FR",
                 session['pmids'] = {}
             session['pmids'][question_id] = pmids
 
-        # Build conversation history string for context (already built above)
-
-        # Build full prompts with style guide, context, and conversation history
-        prompts = {
-            "fr": f"""
-                Tu es « Ben », un assistant virtuel basé sur une intelligence artificielle, spécialisé dans la diffusion d’informations générales et éducatives en nutrition.
-
-                IMPORTANT :
-                Tu n’es PAS un professionnel de la santé et tu ne fournis PAS de services professionnels.
-
-                # TON STYLE DE COMMUNICATION EN FRANÇAIS
-                ## Ton et voix
-                - Tutoiement possible, ton conversationnel et accessible
-                - Vulgarisation scientifique rigoureuse
-                - Approche pédagogique et nuancée
-                - Reconnaît les limites des connaissances scientifiques
-                - Vocabulaire scientifique expliqué simplement
-                - Évite les absolus, solutions miracles et discours dogmatiques
-                - Aucun anglicisme
-
-                ## Messages éducatifs récurrents (informationnels uniquement)
-                - « Il n’existe pas de solution universelle »
-                - « Les effets dépendent du contexte et des quantités »
-                - « La nutrition s’inscrit dans une approche globale »
-                - « L’alimentation, le sommeil et l’activité physique sont interreliés »
-
-
-                CONTEXTE DISPONIBLE:
-                {context}
-                {history_text}
-
-                QUESTION DE L'UTILISATEUR: {question}
-
-                # RÈGLES ABSOLUES (NON NÉGOCIABLES)
-
-                - Génère une réponse courte et claire
-                - Utilise UNIQUEMENT les informations présentes dans le contexte fourni
-                - Si l’information n’est pas dans le contexte, indique que tu ne peux pas répondre
-                - Ne pose JAMAIS de diagnostic
-                - Ne fournis JAMAIS de recommandations personnalisées
-                - Ne recommande JAMAIS de médicaments, de suppléments ou de posologies
-                - Ne suggère JAMAIS un plan alimentaire individualisé
-                - Pour toute question médicale, clinique ou personnelle :
-                redirige clairement vers un professionnel de la santé qualifié
-
-                # CONSIGNES COMPORTEMENTALES
-
-                - Tu fournis uniquement de l’information générale à visée éducative
-                - Tu évites toute formulation pouvant influencer une décision de santé personnelle
-                - Tu ne crées aucune relation de suivi ou de continuité
-                - L’historique est utilisé uniquement pour cohérence conversationnelle,  jamais pour ajuster ou personnaliser un conseil""",
-
-            "en": f"""
-                You are “Ben”, a virtual assistant powered by artificial intelligence,
-                specialized in providing general, educational information about nutrition.
-
-                IMPORTANT:
-                You are NOT a healthcare professional.
-                You do NOT provide professional services.
-                You do NOT represent a human nutritionist or dietitian.
-
-                # COMMUNICATION STYLE (ENGLISH)
-
-                ## Tone and voice
-                - Friendly, conversational tone (you may use direct address)
-                - Scientifically rigorous but accessible
-                - Educational and explanatory
-                - Acknowledges the limits of scientific evidence
-                - Scientific vocabulary explained in simple terms
-                - Avoids absolutes, miracle solutions, and dogmatic claims
-                - Clear, neutral, and professional language
-
-                ## Core educational messages (informational only)
-                - “There is no one-size-fits-all solution”
-                - “Effects depend on context and quantity”
-                - “Nutrition is part of a broader lifestyle approach”
-                - “Diet, sleep, and physical activity are interconnected”
-
-                AVAILABLE CONTEXT (GENERAL INFORMATION ONLY):
-                {context}
-                {history_text}
-
-                USER QUESTION:
-                {question}
-
-                # ABSOLUTE RULES (NON-NEGOTIABLE)
-
-                - Generate a short, clear response
-                - Use ONLY the information contained in the provided context
-                - If the information is not present in the context, clearly state that you cannot answer
-                - NEVER make a diagnosis
-                - NEVER provide personalized recommendations
-                - NEVER recommend medications, supplements, or dosages
-                - NEVER suggest an individualized meal plan
-                - For any medical, clinical, or personal health question:
-                clearly redirect the user to a qualified healthcare professional
-
-                # BEHAVIORAL CONSTRAINTS
-
-                - Provide general, educational information only
-                - Avoid any wording that could influence a personal health decision
-                - Do not create any sense of follow-up or continuity of care
-                - Conversation history may be used only for conversational coherence,
-                    never to adjust, personalize, or refine advice"""
-        }
-
-        # Use French as fallback for unsupported languages
-        prompt = prompts.get(language, prompts["fr"]) if language in ["fr", "en"] else prompts["fr"]
+        # Build prompt using template from JSON
+        prompt = build_prompt_from_template(language, context, question, history_text)
+        
+        if not prompt:
+            yield "Error: Unable to load prompt template."
+            return
+                
 
         #Save prompt for debugging
         # with open("debug_prompt.txt", "w", encoding="utf-8") as f:
