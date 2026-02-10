@@ -74,7 +74,7 @@ PROJECT_ROOT = Path(__file__).parent
 env_path = PROJECT_ROOT / '.env'
 load_dotenv(dotenv_path=env_path)
 
-app = FastAPI(title="Dok2u Agent")
+app = FastAPI(title="Dok2u Multi Agent")
 
 # Mount static files and templates with absolute paths
 app.mount("/static", StaticFiles(directory=str(PROJECT_ROOT / "static")), name="static")

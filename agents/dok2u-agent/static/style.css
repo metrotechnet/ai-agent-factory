@@ -21,7 +21,7 @@ html {
 } 
 
 header {
-    padding: 1rem 2rem;
+    padding: 2rem;
     border-bottom: 1px solid #e2e8f0;
     background: #ffffff;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
@@ -141,6 +141,7 @@ footer {
     top: 50%;
     right: 1.5rem;
     transform: translateY(-50%);
+    padding: 0.5rem;
 }
 
 .agent-selector {
@@ -265,6 +266,7 @@ footer {
         position: static;
         transform: none;
         margin-left: auto;
+        padding: 0.5rem;
     }
     
     header {
@@ -537,12 +539,12 @@ footer {
 }
 
 .message.user .message-icon {
-    background: #6366f1;
+    background: #10b981;
     color: #ffffff;
 }
 
 .message.assistant .message-icon {
-    background: #10b981;
+    background: #6366f1;
     color: #ffffff;
 }
 
@@ -581,7 +583,7 @@ footer {
     margin: 0 auto;
     position: relative;
     display: flex;
-    align-items: flex-end;
+    align-items: center;
     gap: 0;
 }
 
@@ -593,7 +595,8 @@ footer {
 .input-buttons {
     position: absolute;
     right: 0.5rem;
-    bottom: 0.65rem;
+    top: 50%;
+    transform: translateY(-50%);
     display: flex;
     align-items: center;
     gap: 4px;
@@ -933,6 +936,39 @@ footer {
     font-size: 0.875rem;
     color: #718096;
     line-height: 1.5;
+}
+
+/* Agent-specific card styling */
+.suggestion-card.agent-card[data-agent="translator"] {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-color: #667eea;
+}
+
+.suggestion-card.agent-card[data-agent="translator"]:hover {
+    background: linear-gradient(135deg, #5568d3 0%, #653a8a 100%);
+    border-color: #5568d3;
+    box-shadow: 0 6px 12px rgba(102, 126, 234, 0.3);
+}
+
+.suggestion-card.agent-card[data-agent="translator"] h3,
+.suggestion-card.agent-card[data-agent="translator"] p {
+    color: #ffffff;
+}
+
+.suggestion-card.agent-card[data-agent="dok2u"] {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    border-color: #10b981;
+}
+
+.suggestion-card.agent-card[data-agent="dok2u"]:hover {
+    background: linear-gradient(135deg, #0d9668 0%, #047857 100%);
+    border-color: #0d9668;
+    box-shadow: 0 6px 12px rgba(16, 185, 129, 0.3);
+}
+
+.suggestion-card.agent-card[data-agent="dok2u"] h3,
+.suggestion-card.agent-card[data-agent="dok2u"] p {
+    color: #ffffff;
 }
 
 .legal-popup {

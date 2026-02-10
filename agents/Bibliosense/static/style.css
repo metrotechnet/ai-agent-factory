@@ -333,12 +333,12 @@ footer {
 }
 
 .message.user .message-icon {
-    background: #6366f1;
+    background: #10b981;
     color: #ffffff;
 }
 
 .message.assistant .message-icon {
-    background: #10b981;
+    background: #6366f1;
     color: #ffffff;
 }
 

@@ -1,5 +1,5 @@
-# Start Dok2u Agent Server
-Write-Host "Starting Dok2u Agent Server..." -ForegroundColor Green
+# Start Dok2u Multi Agent Server
+Write-Host "Starting Dok2u Multi Agent Server..." -ForegroundColor Green
 Write-Host ""
 
 # Use the parent-level virtual environment that VS Code is configured to use

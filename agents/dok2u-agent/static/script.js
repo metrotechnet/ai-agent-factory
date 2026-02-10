@@ -152,9 +152,39 @@ function applyTranslations(lang) {
         updateAgentSelectorLabels();
     }
     
+    // Populate language dropdown from config
+    populateLanguageDropdown(lang);
+    
     // Refresh agent-specific placeholders
     if (typeof switchAgent === 'function' && typeof currentAgent !== 'undefined') {
         switchAgent(currentAgent);
+    }
+}
+
+/**
+ * Populate the target language dropdown from config languages
+ */
+function populateLanguageDropdown(lang) {
+    const select = document.getElementById('target-language');
+    if (!select) return;
+    
+    const langData = translations[lang] || translations['fr'];
+    const languages = langData && langData.languages;
+    if (!languages) return;
+    
+    const currentValue = select.value;
+    select.innerHTML = '';
+    
+    for (const [code, label] of Object.entries(languages)) {
+        const option = document.createElement('option');
+        option.value = code;
+        option.textContent = label;
+        select.appendChild(option);
+    }
+    
+    // Restore previous selection if still available
+    if (languages[currentValue]) {
+        select.value = currentValue;
     }
 }
 
@@ -956,7 +986,7 @@ async function handleStreamingResponse(question, contentDiv, actionsDiv) {
                 contentDiv.textContent = fullText;
             }
             // Fetch PMIDs in background 
-            fetchAndDisplayPmids(contentDiv);
+            await fetchAndDisplayPmids(contentDiv);
             // If TTS is pending, poll for the audio (keep spinner)
             if (ttsPendingQuestionId) {
                 pollForTtsAudio(ttsPendingQuestionId, sessionId, ttsOriginalContent);
@@ -1352,7 +1382,7 @@ function switchAgent(agent, userInitiated) {
         const welcomeDiv = document.createElement('div');
         welcomeDiv.className = 'message assistant';
         welcomeDiv.innerHTML = `
-            <div class="message-icon">Dok2u</div>
+            <div class="message-icon">D2U</div>
             <div class="message-content">
                 <div class="message-text">${welcomeText}</div>
             </div>
@@ -1520,8 +1550,9 @@ async function sendTranslation() {
         contentDiv.textContent = t('messages.error');
     } finally {
         cleanupAfterMessage(messageDiv);
-        // Read translation aloud if TTS is enabled
-        speakText(contentDiv.textContent);
+        // Read translation aloud if TTS is enabled (exclude the label)
+        const translationTextDiv = contentDiv.querySelector('.translation-result > div:last-child');
+        speakText(translationTextDiv ? translationTextDiv.textContent : contentDiv.textContent);
     }
 }
 

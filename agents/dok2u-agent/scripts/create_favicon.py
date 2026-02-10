@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Utility script to generate favicon for Dok2u Agent
+Utility script to generate favicon for Dok2u Multi Agent
 Generates favicon.ico with 'Ben' text on blue background
 """
 
