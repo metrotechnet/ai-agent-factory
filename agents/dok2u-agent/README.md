@@ -1,4 +1,4 @@
-# Dok2u Multi Agent 🧠
+# Dok2u Multi-Agent 🧠
 
 A multi-agent AI assistant platform by [Dok2U](https://dok2u.com). Features a **Document Assistant** powered by RAG (Retrieval-Augmented Generation) over your documents, and a **Translation Agent** with speech-to-text via OpenAI Whisper. Built with FastAPI, ChromaDB, and OpenAI GPT-4o-mini.
 

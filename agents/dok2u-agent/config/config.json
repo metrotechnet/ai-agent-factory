@@ -1,8 +1,8 @@
 {
   "fr": {
     "app": {
-      "title": "Dok2u Multi Agent | Assistant IA",
-      "description": "Assistant IA de Dok2u Multi Agent par IMX Technologie inc."
+      "title": "Dok2u Multi-Agent | Assistant IA",
+      "description": "Assistant IA de Dok2u Multi-Agent par IMX Technologie inc."
     },
     "agents": {
       "label": "Agent",
@@ -21,11 +21,11 @@
       "disclaimer": "⚠️ Traduction automatique. Vérifiez toujours le résultat."
     },
     "header": {
-      "title": "Dok2u Multi Agent",
+      "title": "Dok2u Multi-Agent",
       "menuButton": "Menu"
     },
     "sidebar": {
-      "title": "Dok2u Multi Agent",
+      "title": "Dok2u Multi-Agent",
       "closeButton": "Fermer",
       "contact": "Nous rejoindre",
       "legal": "Avertissements",
@@ -34,10 +34,10 @@
       "language": "Langue"
     },
     "intro": {
-      "title": "Bienvenue sur Dok2u Multi Agent",
-      "description": "Votre assistant IA multi-agents spécialisé. Posez vos questions et obtenez des réponses basées sur des sources fiables.",
-      "disclaimer": "Note : Cet agent IA fournit un support informationnel. Pour des décisions importantes, consultez toujours un professionnel de la santé.",
-      "profileAlt": "Dok2u Multi Agent",
+      "title": "Bienvenue sur Dok2u Multi-Agent",
+      "description": "Votre assistant IA multi-agent spécialisé. Posez vos questions et obtenez des réponses basées sur des sources fiables.",
+      "disclaimer": "Note : Ces agents IA fournissent un support informationnel. Pour des décisions importantes, consultez toujours un professionnel de la santé.",
+      "profileAlt": "Dok2u Multi-Agent",
       "profileImage": "/static/logo-dok2u.png"
     },
     "suggestions": {
@@ -64,7 +64,7 @@
     "legal": {
       "title": "⚠️ Avertissements importants",
       "content": [
-        "Cet assistant virtuel est une intelligence artificielle offrant des informations générales à caractère éducatif, basées sur du contenu non personnalisé.",
+        "Ces assistants virtuels sont des intelligences artificielles offrant des informations générales à caractère éducatif, basées sur du contenu non personnalisé.",
         "",
         " ❌ NE REMPLACE PAS une consultation médicale ou nutritionnelle",
         " ❌ NE POSE PAS de diagnostic",
@@ -82,7 +82,7 @@
       "title": "Politique de confidentialité",
       "lastUpdate": "31 décembre 2025",
       "content": [
-        "Votre vie privée est importante pour nous. Cette politique de confidentialité explique quelles données sont collectées, comment elles sont utilisées et protégées lorsque vous utilisez l'assistant Dok2u Multi Agent.",
+        "Votre vie privée est importante pour nous. Cette politique de confidentialité explique quelles données sont collectées, comment elles sont utilisées et protégées lorsque vous utilisez l'assistant Dok2u Multi-Agent.",
         "",
         "1. Données collectées",
         " - Informations fournies : Les questions que vous posez à l’assistant et les informations que vous saisissez.",
@@ -130,7 +130,7 @@
     "about": {
       "title": "À propos de l'application",
       "content": [
-        "Dok2u Multi Agent est une application web expérimentale utilisant une intelligence artificielle.",
+        "Dok2u Multi-Agent est une application web expérimentale utilisant une intelligence artificielle.",
         "L'objectif de l'outil est de favoriser la compréhension et l'éducation du public, tout en respectant les limites entre information générale et services professionnels.",
         "L'application est développée par IMX Technologie inc."
       ],
@@ -166,13 +166,13 @@
       "id": "Bahasa Indonesia (Indonésien)"
     },
     "footer": {
-      "content": "© IMX Technologie inc. – Dok2u Multi Agent"
+      "content": "© IMX Technologie inc. – Dok2u Multi-Agent"
     }
   },
   "en": {
     "app": {
-      "title": "Dok2u Multi Agent | AI Assistant",
-      "description": "AI Assistant of IMX Technologie inc. - Dok2u Multi Agent"
+      "title": "Dok2u Multi-Agent | AI Assistant",
+      "description": "AI Assistant of IMX Technologie inc. - Dok2u Multi-Agent"
     },
     "agents": {
       "label": "Agent",
@@ -191,11 +191,11 @@
       "disclaimer": "⚠️ Automatic translation. Always verify the result."
     },
     "header": {
-      "title": "Dok2u Multi Agent",
+      "title": "Dok2u Multi-Agent",
       "menuButton": "Menu"
     },
     "sidebar": {
-      "title": "Dok2u Multi Agent",
+      "title": "Dok2u Multi-Agent",
       "closeButton": "Close",
       "contact": "Contact me",
       "legal": "Warnings",
@@ -204,10 +204,10 @@
       "language": "Language"
     },
     "intro": {
-      "title": "Welcome to Dok2u Multi Agent",
+      "title": "Welcome to Dok2u Multi-Agent",
       "description": "Your AI multi-agent assistant. Ask your questions and get answers based on reliable sources.",
-      "disclaimer": "Note: This AI provides informational support. For important decisions, always consult a healthcare professional.",
-      "profileAlt": "Dok2u Multi Agent",
+      "disclaimer": "Note: These AI provide informational support. For important decisions, always consult a healthcare professional.",
+      "profileAlt": "Dok2u Multi-Agent",
       "profileImage": "/static/logo-dok2u.png"
     },
     "suggestions": {
@@ -234,7 +234,7 @@
     "legal": {
       "title": "⚠️ Important warnings",
       "content": [
-        "This virtual assistant is an artificial intelligence offering general information for educational purposes, based on non-personalized content.",
+        "These virtual assistants are artificial intelligences offering general information for educational purposes, based on non-personalized content.",
         "",
         " ❌ DOES NOT REPLACE a medical or nutritional consultation",
         " ❌ DOES NOT DIAGNOSE",
@@ -252,7 +252,7 @@
       "title": "Privacy Policy",
       "lastUpdate": "December 31, 2025",
       "content": [
-        "Your privacy is important to us. This privacy policy explains what data is collected, how it is used and protected when you use the Dok2u Multi Agent assistant.",
+        "Your privacy is important to us. This privacy policy explains what data is collected, how it is used and protected when you use the Dok2u Multi-Agent assistant.",
         "",
         "1. Data collected",
         " - Provided information: The questions you ask the assistant and the information you enter.",
@@ -299,7 +299,7 @@
     },
     "about": {
       "title": "About the application ",
-      "content": "Dok2u Multi Agent is an experimental web application using artificial intelligence.\n\nThe goal of this tool is to promote public understanding and education, while respecting the boundaries between general information and regulated professional services.\n\nThis application is developed by IMX Technologie inc.",
+      "content": "Dok2u Multi-Agent is an experimental web application using artificial intelligence.\n\nThe goal of this tool is to promote public understanding and education, while respecting the boundaries between general information and regulated professional services.\n\nThis application is developed by IMX Technologie inc.",
       "closeButton": "Close"
     },
     "languages": {
@@ -332,7 +332,7 @@
       "id": "Bahasa Indonesia (Indonesian)"
     },
     "footer": {
-      "content": "© IMX Technologie inc. – Dok2u Multi Agent"
+      "content": "© IMX Technologie inc. – Dok2u Multi-Agent"
     }
   }
 }
