@@ -33,9 +33,6 @@ def load_style_guides():
         formatted_guides = {}
         for lang, data in style_data.items():
             guide = f"# {data['title']}\n\n"
-            # guide += f"## {data['narrative_structure']['title']}\n"
-            # for i, step in enumerate(data['narrative_structure']['steps'], 1):
-            #     guide += f"{i}. {step}\n"
             guide += f"\n## {data['characteristic_expressions']['title']}\n"
             for phrase in data['characteristic_expressions']['phrases']:
                 guide += f"- \"{phrase}\"\n"

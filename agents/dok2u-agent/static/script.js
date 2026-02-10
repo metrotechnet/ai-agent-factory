@@ -1,37 +1,4 @@
 // ===================================
-// ENABLE/DISABLE INPUT-AREA BASED ON URL ARGUMENT
-// ===================================
-
-function setInputAreaEnabled(enabled) {
-    const inputArea = document.querySelector('.input-area');
-    if (!inputArea) return;
-    const textarea = inputArea.querySelector('textarea');
-    const sendBtn = inputArea.querySelector('#send-button');
-    const voiceBtn = inputArea.querySelector('#voice-button');
-    if (enabled) {
-        inputArea.classList.remove('disabled');
-        if (textarea) textarea.disabled = false;
-        if (sendBtn) sendBtn.disabled = false;
-        if (voiceBtn) voiceBtn.disabled = false;
-    } else {
-        inputArea.classList.add('disabled');
-        if (textarea) textarea.disabled = true;
-        if (sendBtn) sendBtn.disabled = true;
-        if (voiceBtn) voiceBtn.disabled = true;
-    }
-}
-
-function checkDemo4836Argument() {
-    // const urlParams = new URLSearchParams(window.location.search);
-    // const demoArg = urlParams.get('code');
-    // setInputAreaEnabled(demoArg === 'demo4836');
-    setInputAreaEnabled(true); // Always enable input area
-}
-
-document.addEventListener('DOMContentLoaded', function() {
-    checkDemo4836Argument();
-});
-// ===================================
 // INTERNATIONALIZATION SYSTEM
 // ===================================
 
@@ -159,6 +126,12 @@ function applyTranslations(lang) {
     if (typeof switchAgent === 'function' && typeof currentAgent !== 'undefined') {
         switchAgent(currentAgent);
     }
+    
+    // Update language selector value
+    const langSelector = document.getElementById('language-selector');
+    if (langSelector) {
+        langSelector.value = lang;
+    }
 }
 
 /**
@@ -208,7 +181,12 @@ function switchLanguage(lang) {
     url.searchParams.set('lang', lang);
     window.history.replaceState({}, '', url);
     applyTranslations(lang);
-    updateFooterFromConfig();
+    
+    // Update language selector value
+    const langSelector = document.getElementById('language-selector');
+    if (langSelector) {
+        langSelector.value = lang;
+    }
 }
 
 /**
@@ -427,6 +405,13 @@ cookieDecline.addEventListener('click', () => {
 // Initialize cookie consent check on page load
 checkCookieConsent();
 
+// Language selector event listener
+const languageSelector = document.getElementById('language-selector');
+if (languageSelector) {
+    languageSelector.addEventListener('change', function() {
+        switchLanguage(this.value);
+    });
+}
 
 
 // ===================================
@@ -1705,9 +1690,6 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initialize speech recognition
     initSpeechRecognition();
-    
-    // Add language switcher for testing (comment out in production)
-    // addLanguageSwitcher();
 });
 
 

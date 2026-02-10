@@ -34,12 +34,6 @@ header {
     flex-shrink: 0;
 }
 
-.header-logo {
-    height: 36px;
-    width: auto;
-    object-fit: contain;
-}
-
 .content {
     flex: 1;
     overflow-y: auto;
@@ -274,15 +268,6 @@ footer {
         gap: 6px;
         padding: 0.75rem 1rem;
     }
-
-    header h2 {
-        font-size: 1rem;
-        white-space: nowrap;
-    }
-
-    .header-logo {
-        height: 28px;
-    }
     
     .agent-selector {
         font-size: 0.78rem;
@@ -405,6 +390,43 @@ footer {
     width: 24px;
     height: 24px;
     flex-shrink: 0;
+}
+
+.language-selector-container {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid #e2e8f0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.language-selector-container label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #4a5568;
+}
+
+.language-selector {
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #cbd5e0;
+    border-radius: 8px;
+    background: #ffffff;
+    color: #2d3748;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+.language-selector:hover {
+    border-color: #6366f1;
+    background: #f8f9ff;
+}
+
+.language-selector:focus {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
 }
 
 .overlay {
@@ -969,105 +991,6 @@ footer {
 .suggestion-card.agent-card[data-agent="dok2u"] h3,
 .suggestion-card.agent-card[data-agent="dok2u"] p {
     color: #ffffff;
-}
-
-.legal-popup {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.6);
-    z-index: 2000;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 1rem;
-    animation: fadeIn 0.2s ease;
-}
-
-.legal-popup-content {
-    background: #ffffff;
-    border-radius: 16px;
-    padding: 2rem;
-    max-width: 600px;
-    width: 100%;
-    max-height: 80vh;
-    overflow-y: auto;
-    position: relative;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-    animation: slideUp 0.3s ease;
-}
-
-@keyframes slideUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.legal-popup-close {
-    position: absolute;
-    top: 1rem;
-    right: 1rem;
-    background: none;
-    border: none;
-    font-size: 2rem;
-    color: #718096;
-    cursor: pointer;
-    width: 36px;
-    height: 36px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 8px;
-    transition: all 0.2s ease;
-}
-
-.legal-popup-close:hover {
-    background: #f7f7f8;
-    color: #2d3748;
-}
-
-.legal-popup-content h2 {
-    font-size: 1.75rem;
-    font-weight: 600;
-    color: #1a202c;
-    margin-bottom: 1.5rem;
-    padding-right: 2rem;
-}
-
-.legal-text {
-    color: #2d3748;
-    line-height: 1.7;
-}
-
-.legal-text p {
-    margin-bottom: 1rem;
-}
-
-.legal-text p:last-child {
-    margin-bottom: 0;
-}
-
-@media (max-width: 768px) {
-    .legal-popup-content {
-        padding: 1.5rem;
-        max-height: 85vh;
-    }
-    
-    .legal-popup-content h2 {
-        font-size: 1.5rem;
-        margin-bottom: 1rem;
-    }
-    
-    .legal-text {
-        font-size: 0.9rem;
-    }
 }
 
 /* Cookie Banner */

@@ -2,7 +2,7 @@
 # =====================================================
 # Imports - Importations des modules nécessaires
 # =====================================================
-from fastapi import FastAPI, Body, Query, Request, APIRouter, UploadFile, File, Form
+from fastapi import FastAPI, Body, Query, Request, UploadFile, File, Form
 from fastapi.responses import FileResponse, HTMLResponse, StreamingResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -19,11 +19,10 @@ from datetime import datetime, timedelta
 import threading
 import re as re_tts
 import os
-import base64
 
 
 def _generate_tts_audio(text, language):
-    """Generate TTS audio from text. Returns base64-encoded mp3 or None on error."""
+    """Generate TTS audio from text. Returns audio bytes or None on error."""
     try:
         import openai
         client_tts = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))

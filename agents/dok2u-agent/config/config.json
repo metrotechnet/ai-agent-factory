@@ -30,7 +30,8 @@
       "contact": "Nous rejoindre",
       "legal": "Avertissements",
       "about": "À propos de l'application",
-      "privacy": "Politique de confidentialité"
+      "privacy": "Politique de confidentialité",
+      "language": "Langue"
     },
     "intro": {
       "title": "Bienvenue sur Dok2u Multi Agent",
@@ -199,7 +200,8 @@
       "contact": "Contact me",
       "legal": "Warnings",
       "about": "About the application",
-      "privacy": "Privacy Policy"
+      "privacy": "Privacy Policy",
+      "language": "Language"
     },
     "intro": {
       "title": "Welcome to Dok2u Multi Agent",
