@@ -6,10 +6,10 @@
     },
     "agents": {
       "label": "Agent",
-      "dok2u": "Assistant Nutrition",
-      "translator": "Traducteur",
-      "dok2u_welcome": "Bonjour ! Je suis votre assistant nutrition. Posez-moi vos questions sur l alimentation, les suppléments ou la santé en général.",
-      "translator_welcome": "Bonjour ! Je suis le traducteur. Sélectionnez une langue cible et écrivez dans cette langue ou dans la langue de l'interface pour traduire automatiquement."
+      "dok2u": "Agent Nutrition",
+      "translator": "Agent Traducteur",
+      "dok2u_welcome": "Bonjour ! Je suis votre agent nutrition. Posez-moi vos questions sur l alimentation, les suppléments ou la santé en général.",
+      "translator_welcome": "Bonjour ! Je suis l'agent traducteur. Sélectionnez une langue cible et écrivez dans cette langue ou dans la langue de l'interface pour traduire automatiquement."
     },
     "translator": {
       "sourceLabel": "De",
@@ -44,11 +44,11 @@
     },
     "suggestions": {
       "agent_nutrition": {
-        "title": "🥬 Assistant Nutrition",
+        "title": "🥬 Agent Nutrition",
         "description": "Posez vos questions sur la nutrition et la santé"
       },
       "agent_translator": {
-        "title": "🌐 Traducteur",
+        "title": "🌐 Agent Traducteur",
         "description": "Traduction bidirectionnelle automatique"
       }
     },
@@ -179,9 +179,9 @@
     "agents": {
       "label": "Agent",
       "dok2u": "Nutrition Assistant",
-      "translator": "Translator",
+      "translator": "Translator Assistant",
       "dok2u_welcome": "Hello! I am your nutrition assistant. Ask me your questions about diet, supplements or general health.",
-      "translator_welcome": "Hello! I am the translator. Select a target language and write in that language or in the interface language to translate automatically."
+      "translator_welcome": "Hello! I am the translator assistant. Select a target language and write in that language or in the interface language to translate automatically."
     },
     "translator": {
       "sourceLabel": "From",
@@ -220,7 +220,7 @@
         "description": "Ask your questions about nutrition and health"
       },
       "agent_translator": {
-        "title": "🌐 Translator",
+        "title": "🌐 Translator Assistant",
         "description": "Automatic bidirectional translation"
       }
     },

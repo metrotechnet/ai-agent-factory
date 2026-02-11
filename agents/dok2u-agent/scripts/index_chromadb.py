@@ -50,7 +50,7 @@ def chunk_text(text, chunk_size=500, overlap=50):
         start = end - overlap
     return chunks
 
-def index_text_files(folder_path=str(PROJECT_ROOT / "transcripts")):
+def index_text_files(folder_path=str(PROJECT_ROOT / "extracted_texts")):
     """Index all .txt files from the extracted folder"""
     if not os.path.exists(folder_path):
         print(f"❌ Folder '{folder_path}' not found")

@@ -275,17 +275,20 @@ def get_pmids_api(
     question: str = Body(None),
     top_k: int = 5
 ):
-    # Try to fetch from session memory first
+    # Try to fetch from session memory first (PMIDs already computed during streaming)
     if session_id and question_id:
         session = conversation_sessions.get(session_id)
         if session and 'pmids' in session and question_id in session['pmids']:
             return {"pmids": session['pmids'][question_id]}
-    # Fallback: recompute from question
+        
+    # Fallback: recompute from question if not in cache
     if not question:
         return {"pmids": []}
+    
     col = get_collection()
     if col is None:
         return {"error": "ChromaDB collection not available"}
+    
     query_emb = client.embeddings.create(
         model="text-embedding-3-large",
         input=question
@@ -298,7 +301,6 @@ def get_pmids_api(
     contexts = results['documents'][0] if results['documents'] and results['documents'][0] else []
     metadatas = results['metadatas'][0] if results.get('metadatas') and results['metadatas'][0] else []
     pmids = get_pmids_from_contexts(contexts, metadatas=metadatas)
-    print(f"Fetched PMIDs for question_id {question_id}: {pmids}")
     return {"pmids": pmids}
 
 @app.post("/api/add_comment")

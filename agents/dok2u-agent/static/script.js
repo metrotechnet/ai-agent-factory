@@ -694,17 +694,7 @@ sendButton.addEventListener('click', () => {
     }
 });
 
-/**
- * Handle suggestion card clicks
- * Fills input with suggestion text and sends message
- */
-document.querySelectorAll('.suggestion-card').forEach(card => {
-    card.addEventListener('click', function() {
-        const suggestionText = this.querySelector('p').textContent;
-        inputBox.value = suggestionText;
-        sendMessage();
-    });
-});
+
 
 
 
@@ -1057,7 +1047,7 @@ async function handleStreamingResponse(question, contentDiv, actionsDiv) {
                             contentDiv.textContent = fullText;
                         }
                         // Auto-scroll to keep assistant message bottom visible
-                        scrollToMessageBottom(contentDiv.closest('.message'));
+                        // scrollToMessageBottom(contentDiv.closest('.message'));
                     }
                   
                     updateScrollIndicator();
@@ -1414,6 +1404,14 @@ function switchAgent(agent, userInitiated) {
         inputBox.placeholder = t('translator.placeholder') || 'Entrez le texte à traduire...';
     } else {
         inputBox.placeholder = t('input.placeholder') || 'Pose-moi une question...';
+    }
+    
+    // Show input area when agent is selected
+    if (userInitiated) {
+        const inputArea = document.querySelector('.input-area');
+        if (inputArea) {
+            inputArea.style.display = '';
+        }
     }
     
     // Hide intro/empty state only when user explicitly picks an agent
@@ -1820,6 +1818,12 @@ async function speakText(text) {
  * Initialize the application
  */
 document.addEventListener('DOMContentLoaded', function() {
+    // Hide input area on initial load (show only when agent is selected)
+    const inputArea = document.querySelector('.input-area');
+    if (inputArea) {
+        inputArea.style.display = 'none';
+    }
+    
     // Load translations and set up internationalization
     loadTranslations().then(() => {
         updateAgentSelectorLabels();
