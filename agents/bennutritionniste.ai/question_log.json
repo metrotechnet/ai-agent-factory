@@ -215,5 +215,40 @@
     "response": "Je ne peux pas fournir de conseils alimentaires ou de nutrition personnalisés. Cependant, je peux te donner des informations générales sur la façon de structurer ton environnement pour faciliter une alimentation équilibrée. \n\nIl est utile de :\n\n1. **Avoir des aliments de base accessibles** : Opte pour des aliments nutritifs et peu coûteux comme les œufs, le tofu, les pois chiches, l'avoine ou les bananes.\n\n2. **Pratiquer le batch cooking** : Prépare des repas en avance pour réduire le stress de la préparation quotidienne.\n\n3. **Choisir des collations saines** : Avoir des collations prêtes peut aider à éviter les choix alimentaires moins sains.\n\n4. **Penser à la conservation** : Les légumes congelés ou les conserves peuvent être tout aussi nutritifs que les frais.\n\n5. **Écouter ton corps** : Une approche bienveillante et intuitive de l'alimentation peut t'aider à mieux gérer la faim et la satiété.\n\nRappelle-toi que l'alimentation fait partie d'une approche globale qui inclut aussi le sommeil et l'activité physique. Pour toute question plus spécifique ou pour des conseils adaptés à ta situation, je te recommande de consulter un professionnel de la santé qualifié.",
     "timestamp": "2026-02-11T12:42:02.657469",
     "comments": []
+  },
+  {
+    "question_id": "cb41b503-0155-41b2-9c1f-44ad8e82473b",
+    "question": "Conseils alimentaires et nutrition",
+    "response": "Il n'existe pas de solution universelle en matière d'alimentation, mais voici quelques conseils généraux pour structurer ton environnement et intégrer des habitudes alimentaires équilibrées :\n\n1. **Aliments de base accessibles** : Choisis des aliments nutritifs et peu chers comme les œufs, le tofu, les pois chiches, l’avoine, le riz, et les légumes congelés.\n\n2. **Batch cooking** : Prépare des repas en avance pour faciliter les choix sains durant la semaine. Cela peut être aussi simple que de cuire une grande quantité de céréales ou de légumes.\n\n3. **Collations prêtes** : Aie des encas sains à portée de main, comme des fruits ou des noix, pour éviter de céder à des options moins nutritives.\n\n4. **Épicerie futée** : Opte pour des aliments congelés ou en conserve, qui peuvent être tout aussi nutritifs que les frais et souvent moins chers.\n\n5. **Écoute de son corps** : Pratique une alimentation intuitive en apprenant à distinguer la faim physique des envies émotionnelles.\n\nN'oublie pas que l'alimentation s'inscrit dans une approche globale qui inclut également le sommeil et l'activité physique.",
+    "timestamp": "2026-02-11T13:29:24.058315",
+    "comments": []
+  },
+  {
+    "question_id": "9ca5ef37-973d-4590-bdf3-7e8142e609fa",
+    "question": "question",
+    "response": "Je ne peux pas répondre à ta question sans plus de détails. Peux-tu préciser ce que tu souhaites savoir ?",
+    "timestamp": "2026-02-11T13:29:30.645319",
+    "comments": []
+  },
+  {
+    "question_id": "6b68baa3-3c36-4838-826e-06f2bd58c0f9",
+    "question": "c'est quoi de la créatine",
+    "response": "La créatine est un composé naturel que l'on trouve principalement dans les muscles et qui joue un rôle clé dans la production d'énergie. Elle aide à reconstituer l'ATP (adénosine triphosphate), la principale source d'énergie pour les cellules, notamment lors d'efforts physiques intenses et courts.\n\nEn tant que supplément, la créatine est souvent utilisée par les sportifs pour améliorer la force, la puissance et la performance lors d'exercices de haute intensité. Elle peut également avoir des effets bénéfiques sur la masse musculaire et, dans certains cas, sur les fonctions cognitives. Cependant, son efficacité dépend du contexte et des caractéristiques individuelles de chacun.",
+    "timestamp": "2026-02-11T13:29:42.729447",
+    "comments": []
+  },
+  {
+    "question_id": "3cdf96d7-47b6-4c93-b20a-f2e619cd9fa7",
+    "question": "c'est quoi de la créatine",
+    "response": "La créatine est un composé naturel que l'on trouve principalement dans les muscles et qui joue un rôle clé dans la production d'énergie, surtout lors d'efforts courts et intenses. Elle aide à reconstituer l'ATP, la principale source d'énergie pour les cellules. La créatine est souvent utilisée comme supplément par les athlètes, notamment dans les sports de force et de puissance, car elle peut augmenter la force, la masse musculaire et la capacité à répéter des efforts. En plus de ses effets sur la performance physique, des études suggèrent qu'elle pourrait avoir des bénéfices modestes sur des aspects cognitifs. Cependant, son efficacité dépend du contexte et des individus.",
+    "timestamp": "2026-02-11T13:30:00.791917",
+    "comments": []
+  },
+  {
+    "question_id": "98425112-35ce-44a1-91b2-eedfb15f7493",
+    "question": "parle-moi du régime kéto",
+    "response": "Le régime cétogène, souvent appelé « KETO », est une approche alimentaire très faible en glucides et riche en lipides. L'idée principale est de forcer le corps à utiliser ses réserves de graisses comme source d'énergie, en entrant dans un état de cétose. Dans cet état, le corps produit des corps cétoniques pour alimenter le cerveau.\n\nLes études montrent qu'il peut y avoir une perte significative de masse grasse, mais à long terme, des carences nutritionnelles peuvent apparaître si le régime n'est pas bien encadré. De plus, il existe des risques, notamment des effets variables sur le cholestérol LDL, ce qui nécessite un suivi médical.\n\nEn somme, bien que la diète KETO puisse être un outil intéressant dans un contexte médical spécifique, elle n'est pas une solution universelle. Une approche globale prenant en compte l'alimentation, le sommeil et l'activité physique est essentielle pour favoriser une santé durable.",
+    "timestamp": "2026-02-11T13:31:48.274709",
+    "comments": []
   }
 ]

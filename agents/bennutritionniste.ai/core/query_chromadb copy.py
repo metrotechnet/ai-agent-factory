@@ -33,6 +33,9 @@ def load_style_guides():
         formatted_guides = {}
         for lang, data in style_data.items():
             guide = f"# {data['title']}\n\n"
+            # guide += f"## {data['narrative_structure']['title']}\n"
+            # for i, step in enumerate(data['narrative_structure']['steps'], 1):
+            #     guide += f"{i}. {step}\n"
             guide += f"\n## {data['characteristic_expressions']['title']}\n"
             for phrase in data['characteristic_expressions']['phrases']:
                 guide += f"- \"{phrase}\"\n"
@@ -150,69 +153,14 @@ def get_collection():
             return None
     return collection
 
-def is_substantial_question(question):
-    """
-    Vérifie si la question est suffisamment substantielle pour mériter des PMIDs.
-    Retourne False pour les questions trop courtes ou génériques.
-    """
-    if not question or len(question.strip()) < 10:
-        return False
-    
-    # Compter les mots significatifs (au moins 3 caractères)
-    words = [w for w in question.split() if len(w) >= 3]
-    if len(words) < 3:
-        return False
-    
-    # Liste de phrases génériques qui ne méritent pas de PMIDs
-    generic_phrases = [
-        'pose une question',
-        'aide moi',
-        'bonjour',
-        'salut',
-        'merci',
-        'hello',
-        'hi',
-        'help',
-        'ask a question',
-        'ask question',
-    ]
-    
-    question_lower = question.lower().strip()
-    for phrase in generic_phrases:
-        if question_lower == phrase or question_lower == phrase + '?':
-            return False
-    
-    return True
-
 def extract_pmids_from_text(text):
     """Extrait toutes les références PMID d'un texte."""
     return re.findall(r'PMID:\s*\d+', text)
 
-def get_pmids_from_contexts(contexts, metadatas=None):
-    """Extract PMIDs from contexts. If metadatas with 'source' info is provided,
-    look up chunk_0 of each source document to find PMIDs that may not be
-    in the matched chunks."""
+def get_pmids_from_contexts(contexts):
     pmids = set()
-    # First, check the matched chunks themselves
     for doc in contexts:
-        pmids.update(extract_pmids_from_text(doc))
-    # If metadatas available, look up chunk_0 of each unique source for PMIDs
-    if metadatas and not pmids:
-        col = get_collection()
-        if col:
-            sources = set()
-            for meta in metadatas:
-                if isinstance(meta, dict) and 'source' in meta:
-                    sources.add(meta['source'])
-            chunk0_ids = [src + '_chunk0' for src in sources]
-            if chunk0_ids:
-                try:
-                    results = col.get(ids=chunk0_ids, include=['documents'])
-                    for doc in results.get('documents', []):
-                        if doc:
-                            pmids.update(extract_pmids_from_text(doc))
-                except Exception as e:
-                    print(f'Error fetching chunk_0 for PMIDs: {e}')
+           pmids.update(extract_pmids_from_text(doc))
     return list(pmids)
 
 def ask_question_stream(question, language="fr", timezone="UTC", locale="fr-FR", top_k=5, conversation_history=None, session=None, question_id=None):
@@ -233,11 +181,6 @@ def ask_question_stream(question, language="fr", timezone="UTC", locale="fr-FR",
     # context is not available yet (need ChromaDB), so pass empty string for now
     refusal_result = validate_user_query(question, llm_call_fn=None, language=language)
     if refusal_result and refusal_result.get("decision") == "refuse":
-        # Store empty PMIDs list in session for refusal
-        if session is not None and question_id is not None:
-            if 'pmids' not in session:
-                session['pmids'] = {}
-            session['pmids'][question_id] = []
         yield "__REFUSAL__"
         yield refusal_result["answer"]
         return
@@ -257,8 +200,7 @@ def ask_question_stream(question, language="fr", timezone="UTC", locale="fr-FR",
         # Query ChromaDB
         results = col.query(
             query_embeddings=[query_emb],
-            n_results=top_k,
-            include=['documents', 'metadatas']
+            n_results=top_k
         )
 
         if not results['documents'] or not results['documents'][0]:
@@ -271,13 +213,8 @@ def ask_question_stream(question, language="fr", timezone="UTC", locale="fr-FR",
             contexts.append(doc)
         context = "\n\n".join(contexts)
 
-        # Extraire les PMIDs du contexte (with source metadata lookup)
-        # Only extract PMIDs for substantial questions (not for generic/short questions)
-        pmids = []
-        if is_substantial_question(question):
-            metadatas = results.get('metadatas', [[]])[0]
-            pmids = get_pmids_from_contexts(contexts, metadatas=metadatas)
-        
+        # Extraire les PMIDs du contexte
+        pmids = get_pmids_from_contexts(contexts)
         # Save PMIDs in session if provided
         if session is not None and question_id is not None:
             if 'pmids' not in session:
