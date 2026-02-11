@@ -23,7 +23,8 @@
     },
     "header": {
       "title": "Dok2u Multi-Agent",
-      "menuButton": "Menu"
+      "menuButton": "Menu",
+      "agentLabel": "Agent"
     },
     "sidebar": {
       "title": "Dok2u Multi-Agent",
@@ -194,7 +195,8 @@
     },
     "header": {
       "title": "Dok2u Multi-Agent",
-      "menuButton": "Menu"
+      "menuButton": "Menu",
+      "agentLabel": "Agent"
     },
     "sidebar": {
       "title": "Dok2u Multi-Agent",

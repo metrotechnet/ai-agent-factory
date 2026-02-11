@@ -1132,5 +1132,47 @@
     "response": "Je ne peux pas répondre à ta demande, car elle ne correspond pas au contexte fourni. Si tu as une question spécifique sur un sujet lié à la nutrition ou à la santé, n'hésite pas à demander !",
     "timestamp": "2026-02-10T20:21:09.944529",
     "comments": []
+  },
+  {
+    "question_id": "286e77df-fc9e-43d1-8ae7-638d21fdb1a8",
+    "question": "Traduction bidirectionnelle automatique",
+    "response": "Je ne peux pas répondre à cette question, car elle ne se rapporte pas au contexte fourni. Si tu as des questions sur la nutrition, le contrôle de l'appétit ou d'autres sujets liés, n'hésite pas à demander !",
+    "timestamp": "2026-02-10T20:23:37.548090",
+    "comments": []
+  },
+  {
+    "question_id": "ecd3404e-7a5f-42de-9a01-17de2da32a8a",
+    "question": "Traduction bidirectionnelle automatique",
+    "response": "Je ne peux pas répondre à ta demande, car elle ne correspond pas au contexte fourni. Si tu as une question liée à la nutrition ou à des sujets connexes, n'hésite pas à la poser !",
+    "timestamp": "2026-02-10T20:31:07.108437",
+    "comments": []
+  },
+  {
+    "question_id": "ed9dcd53-4b30-4d0c-a629-2e811f3908cb",
+    "question": "Traduction bidirectionnelle automatique",
+    "response": "Je ne peux pas répondre à ta demande, car elle ne se rapporte pas au contexte fourni. Si tu as des questions sur la nutrition, le contrôle de l'appétit ou des applications de classification alimentaire, n'hésite pas à demander !",
+    "timestamp": "2026-02-11T08:46:38.189469",
+    "comments": []
+  },
+  {
+    "question_id": "0cb851f0-3df2-4caa-a66f-61dab7185fdc",
+    "question": "Traduction bidirectionnelle automatique",
+    "response": "Je ne peux pas répondre à ta demande concernant la traduction bidirectionnelle automatique, car ce sujet n'est pas couvert dans le contexte fourni. Si tu as des questions sur la nutrition, le contrôle de l'appétit ou d'autres sujets liés, n'hésite pas à demander !",
+    "timestamp": "2026-02-11T08:47:19.395215",
+    "comments": []
+  },
+  {
+    "question_id": "f6dd4d88-f424-4ba0-982a-7d50290f3ecf",
+    "question": "Traduction bidirectionnelle automatique",
+    "response": "Je ne peux pas répondre à ta demande. Si tu cherches des informations spécifiques sur la traduction bidirectionnelle automatique, je te conseille de consulter des ressources spécialisées ou des professionnels dans ce domaine.",
+    "timestamp": "2026-02-11T08:48:35.297756",
+    "comments": []
+  },
+  {
+    "question_id": "8642e5c9-f89d-48c2-a0cf-28c6117d1db2",
+    "question": "Traduction bidirectionnelle automatique",
+    "response": "Je ne peux pas répondre à ta demande sur la traduction bidirectionnelle automatique. Si tu as d'autres questions ou besoin d'informations sur un sujet spécifique, n'hésite pas à demander !",
+    "timestamp": "2026-02-11T08:49:00.335455",
+    "comments": []
   }
 ]

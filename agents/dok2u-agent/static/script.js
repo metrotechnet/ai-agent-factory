@@ -1663,6 +1663,21 @@ async function sendTranslation() {
         // Read translation aloud if TTS is enabled (exclude the label)
         const translationTextDiv = contentDiv.querySelector('.translation-result > div:last-child');
         speakText(translationTextDiv ? translationTextDiv.textContent : contentDiv.textContent);
+        
+        // Automatically reverse translation direction for next input
+        translationReversed = !translationReversed;
+        
+        // Update button visual state
+        if (translationDirectionBtn) {
+            if (translationReversed) {
+                translationDirectionBtn.classList.add('reversed');
+            } else {
+                translationDirectionBtn.classList.remove('reversed');
+            }
+        }
+        
+        // Update source language display
+        updateSourceLanguageDisplay();
     }
 }
 
