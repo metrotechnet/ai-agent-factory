@@ -779,7 +779,7 @@ function createAssistantMessage() {
     messageDiv.className = 'message assistant';
     
     messageDiv.innerHTML = `
-        <div class="message-icon">Dok2u</div>
+        <div class="message-icon">D2U</div>
         <div class="message-content">
             <div class="message-text">
                 <div class="loading">
@@ -1195,7 +1195,7 @@ function addMessage(text, role) {
     const messageDiv = document.createElement('div');
     messageDiv.className = `message ${role}`;
     messageDiv.innerHTML = `
-        <div class="message-icon">${role === 'user' ? 'U' : 'Dok2u'}</div>
+        <div class="message-icon">${role === 'user' ? 'U' : 'D2U'}</div>
         <div class="message-content">${escapeHtml(text)}</div>
     `;
     // Clear the text area
@@ -1448,9 +1448,9 @@ function switchAgent(agent, userInitiated) {
     }
 
     // Focus input only on user action
-    if (userInitiated && inputBox) {
-        inputBox.focus();
-    }
+    // if (userInitiated && inputBox) {
+    //     inputBox.focus();
+    // }
 }
 
 // Agent selector event listener

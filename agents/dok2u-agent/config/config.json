@@ -6,9 +6,9 @@
     },
     "agents": {
       "label": "Agent",
-      "dok2u": "Agent Nutrition",
+      "dok2u": "Agent Nutritionniste",
       "translator": "Agent Traducteur",
-      "dok2u_welcome": "Bonjour ! Je suis votre agent nutrition. Posez-moi vos questions sur l alimentation, les suppléments ou la santé en général.",
+      "dok2u_welcome": "Bonjour ! Je suis votre agent nutritionniste. Posez-moi vos questions sur l alimentation, les suppléments ou la santé en général.",
       "translator_welcome": "Bonjour ! Je suis l'agent traducteur. Sélectionnez une langue cible et écrivez dans cette langue ou dans la langue de l'interface pour traduire automatiquement."
     },
     "translator": {
@@ -44,7 +44,7 @@
     },
     "suggestions": {
       "agent_nutrition": {
-        "title": "🥬 Agent Nutrition",
+        "title": "🥬 Agent Nutritionniste",
         "description": "Posez vos questions sur la nutrition et la santé"
       },
       "agent_translator": {
@@ -178,10 +178,10 @@
     },
     "agents": {
       "label": "Agent",
-      "dok2u": "Nutrition Assistant",
-      "translator": "Translator Assistant",
-      "dok2u_welcome": "Hello! I am your nutrition assistant. Ask me your questions about diet, supplements or general health.",
-      "translator_welcome": "Hello! I am the translator assistant. Select a target language and write in that language or in the interface language to translate automatically."
+      "dok2u": "Nutritionist Agent",
+      "translator": "Translator Agent",
+      "dok2u_welcome": "Hello! I am your nutritionist agent. Ask me your questions about diet, supplements or general health.",
+      "translator_welcome": "Hello! I am the translator agent. Select a target language and write in that language or in the interface language to translate automatically."
     },
     "translator": {
       "sourceLabel": "From",
@@ -216,11 +216,11 @@
     },
     "suggestions": {
       "agent_nutrition": {
-        "title": "🥬 Nutrition Assistant",
+        "title": "🥬 Nutritionist Agent",
         "description": "Ask your questions about nutrition and health"
       },
       "agent_translator": {
-        "title": "🌐 Translator Assistant",
+        "title": "🌐 Translator Agent",
         "description": "Automatic bidirectional translation"
       }
     },

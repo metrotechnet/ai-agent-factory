@@ -1489,5 +1489,138 @@
     "response": "Je suis un assistant virtuel basé sur une intelligence artificielle, conçu pour fournir des informations générales et éducatives sur des sujets liés à la nutrition et à la santé. Mon but est de vulgariser des concepts scientifiques pour les rendre accessibles à tous, tout en reconnaissant les limites des connaissances scientifiques. Je ne suis pas un professionnel de la santé et je ne donne pas de conseils médicaux personnalisés. Si tu as des questions spécifiques sur ta santé, il est toujours préférable de consulter un professionnel qualifié.",
     "timestamp": "2026-02-11T09:55:30.683894",
     "comments": []
+  },
+  {
+    "question_id": "697117a9-9996-45fc-b66a-f5cd0f5587d7",
+    "question": "pose une question",
+    "response": "Je suis là pour répondre à tes questions sur la nutrition et la santé de manière générale. N'hésite pas à poser ta question !",
+    "timestamp": "2026-02-11T10:12:37.618976",
+    "comments": []
+  },
+  {
+    "question_id": "07911ad9-49c1-4719-9992-aaaa677ed361",
+    "question": "pose une question",
+    "response": "Je suis là pour répondre à tes questions sur la nutrition et la santé de manière générale. Qu'est-ce qui t'intéresse ?",
+    "timestamp": "2026-02-11T10:13:47.146028",
+    "comments": []
+  },
+  {
+    "question_id": "e308f879-126a-4c12-8c9f-b55c406e270a",
+    "question": "pose une question",
+    "response": "Je suis là pour répondre à tes questions sur la nutrition et la santé de manière générale. Quel sujet t'intéresse ?",
+    "timestamp": "2026-02-11T10:17:01.245933",
+    "comments": []
+  },
+  {
+    "question_id": "6f70e094-1000-4419-8a8a-303c92c05059",
+    "question": "salut",
+    "response": "Salut ! Comment puis-je t'aider aujourd'hui ?",
+    "timestamp": "2026-02-11T10:17:22.960480",
+    "comments": []
+  },
+  {
+    "question_id": "ea5a3abb-c40d-414e-b9a3-29a523aa1fe6",
+    "question": "pose une question",
+    "response": "D'accord, voici une question : Selon toi, quelles sont les clés pour développer un esprit critique face à la publicité et aux images que nous voyons ?",
+    "timestamp": "2026-02-11T10:17:34.126163",
+    "comments": []
+  },
+  {
+    "question_id": "42c6462e-0323-4c81-9a29-b917af48a91c",
+    "question": "c'est quoi de la créatine",
+    "response": "La créatine est un composé naturellement présent dans notre corps, principalement dans les muscles. Elle joue un rôle essentiel dans la production d'énergie, notamment lors d'efforts courts et intenses. En supplément, la créatine est souvent utilisée pour améliorer les performances sportives, notamment dans les sports de force et de puissance. Elle peut également avoir des effets bénéfiques pour certaines populations, comme les personnes âgées ou les végétariens, en contribuant à la masse musculaire et à la santé cognitive. Toutefois, son efficacité dépend du contexte et des individus.",
+    "timestamp": "2026-02-11T10:17:47.496010",
+    "comments": []
+  },
+  {
+    "question_id": "cb4d1ceb-069a-49c8-8917-2e2bf02d28a4",
+    "question": "j'ai mal au ventre",
+    "response": "Je ne peux pas fournir de diagnostic ni de recommandations pour des douleurs abdominales. Il est important de consulter un professionnel de la santé pour discuter de tes symptômes et obtenir des conseils appropriés.",
+    "timestamp": "2026-02-11T10:21:28.320639",
+    "comments": []
+  },
+  {
+    "question_id": "11ef60ec-ece6-464c-8824-6d8af9a59994",
+    "question": "j'ai mal au ventre",
+    "response": "Je ne peux pas diagnostiquer ou donner des recommandations spécifiques pour des douleurs abdominales. Si tu ressens un inconfort persistant ou aigu, il est important de consulter un professionnel de la santé qualifié pour obtenir un avis approprié.",
+    "timestamp": "2026-02-11T10:23:15.386127",
+    "comments": []
+  },
+  {
+    "question_id": "df858327-7e97-4142-a21f-cc061bf9e188",
+    "question": "j'ai mal au ventre",
+    "response": "Je ne peux pas poser de diagnostic ni fournir de recommandations personnelles. Si tu as mal au ventre, il est important de consulter un professionnel de la santé qualifié pour évaluer ta situation. Les douleurs abdominales peuvent avoir de nombreuses causes, et un avis médical est nécessaire pour obtenir des conseils adaptés.",
+    "timestamp": "2026-02-11T10:24:03.265831",
+    "comments": []
+  },
+  {
+    "question_id": "503a99f8-8463-4c10-92bd-7baff4093020",
+    "question": "j'ai mal aux dents",
+    "response": "Je ne peux pas fournir de conseils médicaux ou de recommandations personnalisées pour des douleurs dentaires. Je te conseille de consulter un professionnel de la santé dentaire pour évaluer ta situation.",
+    "timestamp": "2026-02-11T10:24:38.595863",
+    "comments": []
+  },
+  {
+    "question_id": "0071cbe3-bd2a-4c9d-9255-e0adf0707a81",
+    "question": "j'ai mal au ventre",
+    "response": "Je ne peux pas poser de diagnostic. Si tu ressens des douleurs abdominales, il est préférable de consulter un professionnel de la santé qualifié pour obtenir un avis approprié. Les douleurs abdominales peuvent avoir différentes causes, et seul un professionnel pourra évaluer ta situation correctement.",
+    "timestamp": "2026-02-11T10:27:32.708201",
+    "comments": []
+  },
+  {
+    "question_id": "7a3a4ae7-b7a3-49b2-b8c9-c585371b3e59",
+    "question": "j'ai mal au ventre",
+    "response": "Je ne peux pas fournir de conseils médicaux ou de diagnostic. Si tu ressens des douleurs au ventre, il est important de consulter un professionnel de la santé qualifié qui pourra évaluer ta situation et te donner des conseils appropriés.",
+    "timestamp": "2026-02-11T10:28:42.733363",
+    "comments": []
+  },
+  {
+    "question_id": "c55eceda-d025-4671-b4f4-6ac0dcc75e99",
+    "question": "j'ai mal au ventre",
+    "response": "Je ne peux pas fournir de conseils médicaux ou de diagnostic. Il est important de consulter un professionnel de la santé qualifié pour évaluer ta situation et te donner des conseils appropriés.",
+    "timestamp": "2026-02-11T10:28:55.977662",
+    "comments": []
+  },
+  {
+    "question_id": "e8a2a185-9c17-4ea0-864e-f5e03400f5a5",
+    "question": "j'ai mal au ventre",
+    "response": "Je ne peux pas fournir de diagnostic ou de recommandations médicales. Si tu ressens des douleurs abdominales, il est important de consulter un professionnel de la santé qualifié pour évaluer ta situation. N'hésite pas à en parler à un médecin.",
+    "timestamp": "2026-02-11T10:29:40.886149",
+    "comments": []
+  },
+  {
+    "question_id": "d30dfad0-f21a-4f2b-885f-c6d126b6200c",
+    "question": "j'ai mal au ventre",
+    "response": "Je ne peux pas fournir de diagnostic ou de recommandations médicales. Si tu ressens des douleurs abdominales, il est important de consulter un professionnel de la santé qualifié pour évaluer ta situation. N'hésite pas à en parler à un médecin.",
+    "timestamp": "2026-02-11T10:35:17.851489",
+    "comments": []
+  },
+  {
+    "question_id": "f20893f6-1598-4460-ab64-9e124f75cbde",
+    "question": "j'ai mal au ventre",
+    "response": "Je ne peux pas fournir de diagnostic ou de recommandations médicales. Si tu ressens des douleurs abdominales, il est important de consulter un professionnel de la santé qualifié pour évaluer ta situation. N'hésite pas à en parler à un médecin.",
+    "timestamp": "2026-02-11T10:35:51.636200",
+    "comments": []
+  },
+  {
+    "question_id": "9e754a58-ade3-4ac9-93db-8bdec257ff0d",
+    "question": "j'ai mal au ventre",
+    "response": "Je ne peux pas fournir de diagnostic ou de recommandations médicales. Si tu ressens des douleurs abdominales, il est important de consulter un professionnel de la santé qualifié pour évaluer ta situation. N'hésite pas à en parler à un médecin.",
+    "timestamp": "2026-02-11T10:37:58.556373",
+    "comments": []
+  },
+  {
+    "question_id": "c5e516c2-01b8-45ae-8c55-6ae05960ae52",
+    "question": "j'ia mal au ventre",
+    "response": "Je ne peux pas diagnostiquer ni fournir de conseils médicaux. Si tu ressens des douleurs au ventre, il est important de consulter un professionnel de la santé qualifié pour évaluer ta situation. Les douleurs abdominales peuvent avoir de nombreuses causes différentes. Prends soin de toi !",
+    "timestamp": "2026-02-11T10:43:50.472958",
+    "comments": []
+  },
+  {
+    "question_id": "c236d9ad-c83d-458a-bbc2-4448f8dfa5f7",
+    "question": "j'ai mal au ventre",
+    "response": "Je ne peux pas poser de diagnostic ni fournir de recommandations personnalisées. Si tu ressens des douleurs au ventre, il est important de consulter un professionnel de la santé qualifié pour évaluer ta situation. N'hésite pas à en parler à un médecin qui pourra t'aider.",
+    "timestamp": "2026-02-11T10:45:06.169565",
+    "comments": []
   }
 ]
