@@ -9,11 +9,12 @@
       "dok2u": "Assistant Nutrition",
       "translator": "Traducteur",
       "dok2u_welcome": "Bonjour ! Je suis votre assistant nutrition. Posez-moi vos questions sur l alimentation, les suppléments ou la santé en général.",
-      "translator_welcome": "Bonjour ! Je suis le traducteur. Entrez du texte ou enregistrez un message vocal, puis choisissez la langue cible pour obtenir votre traduction."
+      "translator_welcome": "Bonjour ! Je suis le traducteur. Sélectionnez une langue cible et écrivez dans cette langue ou dans la langue de l'interface pour traduire automatiquement."
     },
     "translator": {
-      "targetLabel": "Traduire vers",
-      "placeholder": "Entrez le texte à traduire...",
+      "sourceLabel": "De",
+      "targetLabel": "Vers",
+      "placeholder": "\u00c9crivez votre texte...",
       "sendButton": "Traduire",
       "voiceButton": "Enregistrer un message vocal",
       "result": "Traduction",
@@ -47,7 +48,7 @@
       },
       "agent_translator": {
         "title": "🌐 Traducteur",
-        "description": "Traduire du contenu dans plusieurs langues"
+        "description": "Traduction bidirectionnelle automatique"
       }
     },
     "input": {
@@ -179,11 +180,12 @@
       "dok2u": "Nutrition Assistant",
       "translator": "Translator",
       "dok2u_welcome": "Hello! I am your nutrition assistant. Ask me your questions about diet, supplements or general health.",
-      "translator_welcome": "Hello! I am the translator. Enter text or record a voice message, then choose the target language to get your translation."
+      "translator_welcome": "Hello! I am the translator. Select a target language and write in that language or in the interface language to translate automatically."
     },
     "translator": {
+      "sourceLabel": "From",
       "targetLabel": "Translate to",
-      "placeholder": "Enter text to translate...",
+      "placeholder": "Write in any language...",
       "sendButton": "Translate",
       "voiceButton": "Record voice message",
       "result": "Translation",
@@ -217,7 +219,7 @@
       },
       "agent_translator": {
         "title": "🌐 Translator",
-        "description": "Translate content into multiple languages"
+        "description": "Automatic bidirectional translation"
       }
     },
     "input": {

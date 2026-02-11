@@ -187,6 +187,16 @@ function switchLanguage(lang) {
     if (langSelector) {
         langSelector.value = lang;
     }
+    
+    // Update source language display in translator
+    updateSourceLanguageDisplay();
+}
+
+/**
+ * Update the source language display in translator options
+ */
+function updateSourceLanguageDisplay() {
+    updateSourceLanguageBasedOnDirection();
 }
 
 /**
@@ -243,6 +253,12 @@ let currentAgent = 'dok2u'; // 'dok2u' or 'translator'
 const agentSelector = document.getElementById('agent-selector');
 const translateOptions = document.getElementById('translate-options');
 const targetLanguageSelect = document.getElementById('target-language');
+const translationDirectionBtn = document.getElementById('translation-direction-btn');
+const sourceLanguageText = document.getElementById('source-language-text');
+
+// Translation state
+let manualSourceLanguage = null; // null = auto-detect, otherwise the selected language code
+let translationReversed = false; // Track if translation direction is reversed
 
 // Voice recording state
 let recognition = null;
@@ -1298,11 +1314,62 @@ function toggleRecording() {
 }
 
 /**
+ * Convert language code to speech recognition locale
+ */
+function getRecognitionLocale(langCode) {
+    const localeMap = {
+        'fr': 'fr-FR',
+        'en': 'en-US',
+        'es': 'es-ES',
+        'de': 'de-DE',
+        'it': 'it-IT',
+        'pt': 'pt-PT',
+        'nl': 'nl-NL',
+        'ru': 'ru-RU',
+        'zh': 'zh-CN',
+        'ja': 'ja-JP',
+        'ko': 'ko-KR',
+        'ar': 'ar-SA',
+        'hi': 'hi-IN',
+        'pl': 'pl-PL',
+        'tr': 'tr-TR',
+        'sv': 'sv-SE',
+        'da': 'da-DK',
+        'no': 'no-NO',
+        'fi': 'fi-FI',
+        'uk': 'uk-UA',
+        'cs': 'cs-CZ',
+        'ro': 'ro-RO',
+        'el': 'el-GR',
+        'he': 'he-IL',
+        'th': 'th-TH',
+        'vi': 'vi-VN',
+        'id': 'id-ID'
+    };
+    return localeMap[langCode] || 'en-US';
+}
+
+/**
  * Start voice recording
  */
 function startRecording() {
     try {
-        recognition.lang = currentLanguage === 'en' ? 'en-US' : 'fr-FR';
+        // Determine source language based on translation direction
+        if (currentAgent === 'translator') {
+            let sourceLang;
+            if (translationReversed) {
+                // Reversed: target becomes source
+                sourceLang = targetLanguageSelect ? targetLanguageSelect.value : 'en';
+            } else {
+                // Normal: interface language is source
+                sourceLang = currentLanguage || 'fr';
+            }
+            recognition.lang = getRecognitionLocale(sourceLang);
+            console.log(`Voice recording in translator mode: ${sourceLang} (${recognition.lang})`);
+        } else {
+            recognition.lang = currentLanguage === 'en' ? 'en-US' : 'fr-FR';
+            console.log(`Voice recording in interface language: ${currentLanguage} (${recognition.lang})`);
+        }
         recognition.start();
         console.log('Voice recording started');
     } catch (error) {
@@ -1338,7 +1405,7 @@ function switchAgent(agent, userInitiated) {
     currentAgent = agent;
     const isTranslator = agent === 'translator';
     
-    // Toggle translation options bar
+    // Show/hide translation options bar
     if (translateOptions) {
         translateOptions.style.display = isTranslator ? 'flex' : 'none';
     }
@@ -1362,7 +1429,7 @@ function switchAgent(agent, userInitiated) {
         // Show agent welcome message
         const welcomeKey = isTranslator ? 'agents.translator_welcome' : 'agents.dok2u_welcome';
         const welcomeText = t(welcomeKey) || (isTranslator 
-            ? 'Enter text or record a voice message, then choose the target language.'
+            ? `Write in any language, I will automatically detect it and translate to ${currentLanguage === 'fr' ? 'French' : 'English'}.`
             : 'Ask me your questions about nutrition and health.');
         const welcomeDiv = document.createElement('div');
         welcomeDiv.className = 'message assistant';
@@ -1407,6 +1474,41 @@ document.querySelectorAll('.agent-card[data-agent]').forEach(card => {
     });
 });
 
+// Translation direction button for translator
+if (translationDirectionBtn) {
+    translationDirectionBtn.addEventListener('click', function() {
+        // Toggle the reversed state
+        translationReversed = !translationReversed;
+        
+        // Update button visual state
+        if (translationReversed) {
+            translationDirectionBtn.classList.add('reversed');
+        } else {
+            translationDirectionBtn.classList.remove('reversed');
+        }
+        
+        
+        console.log(`Translation direction ${translationReversed ? 'reversed' : 'normal'}`);
+    });
+}
+
+
+
+// Update source language display when target language changes (if reversed)
+if (targetLanguageSelect) {
+    targetLanguageSelect.addEventListener('change', function() {
+        // Reset translation direction to normal (interface -> target)
+        translationReversed = false;
+        
+        // Reset button visual state
+        if (translationDirectionBtn) {
+            translationDirectionBtn.classList.remove('reversed');
+        }
+        
+
+    });
+}
+
 /**
  * Update agent selector option texts with translations
  */
@@ -1430,6 +1532,7 @@ function updateAgentSelectorLabels() {
 
 /**
  * Send a translation request (text) with streaming response
+ * Uses manually selected source language from toggle button
  */
 async function sendTranslation() {
     const text = inputBox.value.trim();
@@ -1471,7 +1574,26 @@ async function sendTranslation() {
     
     prepareUIForLoading();
     
-    const targetLang = targetLanguageSelect ? targetLanguageSelect.value : 'en';
+    // Determine source and target languages based on translation direction
+    let actualSourceLang, actualTargetLang;
+    
+    if (translationReversed) {
+        // Reversed: target language -> interface language
+        actualSourceLang = targetLanguageSelect.value || 'en';
+        actualTargetLang = currentLanguage || 'fr';
+    } else {
+        // Normal: interface language -> target language
+        actualSourceLang = currentLanguage || 'fr';
+        actualTargetLang = targetLanguageSelect.value || 'en';
+    }
+    
+    console.log(`Translating from ${actualSourceLang} to ${actualTargetLang}`);
+    
+    // Get language names for display
+    const langData = translations[currentLanguage] || translations['fr'];
+    const languages = langData.languages || {};
+    const sourceLangName = languages[actualSourceLang] || actualSourceLang.toUpperCase();
+    const targetLangName = languages[actualTargetLang] || actualTargetLang.toUpperCase();
     
     try {
         const response = await fetch('/api/translate', {
@@ -1479,7 +1601,7 @@ async function sendTranslation() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 text: text,
-                target_language: targetLang,
+                target_language: actualTargetLang,
                 source_language: 'auto'
             })
         });
@@ -1494,11 +1616,12 @@ async function sendTranslation() {
         while (true) {
             const { done, value } = await reader.read();
             if (done) {
-                // Final render
-                const targetName = targetLanguageSelect ? targetLanguageSelect.options[targetLanguageSelect.selectedIndex].text : targetLang;
+                // Final render with detected languages
                 contentDiv.innerHTML = `
                     <div class="translation-result">
-                        <div class="translation-label">${t('translator.result') || 'Traduction'} (${targetName})</div>
+                        <div class="translation-label">
+                            <span style="color: #718096; font-size: 0.85em;">${sourceLangName} → ${targetLangName}</span>
+                        </div>
                         <div>${fullText}</div>
                     </div>
                 `;
@@ -1683,6 +1806,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Load translations and set up internationalization
     loadTranslations().then(() => {
         updateAgentSelectorLabels();
+        updateSourceLanguageDisplay();
     });
     
     // Check for cookie consent
