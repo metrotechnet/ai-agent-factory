@@ -1090,5 +1090,47 @@
     "response": "Je ne peux pas répondre à ta question, car elle ne correspond pas au contexte fourni. Si tu as des questions sur la nutrition ou des sujets liés à l'alimentation, n'hésite pas à demander !",
     "timestamp": "2026-02-10T20:11:49.490092",
     "comments": []
+  },
+  {
+    "question_id": "f7c996ce-051b-4143-89dc-c831414b974d",
+    "question": "Traduction bidirectionnelle automatique",
+    "response": "Je ne peux pas répondre à cette question.",
+    "timestamp": "2026-02-10T20:15:07.447179",
+    "comments": []
+  },
+  {
+    "question_id": "60c6a5a8-737b-4f8b-96ca-441cf0763871",
+    "question": "Traduction bidirectionnelle automatique",
+    "response": "Je ne peux pas fournir d'informations sur la traduction bidirectionnelle automatique. Si tu as des questions sur un autre sujet lié à la nutrition ou à la santé, n'hésite pas à demander !",
+    "timestamp": "2026-02-10T20:16:18.338165",
+    "comments": []
+  },
+  {
+    "question_id": "d2c6178b-1daa-487e-a8d0-62633bc66ce7",
+    "question": "Traduction bidirectionnelle automatique",
+    "response": "Je ne peux pas fournir d'informations sur la traduction bidirectionnelle automatique. Si tu as des questions sur un autre sujet, n'hésite pas à demander !",
+    "timestamp": "2026-02-10T20:16:49.644671",
+    "comments": []
+  },
+  {
+    "question_id": "80ddfd3b-01cf-4e3e-acbc-9a3a8a58f768",
+    "question": "Automatic bidirectional translation",
+    "response": "I'm sorry, but I cannot provide information on automatic bidirectional translation. Please specify a different topic or question, and I'll do my best to help!",
+    "timestamp": "2026-02-10T20:18:07.891687",
+    "comments": []
+  },
+  {
+    "question_id": "270d1684-6a44-4a19-8baf-9ec0c95412aa",
+    "question": "Traduction bidirectionnelle automatique",
+    "response": "Je ne peux pas répondre à cette demande. Si tu as des questions sur un sujet particulier, n'hésite pas à me le faire savoir !",
+    "timestamp": "2026-02-10T20:19:21.848594",
+    "comments": []
+  },
+  {
+    "question_id": "c11b87d9-ef1c-43a2-872a-012dc4778370",
+    "question": "Traduction bidirectionnelle automatique",
+    "response": "Je ne peux pas répondre à ta demande, car elle ne correspond pas au contexte fourni. Si tu as une question spécifique sur un sujet lié à la nutrition ou à la santé, n'hésite pas à demander !",
+    "timestamp": "2026-02-10T20:21:09.944529",
+    "comments": []
   }
 ]

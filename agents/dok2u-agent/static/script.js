@@ -196,7 +196,15 @@ function switchLanguage(lang) {
  * Update the source language display in translator options
  */
 function updateSourceLanguageDisplay() {
-    updateSourceLanguageBasedOnDirection();
+    if (!sourceLanguageText) return;
+    
+    const langData = translations[currentLanguage] || translations['fr'];
+    const languages = langData.languages || {};
+    
+    // Always display interface language (doesn't change with arrow direction)
+    const displayLang = currentLanguage || 'fr';
+    
+    sourceLanguageText.textContent = languages[displayLang] || displayLang.toUpperCase();
 }
 
 /**
@@ -257,7 +265,6 @@ const translationDirectionBtn = document.getElementById('translation-direction-b
 const sourceLanguageText = document.getElementById('source-language-text');
 
 // Translation state
-let manualSourceLanguage = null; // null = auto-detect, otherwise the selected language code
 let translationReversed = false; // Track if translation direction is reversed
 
 // Voice recording state
@@ -638,7 +645,6 @@ function createBottomSpacer(userMsgDiv, assistantMsgDiv) {
     const spacerHeight = chatContainer.clientHeight - userMsgDiv.offsetHeight - assistantMsgDiv.offsetHeight - 50;
     bottomSpacer.style.height = (spacerHeight > 0 ? spacerHeight : 0) + 'px';
     bottomSpacer.style.flexShrink = '0';
-    //bottomSpacer.style.border = 'red 1px solid '; // For debugging
     return bottomSpacer
 }
 
@@ -781,10 +787,6 @@ async function sendMessage() {
 function createAssistantMessage() {
     const messageDiv = document.createElement('div');
     messageDiv.className = 'message assistant';
-    
-    // Set initial minimal height to fit icon and small space (100px)
-    // messageDiv.style.paddingBottom = '50px';
-
     
     messageDiv.innerHTML = `
         <div class="message-icon">Dok2u</div>
@@ -1179,9 +1181,6 @@ async function pollForTtsAudio(questionId, sid, originalBtnContent) {
  * @param {HTMLElement} messageDiv - The message container to clean up
  */
 function cleanupAfterMessage(messageDiv) {
-    // Restore normal padding
-    // messageDiv.style.paddingBottom = '50px';
-    
     // Re-enable input controls
     isLoading = false;
     sendButton.disabled = false;
@@ -1487,6 +1486,8 @@ if (translationDirectionBtn) {
             translationDirectionBtn.classList.remove('reversed');
         }
         
+        // Update source language display
+        updateSourceLanguageDisplay();
         
         console.log(`Translation direction ${translationReversed ? 'reversed' : 'normal'}`);
     });
@@ -1505,7 +1506,8 @@ if (targetLanguageSelect) {
             translationDirectionBtn.classList.remove('reversed');
         }
         
-
+        // Update source language display
+        updateSourceLanguageDisplay();
     });
 }
 
