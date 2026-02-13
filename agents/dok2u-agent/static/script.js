@@ -313,7 +313,7 @@ function scrollAllToTheTop() {
     document.documentElement.scrollTop = 0;
     document.body.scrollTop = 0;
     window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
-    console.log('scrollAllToTheTop :');
+    console.log('scrollAllToTheTop2');
     // Scroll chat container to show latest messages
     if (chatContainer) {
         chatContainer.scrollTo({
@@ -334,15 +334,15 @@ function scrollAllToTheTop() {
  * Handle input box blur (when keyboard disappears)
  * Restores normal view and scrolls to show latest messages
  */
-inputBox.addEventListener('blur', function() {
-    setTimeout(() => {
-        try {
-            scrollAllToTheTop();
-        } catch (error) {
-            console.log('Input blur scroll failed:', error);
-        }
-    }, 300); // Delay to allow keyboard dismissal
-});
+// inputBox.addEventListener('blur', function() {
+//     setTimeout(() => {
+//         try {
+//             scrollAllToTheTop();
+//         } catch (error) {
+//             console.log('Input blur scroll failed:', error);
+//         }
+//     }, 300); // Delay to allow keyboard dismissal
+// });
 
 // ===================================
 // SCROLL INDICATOR
@@ -739,11 +739,11 @@ async function sendMessage() {
     chatContainer.appendChild(spacerDiv);
 
     // Scroll to show user message and loading indicator
-    requestAnimationFrame(() => {
-        chatContainer.scrollTo({ top: chatContainer.scrollHeight, behavior: 'smooth' });
-    });
+    // requestAnimationFrame(() => {
+    //     chatContainer.scrollTo({ top: chatContainer.scrollHeight, behavior: 'smooth' });
+    // });
 
-    
+
     // Get message components for manipulation
     const contentDiv = messageDiv.querySelector('.message-text');
     const actionsDiv = messageDiv.querySelector('.message-actions');
@@ -753,6 +753,9 @@ async function sendMessage() {
     
     // Prepare UI for loading state
     prepareUIForLoading();
+
+    // Auto-scroll to keep assistant message bottom visible
+    scrollToMessageBottom(contentDiv.closest('.message'));
     
     try {
         // Send request to backend and handle streaming response
@@ -767,6 +770,10 @@ async function sendMessage() {
     } finally {
         // Clean up and restore UI state
         cleanupAfterMessage(messageDiv);
+        // Focus input only on user action
+        if (inputBox) {
+            inputBox.focus();
+        }
     }
 }
 
@@ -1047,7 +1054,7 @@ async function handleStreamingResponse(question, contentDiv, actionsDiv) {
                             contentDiv.textContent = fullText;
                         }
                         // Auto-scroll to keep assistant message bottom visible
-                        // scrollToMessageBottom(contentDiv.closest('.message'));
+                        scrollToMessageBottom(contentDiv.closest('.message'));
                     }
                   
                     updateScrollIndicator();
@@ -1260,10 +1267,12 @@ function initSpeechRecognition() {
             }
         }
         
-        // Update input box with transcription
-        inputBox.value = finalTranscript + interimTranscript;
-        inputBox.style.height = 'auto';
-        inputBox.style.height = Math.min(inputBox.scrollHeight, 200) + 'px';
+        // Update input box with transcription only if still recording
+        if (isRecording) {
+            inputBox.value = finalTranscript + interimTranscript;
+            inputBox.style.height = 'auto';
+            inputBox.style.height = Math.min(inputBox.scrollHeight, 200) + 'px';
+        }
     };
     
     recognition.onerror = function(event) {
@@ -1448,9 +1457,9 @@ function switchAgent(agent, userInitiated) {
     }
 
     // Focus input only on user action
-    // if (userInitiated && inputBox) {
-    //     inputBox.focus();
-    // }
+    if (userInitiated && inputBox) {
+        inputBox.focus();
+    }
 }
 
 // Agent selector event listener
@@ -1643,6 +1652,7 @@ async function sendTranslation() {
                             if (loadingDiv) contentDiv.textContent = '';
                             fullText += data.chunk;
                             contentDiv.textContent = fullText;
+
                             // Auto-scroll to keep assistant message bottom visible
                             scrollToMessageBottom(contentDiv.closest('.message'));
                         }
@@ -1658,6 +1668,12 @@ async function sendTranslation() {
         contentDiv.textContent = t('messages.error');
     } finally {
         cleanupAfterMessage(messageDiv);
+        
+        // Focus input box after translation completes
+        if (inputBox) {
+            inputBox.focus();
+        }
+        
         // Read translation aloud if TTS is enabled (exclude the label)
         const translationTextDiv = contentDiv.querySelector('.translation-result > div:last-child');
         speakText(translationTextDiv ? translationTextDiv.textContent : contentDiv.textContent);

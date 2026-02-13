@@ -256,10 +256,10 @@ inputBox.addEventListener('focus', function() {
  */
 function scrollAllToTheTop() {
     // Multiple approaches to ensure consistent scroll behavior across browsers
+    console.log('scrollAllToTheTop :');
     document.documentElement.scrollTop = 0;
     document.body.scrollTop = 0;
     window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
-    console.log('scrollAllToTheTop :');
     // Scroll chat container to show latest messages
     if (chatContainer) {
         chatContainer.scrollTo({
@@ -283,6 +283,7 @@ function scrollAllToTheTop() {
 inputBox.addEventListener('blur', function() {
     setTimeout(() => {
         try {
+            console.log('Input blurred, attempting to scroll to top');
             scrollAllToTheTop();
         } catch (error) {
             console.log('Input blur scroll failed:', error);
@@ -602,6 +603,7 @@ sendButton.addEventListener('click', () => {
     // After sending, scroll the user message to the top of chat container
     setTimeout(() => {
         if (userMessageDiv && chatContainer) {
+            console.log('Scrolling to user message:', userMessageDiv);
             chatContainer.scrollTo({
                 top: userMessageDiv.offsetTop - chatContainer.offsetTop,
                 behavior: 'smooth'

@@ -1622,5 +1622,152 @@
     "response": "Je ne peux pas poser de diagnostic ni fournir de recommandations personnalisées. Si tu ressens des douleurs au ventre, il est important de consulter un professionnel de la santé qualifié pour évaluer ta situation. N'hésite pas à en parler à un médecin qui pourra t'aider.",
     "timestamp": "2026-02-11T10:45:06.169565",
     "comments": []
+  },
+  {
+    "question_id": "7055836f-b996-487f-86b0-1ae4ddaa4f23",
+    "question": "question",
+    "response": "Je ne peux pas répondre à ta question sans plus de contexte. Peux-tu préciser ce que tu souhaites savoir ?",
+    "timestamp": "2026-02-12T19:37:03.306174",
+    "comments": []
+  },
+  {
+    "question_id": "c9d17533-7599-4dd0-968c-1631dfc52740",
+    "question": "test",
+    "response": "Il semble que tu souhaites tester le système. Je suis ici pour répondre à tes questions et te fournir des informations générales sur des sujets liés à la nutrition, l'activité physique et le bien-être. N'hésite pas à me poser une question précise !",
+    "timestamp": "2026-02-12T19:38:00.046289",
+    "comments": []
+  },
+  {
+    "question_id": "2dd3cbe8-4b65-48dc-8c7c-3a803df3d62a",
+    "question": "test",
+    "response": "Il semble que ta question soit incomplète ou que tu souhaites tester le système. Si tu as une question spécifique ou un sujet sur lequel tu aimerais des informations, n'hésite pas à préciser, et je me ferai un plaisir de t'aider !",
+    "timestamp": "2026-02-12T19:38:26.308019",
+    "comments": []
+  },
+  {
+    "question_id": "06bbb006-e88c-4c37-a648-638eb24e6f9d",
+    "question": "teest",
+    "response": "Il semble que tu aies saisi un mot incomplet. Si tu as une question ou un sujet en tête, n'hésite pas à le formuler, et je serai ravi de t'aider avec les informations dont je dispose !",
+    "timestamp": "2026-02-12T19:38:35.222540",
+    "comments": []
+  },
+  {
+    "question_id": "2ccda132-c43d-466f-9a83-94b2fc415fab",
+    "question": "asdfa",
+    "response": "Il semble que ta question soit incomplète ou ne contienne pas d'informations précises. Si tu as un sujet ou une question spécifique en tête, n'hésite pas à le formuler, et je serai ravi de t'aider avec les informations disponibles !",
+    "timestamp": "2026-02-12T19:38:38.699344",
+    "comments": []
+  },
+  {
+    "question_id": "6d91ba88-d3fe-4b27-82ad-8a0e4f03f71e",
+    "question": "adsfads",
+    "response": "Je ne peux pas répondre à cette question. Si tu as des questions spécifiques, n'hésite pas à les poser !",
+    "timestamp": "2026-02-12T19:39:02.123001",
+    "comments": []
+  },
+  {
+    "question_id": "db269456-0ac4-47fc-9615-316e3b9fb990",
+    "question": "adsfa",
+    "response": "Je ne peux pas répondre à cette question. Si tu as des questions spécifiques, n'hésite pas à les poser !",
+    "timestamp": "2026-02-12T19:39:04.450100",
+    "comments": []
+  },
+  {
+    "question_id": "24a18769-4d7a-4937-9593-91e65b6a6d6e",
+    "question": "adsf",
+    "response": "Je ne peux pas répondre à cette question. Si tu as des questions spécifiques, n'hésite pas à les poser !",
+    "timestamp": "2026-02-12T19:39:06.905904",
+    "comments": []
+  },
+  {
+    "question_id": "245eca02-f54b-43e4-8829-1d4fab740ef8",
+    "question": "adsf",
+    "response": "Je ne peux pas répondre à cette question. Si tu as des questions spécifiques, n'hésite pas à les poser !",
+    "timestamp": "2026-02-12T19:39:09.993665",
+    "comments": []
+  },
+  {
+    "question_id": "96597da8-0558-4bb7-8bec-07c4e171ceeb",
+    "question": "test",
+    "response": "Je ne peux pas répondre à cette question. Si tu as des questions spécifiques, n'hésite pas à les poser !",
+    "timestamp": "2026-02-12T19:39:14.462796",
+    "comments": []
+  },
+  {
+    "question_id": "712a6011-75b8-4577-9a70-67ec1ff44eb8",
+    "question": "adsfa",
+    "response": "Je ne peux pas répondre à ta question. Si tu as besoin d'informations spécifiques, n'hésite pas à reformuler ta demande !",
+    "timestamp": "2026-02-12T19:41:13.925501",
+    "comments": []
+  },
+  {
+    "question_id": "67bc0600-e949-444b-b64a-537998a9f1d9",
+    "question": "adsf",
+    "response": "Je ne peux pas répondre à ta question. Si tu as besoin d'informations spécifiques, n'hésite pas à reformuler ta demande !",
+    "timestamp": "2026-02-12T19:41:16.502913",
+    "comments": []
+  },
+  {
+    "question_id": "8ff7891d-82b7-4440-aa85-cb151ca24a4e",
+    "question": "adsf",
+    "response": "Je ne peux pas répondre à ta question. Si tu as besoin d'informations spécifiques, n'hésite pas à reformuler ta demande !",
+    "timestamp": "2026-02-12T19:41:18.968626",
+    "comments": []
+  },
+  {
+    "question_id": "fb360e9f-ed3f-4d5b-8b9f-162f8c0bcb63",
+    "question": "adsf",
+    "response": "Je ne peux pas répondre à ta question. Si tu as besoin d'informations spécifiques, n'hésite pas à reformuler ta demande !",
+    "timestamp": "2026-02-12T19:41:21.219721",
+    "comments": []
+  },
+  {
+    "question_id": "8eaf4cc3-028c-4765-8a29-2b91b3d676b0",
+    "question": "c'est quoi la créatine",
+    "response": "La créatine est une substance naturellement présente dans le corps, principalement dans les muscles. Elle aide à produire de l'énergie rapidement lors d'efforts courts et intenses, comme des sprints ou des exercices de force. En plus de son rôle dans la performance sportive, la créatine est également utilisée comme supplément pour augmenter la force, la masse musculaire et améliorer la récupération après l'effort. Cependant, son efficacité peut varier selon les individus et les contextes, notamment chez les athlètes, les personnes âgées ou les végétariens.",
+    "timestamp": "2026-02-12T19:41:30.014471",
+    "comments": []
+  },
+  {
+    "question_id": "43caa367-fe09-4615-a6a6-609aa04d1e5f",
+    "question": "bonjout",
+    "response": "Bonjour ! Comment puis-je t'aider aujourd'hui ?",
+    "timestamp": "2026-02-12T19:41:47.005647",
+    "comments": []
+  },
+  {
+    "question_id": "7844f5b6-51a5-43d3-bd4c-70548a7a3895",
+    "question": "c'est quoi la créatine",
+    "response": "La créatine est une substance naturellement présente dans le corps, surtout dans les muscles. Elle joue un rôle clé dans la production d'énergie rapide lors d'efforts courts et intenses, comme les sprints ou les exercices de force. En tant que supplément, elle est souvent utilisée pour augmenter la force, la masse musculaire et améliorer la récupération après l'effort. Son efficacité peut varier selon les individus et les contextes, comme chez les athlètes, les personnes âgées ou les végétariens.",
+    "timestamp": "2026-02-12T19:41:58.708813",
+    "comments": []
+  },
+  {
+    "question_id": "10c8d7ad-b6a7-4d40-a382-1369cf6470ed",
+    "question": "créatine",
+    "response": "La créatine est une substance naturellement présente dans le corps, principalement dans les muscles. Elle aide à produire de l'énergie rapidement lors d'efforts courts et intenses, comme les sprints ou les exercices de force. En tant que supplément, elle est souvent utilisée pour améliorer la performance sportive, augmenter la force et la masse musculaire, et favoriser la récupération après l'effort. Cependant, son efficacité peut varier selon les individus et les contextes.",
+    "timestamp": "2026-02-12T19:43:48.940543",
+    "comments": []
+  },
+  {
+    "question_id": "45c2815c-c6c9-4a20-bc76-80bd1925f832",
+    "question": "jeune",
+    "response": "Le terme \"jeune\" peut faire référence à différentes choses, notamment à l'âge d'une personne, à une phase de développement ou à des comportements associés à la jeunesse. Dans le contexte de la santé et de la nutrition, les jeunes peuvent être particulièrement influencés par des facteurs tels que les médias, les réseaux sociaux et les normes de beauté, ce qui peut affecter leur perception de soi et leurs choix alimentaires. Si tu souhaites aborder un aspect spécifique lié aux jeunes, n'hésite pas à préciser !",
+    "timestamp": "2026-02-12T19:43:54.211569",
+    "comments": []
+  },
+  {
+    "question_id": "810129bc-d0f6-4347-8b03-503b66fe42ca",
+    "question": "jeûne",
+    "response": "Le jeûne fait référence à une période durant laquelle une personne s'abstient de manger, souvent dans un but de santé ou de spiritualité. Le jeûne intermittent, en particulier, alterne entre des périodes de jeûne et des périodes où l'on mange. Il est souvent associé à la perte de poids et à des améliorations métaboliques, mais il est important de noter que ses effets peuvent varier d'une personne à l'autre et dépendent du contexte et des quantités. Si tu as des questions spécifiques sur le jeûne, n'hésite pas à les poser !",
+    "timestamp": "2026-02-12T19:44:00.733152",
+    "comments": []
+  },
+  {
+    "question_id": "b41d7e84-47b7-4d65-812c-95f14a5246a1",
+    "question": "oui mais pourquoi je suis gros",
+    "response": "Il n'existe pas de solution universelle pour expliquer pourquoi une personne peut avoir un poids plus élevé. Plusieurs facteurs entrent en jeu, incluant la génétique, le métabolisme, l'alimentation, le niveau d'activité physique, ainsi que des aspects psychologiques et environnementaux. De plus, le poids est souvent le résultat d'interactions complexes entre ces différents éléments. \n\nIl est important de rappeler que chacun est unique et que les effets dépendent du contexte et des quantités. Si tu as des préoccupations concernant ton poids, il est recommandé de consulter un professionnel de la santé qualifié.",
+    "timestamp": "2026-02-12T19:44:10.842107",
+    "comments": []
   }
 ]
