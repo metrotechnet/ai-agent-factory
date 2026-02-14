@@ -1,4 +1,12 @@
 // ===================================
+// CONFIGURATION
+// ===================================
+
+// Backend URL - can be overridden by window.BACKEND_URL from config.js
+// Empty string defaults to same-origin (relative URLs)
+const BACKEND_URL = window.BACKEND_URL || '';
+console.log('Using BACKEND_URL:', BACKEND_URL);
+// ===================================
 // INTERNATIONALIZATION SYSTEM
 // ===================================
 
@@ -18,7 +26,7 @@ function getUrlParameter(name) {
  */
 async function loadTranslations() {
     try {
-        const response = await fetch('/api/get_config');
+        const response = await fetch(`${BACKEND_URL}/api/get_config`);
         translations = await response.json();
         
         // Language detection priority: URL parameter > browser language > stored preference
@@ -271,6 +279,149 @@ let translationReversed = false; // Track if translation direction is reversed
 let recognition = null;
 let isRecording = false;
 
+// Keyboard state
+let isKeyboardVisible = false;
+let previousViewportHeight = window.innerHeight;
+
+// ===================================
+// MOBILE KEYBOARD DETECTION
+// ===================================
+
+/**
+ * Initialize mobile keyboard detection
+ * Detects when virtual keyboard appears or disappears on mobile devices
+ */
+function initKeyboardDetection() {
+    // Method 1: Visual Viewport API (modern browsers - most reliable)
+    if (window.visualViewport) {
+        let lastHeight = window.visualViewport.height;
+        
+        window.visualViewport.addEventListener('resize', () => {
+            const currentHeight = window.visualViewport.height;
+            const heightDiff = lastHeight - currentHeight;
+            
+            // Keyboard appears when viewport height decreases significantly
+            if (heightDiff > 150) {
+                if (!isKeyboardVisible) {
+                    isKeyboardVisible = true;
+                    onKeyboardShow();
+                }
+            }
+            // Keyboard disappears when viewport height increases significantly
+            else if (heightDiff < -150) {
+                if (isKeyboardVisible) {
+                    isKeyboardVisible = false;
+                    onKeyboardHide();
+                }
+            }
+            
+            lastHeight = currentHeight;
+        });
+    }
+    
+    // Method 2: Window resize fallback (older browsers)
+    window.addEventListener('resize', () => {
+        const currentHeight = window.innerHeight;
+        const heightDiff = previousViewportHeight - currentHeight;
+        
+        // Significant height decrease (keyboard likely appeared)
+        if (heightDiff > 150) {
+            if (!isKeyboardVisible) {
+                isKeyboardVisible = true;
+                onKeyboardShow();
+            }
+        }
+        // Significant height increase (keyboard likely disappeared)
+        else if (heightDiff < -150) {
+            if (isKeyboardVisible) {
+                isKeyboardVisible = false;
+                onKeyboardHide();
+            }
+        }
+        
+        previousViewportHeight = currentHeight;
+    });
+    
+    // Method 3: Focus/blur detection (additional indicator)
+    document.addEventListener('focusin', (e) => {
+        // Only track for input elements on mobile
+        if (isMobileDevice() && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) {
+            setTimeout(() => {
+                const currentHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+                const heightDiff = previousViewportHeight - currentHeight;
+                
+                if (heightDiff > 100 && !isKeyboardVisible) {
+                    isKeyboardVisible = true;
+                    onKeyboardShow();
+                }
+            }, 300);
+        }
+    });
+    
+    document.addEventListener('focusout', (e) => {
+        // Only track for input elements on mobile
+        if (isMobileDevice() && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) {
+            setTimeout(() => {
+                const currentHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+                const heightDiff = previousViewportHeight - currentHeight;
+                
+                if (Math.abs(heightDiff) < 100 && isKeyboardVisible) {
+                    isKeyboardVisible = false;
+                    onKeyboardHide();
+                }
+            }, 300);
+        }
+    });
+}
+
+/**
+ * Callback when keyboard appears
+ */
+function onKeyboardShow() {
+    console.log('Mobile keyboard shown');
+    document.body.classList.add('keyboard-visible');
+    
+    // Scroll to show bottom of last message
+    if (chatContainer && isMobileDevice()) {
+        setTimeout(() => {
+            // Scroll page to top
+            document.documentElement.scrollTop = 0;
+            document.body.scrollTop = 0;
+            window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+            
+            // Scroll chat container to show latest messages
+            chatContainer.scrollTo({
+                top: chatContainer.scrollHeight,
+                behavior: 'smooth'
+            });
+        }, 100);
+    }
+}
+
+/**
+ * Callback when keyboard disappears
+ */
+function onKeyboardHide() {
+    console.log('Mobile keyboard hidden');
+    document.body.classList.remove('keyboard-visible');
+    
+    // Scroll to show bottom of last message
+    if (isMobileDevice() && chatContainer) {
+        setTimeout(() => {
+            // Scroll page to top
+            document.documentElement.scrollTop = 0;
+            document.body.scrollTop = 0;
+            window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+            
+            // Scroll chat container to show latest messages
+            chatContainer.scrollTo({
+                top: chatContainer.scrollHeight,
+                behavior: 'smooth'
+            });
+        }, 100);
+    }
+}
+
 // ===================================
 // MOBILE INPUT HANDLING
 // ===================================
@@ -305,44 +456,6 @@ inputBox.addEventListener('focus', function() {
     }, 300); // Delay to allow keyboard animation
 });
 
-/**
- * Scroll all relevant containers and elements to the top and show latest messages
- */
-function scrollAllToTheTop() {
-    // Multiple approaches to ensure consistent scroll behavior across browsers
-    document.documentElement.scrollTop = 0;
-    document.body.scrollTop = 0;
-    window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
-    console.log('scrollAllToTheTop2');
-    // Scroll chat container to show latest messages
-    if (chatContainer) {
-        chatContainer.scrollTo({
-            top: chatContainer.scrollHeight,
-            behavior: 'smooth'
-        });
-        // If there's a user message, scroll to show it with some offset
-        if (userMessageDiv) {
-            chatContainer.scrollTo({
-                top: userMessageDiv.offsetTop - 70,
-                behavior: 'smooth'
-            });
-        }
-    }
-}
-
-/**
- * Handle input box blur (when keyboard disappears)
- * Restores normal view and scrolls to show latest messages
- */
-// inputBox.addEventListener('blur', function() {
-//     setTimeout(() => {
-//         try {
-//             scrollAllToTheTop();
-//         } catch (error) {
-//             console.log('Input blur scroll failed:', error);
-//         }
-//     }, 300); // Delay to allow keyboard dismissal
-// });
 
 // ===================================
 // SCROLL INDICATOR
@@ -639,29 +752,32 @@ function removePreviousSpacer() {
  * @param {HTMLElement} userMsgDiv - The user message element
  * @param {HTMLElement} assistantMsgDiv - The assistant message element
  */
-function createBottomSpacer(userMsgDiv, assistantMsgDiv) {
+function createBottomSpacer(userMsgDiv, assistantMsgDiv,offset = 10) {
     const bottomSpacer = document.createElement('div');
     bottomSpacer.id = 'chat-bottom-spacer';
-    const spacerHeight = chatContainer.clientHeight - userMsgDiv.offsetHeight - assistantMsgDiv.offsetHeight - 50;
-    bottomSpacer.style.height = (spacerHeight > 0 ? spacerHeight : 0) + 'px';
+
+    // const spacerHeight = chatContainer.clientHeight - userMsgDiv.offsetHeight - assistantMsgDiv.offsetHeight - translateOptionsHeight - 20;
+    bottomSpacer.style.height =  offset + 'px';
     bottomSpacer.style.flexShrink = '0';
-    return bottomSpacer
+    //set border for debugging
+    // bottomSpacer.style.border = '1px solid red';
+    return bottomSpacer;
 }
 
 /**
  * Update the bottom spacer height based on current message sizes
  * and scroll to keep the bottom of the assistant message visible
  * @param {HTMLElement} assistantMsgDiv - The assistant message element
+ * @param {number} offset - Optional offset for scrolling
  */
-function scrollToMessageBottom(assistantMsgDiv) {
+function scrollToMessageBottom(assistantMsgDiv,offset = 0) {
     // Update spacer to shrink as message grows
     const spacer = document.getElementById('chat-bottom-spacer');
-    if (spacer && userMessageDiv) {
-        const spacerHeight = chatContainer.clientHeight - userMessageDiv.offsetHeight - assistantMsgDiv.offsetHeight - 50;
-        spacer.style.height = (spacerHeight > 0 ? spacerHeight : 0) + 'px';
-    }
     // Scroll so the bottom of the assistant message is visible
-    const targetTop = assistantMsgDiv.offsetTop + assistantMsgDiv.offsetHeight - chatContainer.clientHeight + 20;
+    // console.log('Assistant message offsetTop:', assistantMsgDiv.offsetTop);
+    // console.log('Assistant message offsetHeight:', assistantMsgDiv.offsetHeight);
+    // console.log('Chat container clientHeight:', chatContainer.clientHeight);
+    const targetTop = assistantMsgDiv.offsetTop + assistantMsgDiv.offsetHeight - chatContainer.clientHeight + offset;
     if (targetTop > 0) {
         chatContainer.scrollTop = targetTop;
     }
@@ -678,15 +794,6 @@ sendButton.addEventListener('click', () => {
 
     sendMessage();
 
-    // After sending, scroll the user message to the top of chat container
-    setTimeout(() => {
-        if (userMessageDiv && chatContainer) {
-            chatContainer.scrollTo({
-                top: userMessageDiv.offsetTop - chatContainer.offsetTop,
-                behavior: 'smooth'
-            });
-        }
-    }, 100);
 
     // Only blur if keyboard is visible
     if (isKeyboardVisible) {
@@ -695,8 +802,31 @@ sendButton.addEventListener('click', () => {
 });
 
 
+/**
+ * Detect if the device is mobile
+ * @returns {boolean} True if mobile device
+ */
+function isMobileDevice() {
+    // Check screen width (mobile typically < 768px)
+    if (window.innerWidth <= 768) return true;
+    
+    // Check for touch capability
+    if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
+        // Further verify with screen size for tablets
+        if (window.innerWidth <= 1024) return true;
+    }
+    
+    return false;
+}
 
-
+/**
+ * Focus input box only on desktop browsers
+ */
+function handleFocus() {
+    if (inputBox && !isMobileDevice()) {
+        inputBox.focus();
+    }
+}
 
 /**
  * Main function to send user message and handle AI response
@@ -756,7 +886,7 @@ async function sendMessage() {
 
     // Auto-scroll to keep assistant message bottom visible
     scrollToMessageBottom(contentDiv.closest('.message'));
-    
+
     try {
         // Send request to backend and handle streaming response
         const result = await handleStreamingResponse(question, contentDiv, actionsDiv);
@@ -771,9 +901,9 @@ async function sendMessage() {
         // Clean up and restore UI state
         cleanupAfterMessage(messageDiv);
         // Focus input only on user action
-        if (inputBox) {
-            inputBox.focus();
-        }
+        handleFocus();
+         // Auto-scroll to keep assistant message bottom visible
+         scrollToMessageBottom(contentDiv.closest('.message'));
     }
 }
 
@@ -837,7 +967,7 @@ function setupMessageActions(messageDiv, contentDiv) {
             likeBtn.disabled = true;
             dislikeBtn && (dislikeBtn.disabled = true);
             try {
-                const res = await fetch('/api/like_answer', {
+                const res = await fetch(`${BACKEND_URL}/api/like_answer`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ question_id: questionId, like: true })
@@ -863,7 +993,7 @@ function setupMessageActions(messageDiv, contentDiv) {
             dislikeBtn.disabled = true;
             likeBtn && (likeBtn.disabled = true);
             try {
-                const res = await fetch('/api/like_answer', {
+                const res = await fetch(`${BACKEND_URL}/api/like_answer`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ question_id: questionId, like: false })
@@ -933,7 +1063,7 @@ async function handleStreamingResponse(question, contentDiv, actionsDiv) {
         tts: ttsEnabled  // Request inline TTS audio in the stream
     };
 
-    const response = await fetch('/query', {
+    const response = await fetch(`${BACKEND_URL}/query`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -1075,7 +1205,7 @@ async function fetchAndDisplayPmids( container) {
             payload.session_id = window.sessionId;
             payload.question_id = window.questionId;
         }
-        const res = await fetch('/api/pmids', {
+        const res = await fetch(`${BACKEND_URL}/api/pmids`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
@@ -1116,7 +1246,7 @@ async function pollForTtsAudio(questionId, sid, originalBtnContent) {
 
     for (let attempt = 0; attempt < maxAttempts; attempt++) {
         try {
-            const res = await fetch('/api/tts_result', {
+            const res = await fetch(`${BACKEND_URL}/api/tts_result`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ session_id: sid, question_id: questionId })
@@ -1403,6 +1533,14 @@ function switchAgent(agent, userInitiated) {
     currentAgent = agent;
     const isTranslator = agent === 'translator';
     
+    // Reset translation direction to initial state when switching to translator
+    if (isTranslator) {
+        translationReversed = false;
+        if (translationDirectionBtn) {
+            translationDirectionBtn.classList.remove('reversed');
+        }
+    }
+    
     // Show/hide translation options bar
     if (translateOptions) {
         translateOptions.style.display = isTranslator ? 'flex' : 'none';
@@ -1457,8 +1595,8 @@ function switchAgent(agent, userInitiated) {
     }
 
     // Focus input only on user action
-    if (userInitiated && inputBox) {
-        inputBox.focus();
+    if (userInitiated) {
+        handleFocus();
     }
 }
 
@@ -1575,7 +1713,7 @@ async function sendTranslation() {
         </div>
     `;
     chatContainer.appendChild(messageDiv);
-    
+
     const spacerDiv = createBottomSpacer(userMessageDiv, messageDiv);
     chatContainer.appendChild(spacerDiv);
     
@@ -1583,6 +1721,9 @@ async function sendTranslation() {
     
     prepareUIForLoading();
     
+    // Auto-scroll to keep assistant message bottom visible
+    scrollToMessageBottom(contentDiv.closest('.message'));
+
     // Determine source and target languages based on translation direction
     let actualSourceLang, actualTargetLang;
     
@@ -1605,7 +1746,7 @@ async function sendTranslation() {
     const targetLangName = languages[actualTargetLang] || actualTargetLang.toUpperCase();
     
     try {
-        const response = await fetch('/api/translate', {
+        const response = await fetch(`${BACKEND_URL}/api/translate`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -1670,10 +1811,11 @@ async function sendTranslation() {
         cleanupAfterMessage(messageDiv);
         
         // Focus input box after translation completes
-        if (inputBox) {
-            inputBox.focus();
-        }
+        handleFocus();
         
+        // Auto-scroll to keep assistant message bottom visible
+        scrollToMessageBottom(contentDiv.closest('.message'));
+
         // Read translation aloud if TTS is enabled (exclude the label)
         const translationTextDiv = contentDiv.querySelector('.translation-result > div:last-child');
         speakText(translationTextDiv ? translationTextDiv.textContent : contentDiv.textContent);
@@ -1775,7 +1917,7 @@ async function speakText(text) {
     }
 
     try {
-        const response = await fetch('/api/tts', {
+        const response = await fetch(`${BACKEND_URL}/api/tts`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -1851,6 +1993,11 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initialize speech recognition
     initSpeechRecognition();
+    
+    // Initialize mobile keyboard detection
+    if (isMobileDevice()) {
+        initKeyboardDetection();
+    }
 });
 
 

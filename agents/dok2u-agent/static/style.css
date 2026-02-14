@@ -1196,3 +1196,39 @@ footer {
         padding: 0.875rem;
     }
 }
+
+/* ===================================
+   MOBILE KEYBOARD STATE
+   ===================================
+   Styles when mobile keyboard is visible
+*/
+
+body.keyboard-visible {
+    /* Prevent body scroll when keyboard is shown */
+    overflow: hidden;
+}
+
+body.keyboard-visible #chat-container {
+    /* Adjust chat container when keyboard appears */
+    padding-bottom: 0;
+}
+
+body.keyboard-visible .input-area {
+    /* Ensure input stays visible above keyboard */
+    position: sticky;
+    bottom: 0;
+    z-index: 100;
+}
+
+@media (max-width: 768px) {
+    body.keyboard-visible .content {
+        /* Adjust content height for mobile keyboard */
+        max-height: calc(100vh - env(safe-area-inset-bottom));
+    }
+    
+    body.keyboard-visible #chat-container {
+        /* Reduce padding when keyboard is visible */
+        padding: 1rem;
+        padding-bottom: 0;
+    }
+}

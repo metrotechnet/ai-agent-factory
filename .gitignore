@@ -42,3 +42,10 @@ extracted_texts/
 Thumbs.db
 
 .venv/
+
+# Firebase
+public/
+.firebase/
+firebase-debug.log
+firestore-debug.log
+ui-debug.log
