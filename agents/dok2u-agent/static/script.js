@@ -258,10 +258,6 @@ let isLoading = false; // Flag to prevent multiple simultaneous requests
 let sessionId = null; // Session ID for conversation context
 
 // TTS (Text-to-Speech) state
-const ttsToggle = document.getElementById('tts-toggle');
-const ttsIconOn = ttsToggle ? ttsToggle.querySelector('.tts-icon-on') : null;
-const ttsIconOff = ttsToggle ? ttsToggle.querySelector('.tts-icon-off') : null;
-let ttsEnabled = false;
 let ttsAudio = null; // Current Audio object for playback
 
 // Agent state
@@ -890,10 +886,7 @@ async function sendMessage() {
     try {
         // Send request to backend and handle streaming response
         const result = await handleStreamingResponse(question, contentDiv, actionsDiv);
-        // Read response aloud if TTS is enabled (fallback if not received via stream)
-        if (!result.ttsReceivedViaStream) {
-            speakText(contentDiv.textContent);
-        }
+
     } catch (error) {
         console.error('Message sending error:', error);
         contentDiv.textContent = t('messages.error');
@@ -938,6 +931,9 @@ function createAssistantMessage() {
                 <button class="action-btn dislike-btn" title="Dislike" style="border-radius:50%;padding:8px;background:#f9e6e6;border:none;box-shadow:0 1px 4px rgba(0,0,0,0.07);margin-left:2px;cursor:pointer;">
                     <i class="bi bi-hand-thumbs-down" style="font-size:1.3em;"></i>
                 </button>
+                <button class="action-btn tts-btn" title="" style="border-radius:50%;padding:8px;background:#c1ddf1;border:none;box-shadow:0 1px 4px rgba(0,0,0,0.07);margin-left:2px;cursor:pointer;">
+                    <i class="bi bi-volume-up" style="font-size:1.3em;"></i>
+                </button>
             </div>
         </div>
     `;
@@ -951,11 +947,39 @@ function createAssistantMessage() {
  * @param {HTMLElement} contentDiv - The message content element
  */
 function setupMessageActions(messageDiv, contentDiv) {
+    
     const copyBtn = messageDiv.querySelector('.copy-btn');
     const shareBtn = messageDiv.querySelector('.share-btn');
     const commentBtn = messageDiv.querySelector('.comment-btn');
     const likeBtn = messageDiv.querySelector('.like-btn');
     const dislikeBtn = messageDiv.querySelector('.dislike-btn');
+    const ttsBtn = messageDiv.querySelector('.tts-btn');
+
+    // Set translated titles
+    if (ttsBtn) ttsBtn.title = t('messages.listen') || 'Listen';
+    copyBtn.title = t('messages.copy');
+    shareBtn.title = t('messages.share');
+    if (commentBtn) commentBtn.title = t('messages.comment');
+
+    // TTS button to read message aloud
+    if (ttsBtn) {
+        ttsBtn.addEventListener('click', () => {
+            let textToSpeak;
+            
+            // For translation messages, skip the language header
+            const translationResult = contentDiv.querySelector('.translation-result > div:last-child');
+            if (translationResult) {
+                textToSpeak = translationResult.textContent || translationResult.innerText;
+            } else {
+                textToSpeak = contentDiv.textContent || contentDiv.innerText;
+            }
+            
+            if (textToSpeak && textToSpeak.trim()) {
+                speakText(textToSpeak, ttsBtn);
+            }
+        });
+    }
+
     // Like/dislike buttons
     if (likeBtn) {
         likeBtn.addEventListener('click', async () => {
@@ -1010,11 +1034,6 @@ function setupMessageActions(messageDiv, contentDiv) {
         });
     }
 
-    // Set translated titles
-    copyBtn.title = t('messages.copy');
-    shareBtn.title = t('messages.share');
-    if (commentBtn) commentBtn.title = t('messages.comment');
-
     // Copy message text to clipboard
     copyBtn.addEventListener('click', () => {
         navigator.clipboard.writeText(contentDiv.textContent);
@@ -1059,8 +1078,7 @@ async function handleStreamingResponse(question, contentDiv, actionsDiv) {
         language: currentLanguage,
         timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC",
         locale: navigator.language || (currentLanguage === 'en' ? 'en-US' : 'fr-FR'),
-        session_id: sessionId,  // Include session_id to maintain conversation context
-        tts: ttsEnabled  // Request inline TTS audio in the stream
+        session_id: sessionId  // Include session_id to maintain conversation context
     };
 
     const response = await fetch(`${BACKEND_URL}/query`, {
@@ -1088,12 +1106,6 @@ async function handleStreamingResponse(question, contentDiv, actionsDiv) {
     let ttsReceivedViaStream = false;
     let ttsPendingQuestionId = null;
 
-    // Show spinner on TTS button while waiting for inline audio
-    const ttsOriginalContent = ttsToggle ? ttsToggle.innerHTML : '';
-    if (ttsEnabled && ttsToggle) {
-        ttsToggle.innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span>';
-        ttsToggle.disabled = true;
-    }
     while (true) {
         const { done, value } = await reader.read();
 
@@ -1117,15 +1129,6 @@ async function handleStreamingResponse(question, contentDiv, actionsDiv) {
             }
             // Fetch PMIDs in background 
             await fetchAndDisplayPmids(contentDiv);
-            // If TTS is pending, poll for the audio (keep spinner)
-            if (ttsPendingQuestionId) {
-                pollForTtsAudio(ttsPendingQuestionId, sessionId, ttsOriginalContent);
-                ttsReceivedViaStream = true; // prevent fallback speakText
-            } else if (ttsToggle && ttsToggle.disabled) {
-                // Restore TTS button if spinner is still showing and no TTS pending
-                ttsToggle.innerHTML = ttsOriginalContent;
-                ttsToggle.disabled = false;
-            }
             return { fullText, ttsReceivedViaStream };
             break;
         }
@@ -1171,11 +1174,7 @@ async function handleStreamingResponse(question, contentDiv, actionsDiv) {
 
                     // Append new content chunk
                     if (data.chunk) {
-                        // Remove loading spinner on first content chunk
-                        const loadingDiv = contentDiv.querySelector('.loading');
-                        if (loadingDiv) {
-                            contentDiv.textContent = '';
-                        }
+
                         fullText += data.chunk;
                         // Live preview (optional): render markdown as HTML if marked is available
                         if (typeof marked !== 'undefined') {
@@ -1232,17 +1231,10 @@ async function fetchAndDisplayPmids( container) {
  * Poll the server for TTS audio that is being generated in a background thread.
  * @param {string} questionId - The question ID to fetch TTS for
  * @param {string} sid - The session ID
- * @param {string} originalBtnContent - Original TTS button HTML to restore
  */
-async function pollForTtsAudio(questionId, sid, originalBtnContent) {
+async function pollForTtsAudio(questionId, sid) {
     const maxAttempts = 30; // ~15 seconds max
     const interval = 500;  // 500ms between polls
-    
-    // Show spinner on TTS button
-    if (ttsToggle) {
-        ttsToggle.innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span>';
-        ttsToggle.disabled = true;
-    }
 
     for (let attempt = 0; attempt < maxAttempts; attempt++) {
         try {
@@ -1264,20 +1256,11 @@ async function pollForTtsAudio(questionId, sid, originalBtnContent) {
                 stopTTS();
                 ttsAudio = new Audio(audioUrl);
 
-                // Restore button icon and start speaking animation
-                if (ttsToggle) {
-                    ttsToggle.innerHTML = originalBtnContent;
-                    ttsToggle.disabled = false;
-                    ttsToggle.classList.add('speaking');
-                }
-
                 ttsAudio.addEventListener('ended', () => {
-                    if (ttsToggle) ttsToggle.classList.remove('speaking');
                     URL.revokeObjectURL(audioUrl);
                     ttsAudio = null;
                 });
                 ttsAudio.addEventListener('error', () => {
-                    if (ttsToggle) ttsToggle.classList.remove('speaking');
                     URL.revokeObjectURL(audioUrl);
                     ttsAudio = null;
                 });
@@ -1294,12 +1277,6 @@ async function pollForTtsAudio(questionId, sid, originalBtnContent) {
             console.error('TTS poll fetch error:', err);
             break;
         }
-    }
-
-    // Restore button on failure/timeout
-    if (ttsToggle) {
-        ttsToggle.innerHTML = originalBtnContent;
-        ttsToggle.disabled = false;
     }
 }
 
@@ -1697,27 +1674,23 @@ async function sendTranslation() {
     userMessageDiv = addMessage(text, 'user');
     chatContainer.appendChild(userMessageDiv);
     
-    // Create assistant message with loading
-    const messageDiv = document.createElement('div');
-    messageDiv.className = 'message assistant';
-    messageDiv.innerHTML = `
-        <div class="message-icon">🌐</div>
-        <div class="message-content">
-            <div class="message-text">
-                <div class="loading">
-                    <div class="loading-dot"></div>
-                    <div class="loading-dot"></div>
-                    <div class="loading-dot"></div>
-                </div>
-            </div>
-        </div>
-    `;
+    // Create assistant message with loading state
+    const messageDiv = createAssistantMessage();
+    
+    // Change icon to globe for translator
+    const iconDiv = messageDiv.querySelector('.message-icon');
+    if (iconDiv) iconDiv.textContent = '🌐';
+    
     chatContainer.appendChild(messageDiv);
 
     const spacerDiv = createBottomSpacer(userMessageDiv, messageDiv);
     chatContainer.appendChild(spacerDiv);
     
     const contentDiv = messageDiv.querySelector('.message-text');
+    const actionsDiv = messageDiv.querySelector('.message-actions');
+    
+    // Set up message action buttons (copy/share/like/dislike/TTS)
+    setupMessageActions(messageDiv, contentDiv);
     
     prepareUIForLoading();
     
@@ -1775,6 +1748,8 @@ async function sendTranslation() {
                         <div>${fullText}</div>
                     </div>
                 `;
+                // Show action buttons
+                actionsDiv.style.display = '';
                 break;
             }
             
@@ -1816,9 +1791,6 @@ async function sendTranslation() {
         // Auto-scroll to keep assistant message bottom visible
         scrollToMessageBottom(contentDiv.closest('.message'));
 
-        // Read translation aloud if TTS is enabled (exclude the label)
-        const translationTextDiv = contentDiv.querySelector('.translation-result > div:last-child');
-        speakText(translationTextDiv ? translationTextDiv.textContent : contentDiv.textContent);
         
         // Automatically reverse translation direction for next input
         translationReversed = !translationReversed;
@@ -1842,24 +1814,6 @@ async function sendTranslation() {
 // ===================================
 
 /**
- * Toggle TTS on/off
- */
-if (ttsToggle) {
-    ttsToggle.addEventListener('click', () => {
-        ttsEnabled = !ttsEnabled;
-        ttsToggle.classList.toggle('active', ttsEnabled);
-        if (ttsIconOn && ttsIconOff) {
-            ttsIconOn.style.display = ttsEnabled ? '' : 'none';
-            ttsIconOff.style.display = ttsEnabled ? 'none' : '';
-        }
-        // Stop any current playback when turning off
-        if (!ttsEnabled) {
-            stopTTS();
-        }
-    });
-}
-
-/**
  * Stop current TTS audio playback
  */
 function stopTTS() {
@@ -1868,23 +1822,29 @@ function stopTTS() {
         ttsAudio.currentTime = 0;
         ttsAudio = null;
     }
-    if (ttsToggle) {
-        ttsToggle.classList.remove('speaking');
-    }
 }
 
 /**
  * Read text aloud using OpenAI TTS via backend API
  * @param {string} text - The text to read aloud
+ * @param {HTMLElement} button - Optional TTS button to show spinner
  */
-async function speakText(text) {
-    if (!ttsEnabled || !text || text.trim().length === 0) {
-        console.log('TTS skipped: enabled=' + ttsEnabled + ', text length=' + (text ? text.trim().length : 0));
+async function speakText(text, button = null) {
+    if (!text || text.trim().length === 0) {
+        console.log('TTS skipped: empty text');
         return;
     }
     
     // Stop any previous playback
     stopTTS();
+    
+    // Save original button content and show spinner
+    let originalContent = '';
+    if (button) {
+        originalContent = button.innerHTML;
+        button.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" style="color: #1976d2; border-right-color: transparent;"></span>';
+        button.disabled = true;
+    }
     
     // Strip markdown/HTML for cleaner speech
     const cleanText = text
@@ -1908,13 +1868,6 @@ async function speakText(text) {
     if (!cleanText) return;
     
     console.log('TTS: speaking', cleanText.length, 'chars, language:', currentLanguage);
-    
-    // Save original button content and show spinner while fetching
-    const originalContent = ttsToggle ? ttsToggle.innerHTML : '';
-    if (ttsToggle) {
-        ttsToggle.innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span>';
-        ttsToggle.disabled = true;
-    }
 
     try {
         const response = await fetch(`${BACKEND_URL}/api/tts`, {
@@ -1935,23 +1888,20 @@ async function speakText(text) {
         console.log('TTS audio blob size:', audioBlob.size, 'type:', audioBlob.type);
         const audioUrl = URL.createObjectURL(audioBlob);
         ttsAudio = new Audio(audioUrl);
-
-        // Restore icon and start pulse when playback begins
-        if (ttsToggle) {
-            ttsToggle.innerHTML = originalContent;
-            ttsToggle.disabled = false;
-            ttsToggle.classList.add('speaking');
+        
+        // Restore button after audio is loaded
+        if (button) {
+            button.innerHTML = originalContent;
+            button.disabled = false;
         }
         
         ttsAudio.addEventListener('ended', () => {
-            if (ttsToggle) ttsToggle.classList.remove('speaking');
             URL.revokeObjectURL(audioUrl);
             ttsAudio = null;
         });
         
         ttsAudio.addEventListener('error', () => {
             console.error('TTS audio playback error');
-            if (ttsToggle) ttsToggle.classList.remove('speaking');
             URL.revokeObjectURL(audioUrl);
             ttsAudio = null;
         });
@@ -1960,9 +1910,9 @@ async function speakText(text) {
     } catch (error) {
         console.error('TTS error:', error);
         // Restore button on error
-        if (ttsToggle) {
-            ttsToggle.innerHTML = originalContent;
-            ttsToggle.disabled = false;
+        if (button) {
+            button.innerHTML = originalContent;
+            button.disabled = false;
         }
         stopTTS();
     }

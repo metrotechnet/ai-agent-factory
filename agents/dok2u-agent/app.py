@@ -17,53 +17,7 @@ import json
 import uuid
 from datetime import datetime, timedelta
 import threading
-import re as re_tts
 import os
-
-
-def _generate_tts_audio(text, language):
-    """Generate TTS audio from text. Returns audio bytes or None on error."""
-    try:
-        import openai
-        client_tts = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-        clean = text
-        clean = re_tts.sub(r'\*\*(.+?)\*\*', r'\1', clean)
-        clean = re_tts.sub(r'\*(.+?)\*', r'\1', clean)
-        clean = re_tts.sub(r'#{1,6}\s', '', clean)
-        clean = re_tts.sub(r'```[\s\S]*?```', '', clean)
-        clean = re_tts.sub(r'`([^`]+)`', r'\1', clean)
-        clean = re_tts.sub(r'\[([^\]]+)\]\([^)]+\)', r'\1', clean)
-        clean = re_tts.sub(r'PMID:\s*\d+', '', clean, flags=re_tts.IGNORECASE)
-        clean = re_tts.sub(r'\[\d+\]', '', clean)
-        clean = re_tts.sub(r'R\u00e9f\u00e9rences?\s*PubMed\s*:.*$', '', clean, flags=re_tts.MULTILINE|re_tts.IGNORECASE)
-        clean = re_tts.sub(r'References?\s*:.*$', '', clean, flags=re_tts.MULTILINE|re_tts.IGNORECASE)
-        clean = re_tts.sub(r'Sources?\s*:.*$', '', clean, flags=re_tts.MULTILINE|re_tts.IGNORECASE)
-        clean = re_tts.sub(r'\n{2,}', '. ', clean)
-        clean = re_tts.sub(r'\n', ' ', clean)
-        clean = re_tts.sub(r'\s{2,}', ' ', clean)
-        clean = clean.strip()[:4096]
-        if not clean:
-            return None
-        voice = "nova" if language in ["fr", "es", "it", "pt", "ro"] else "alloy"
-        tts_resp = client_tts.audio.speech.create(
-            model="tts-1", voice=voice, input=clean, response_format="mp3"
-        )
-        audio_bytes = b""
-        for audio_chunk in tts_resp.iter_bytes(4096):
-            audio_bytes += audio_chunk
-        return audio_bytes
-    except Exception as e:
-        print(f"TTS generation error: {e}")
-        return None
-
-
-def _tts_thread_worker(session, question_id, text, language):
-    """Background worker that generates TTS and stores result in session."""
-    audio_bytes = _generate_tts_audio(text, language)
-    if audio_bytes:
-        session.setdefault('tts_audio', {})[question_id] = audio_bytes
-    else:
-        session.setdefault('tts_audio', {})[question_id] = b''  # Empty = failed
 
  # Chargement des variables d'environnement depuis le bon emplacement
 # =====================================================
@@ -206,7 +160,6 @@ class QueryRequest(BaseModel):
     timezone: str = "UTC"
     locale: str = "fr-FR"
     session_id: Optional[str] = None
-    tts: bool = False
 
 class TranslateRequest(BaseModel):
     text: str
@@ -277,16 +230,6 @@ async def query_agent(request: QueryRequest):
         if is_refusal or has_medical_disclaimer:
             session.setdefault('refusals', set()).add(question_id)
         
-        # Start TTS generation in background thread if requested
-        if request.tts and assistant_response:
-            tts_thread = threading.Thread(
-                target=_tts_thread_worker,
-                args=(session, question_id, assistant_response, request.language),
-                daemon=True
-            )
-            tts_thread.start()
-            yield f"data: {json.dumps({'tts_pending': question_id})}\n\n"
-        
         # Only add to history if not a refusal
         if not is_refusal:
             assistant_message = {
@@ -307,29 +250,6 @@ async def query_agent(request: QueryRequest):
             "X-Accel-Buffering": "no",
             "Connection": "keep-alive",
         }
-    )
-
-
-@app.post("/api/tts_result")
-def get_tts_result(
-    session_id: str = Body(...),
-    question_id: str = Body(...)
-):
-    """Return TTS audio if ready, or 202 if still generating."""
-    from fastapi.responses import Response
-    session = conversation_sessions.get(session_id)
-    if not session:
-        return JSONResponse({"status": "not_found"}, status_code=404)
-    tts_store = session.get('tts_audio', {})
-    if question_id not in tts_store:
-        return JSONResponse({"status": "pending"}, status_code=202)
-    audio_bytes = tts_store.pop(question_id)  # Remove after serving
-    if not audio_bytes:
-        return JSONResponse({"status": "failed"}, status_code=500)
-    return Response(
-        content=audio_bytes,
-        media_type="audio/mpeg",
-        headers={"Content-Length": str(len(audio_bytes))}
     )
 
 
