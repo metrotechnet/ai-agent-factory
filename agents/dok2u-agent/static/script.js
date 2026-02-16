@@ -1228,59 +1228,6 @@ async function fetchAndDisplayPmids( container) {
 }
 
 /**
- * Poll the server for TTS audio that is being generated in a background thread.
- * @param {string} questionId - The question ID to fetch TTS for
- * @param {string} sid - The session ID
- */
-async function pollForTtsAudio(questionId, sid) {
-    const maxAttempts = 30; // ~15 seconds max
-    const interval = 500;  // 500ms between polls
-
-    for (let attempt = 0; attempt < maxAttempts; attempt++) {
-        try {
-            const res = await fetch(`${BACKEND_URL}/api/tts_result`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ session_id: sid, question_id: questionId })
-            });
-
-            if (res.status === 202) {
-                // Still generating, wait and retry
-                await new Promise(r => setTimeout(r, interval));
-                continue;
-            }
-
-            if (res.ok) {
-                const audioBlob = await res.blob();
-                const audioUrl = URL.createObjectURL(audioBlob);
-                stopTTS();
-                ttsAudio = new Audio(audioUrl);
-
-                ttsAudio.addEventListener('ended', () => {
-                    URL.revokeObjectURL(audioUrl);
-                    ttsAudio = null;
-                });
-                ttsAudio.addEventListener('error', () => {
-                    URL.revokeObjectURL(audioUrl);
-                    ttsAudio = null;
-                });
-
-                await ttsAudio.play();
-                console.log('TTS: playing audio from background thread');
-                return;
-            }
-
-            // Error status
-            console.error('TTS poll error:', res.status);
-            break;
-        } catch (err) {
-            console.error('TTS poll fetch error:', err);
-            break;
-        }
-    }
-}
-
-/**
  * Clean up UI state after message completion
  * @param {HTMLElement} messageDiv - The message container to clean up
  */
@@ -1349,7 +1296,7 @@ function initSpeechRecognition() {
     }
     
     recognition = new SpeechRecognition();
-    recognition.continuous = false; // Disable continuous mode to prevent duplications
+    recognition.continuous = true; // Enable continuous mode - won't stop after brief pauses
     recognition.interimResults = true;
     recognition.lang = currentLanguage === 'en' ? 'en-US' : 'fr-FR';
     
