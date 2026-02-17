@@ -397,7 +397,7 @@ def like_answer(
     question_id: str = Body(...),
     like: bool = Body(...)
 ):
-    """Add a like or dislike to a question by id. Stores as a list of likes/dislikes (for possible multiple votes)."""
+    """Add or update a like/dislike vote for a question. Replaces any previous vote."""
     with question_log_lock:
         try:
             if QUESTION_LOG_PATH.exists():
@@ -409,12 +409,10 @@ def like_answer(
             return {"status": "error", "message": "Could not read log file"}
         for entry in data:
             if entry.get("question_id") == question_id:
-                if "likes" not in entry:
-                    entry["likes"] = []
-                entry["likes"].append({
+                entry["likes"] = {
                     "like": like,
                     "timestamp": datetime.now().isoformat()
-                })
+                }
                 with open(QUESTION_LOG_PATH, 'w', encoding='utf-8') as f:
                     json.dump(data, f, ensure_ascii=False, indent=2)
                 return {"status": "success", "message": "Vote recorded"}
@@ -541,6 +539,32 @@ async def translate_text_endpoint(request: TranslateRequest):
             "Connection": "keep-alive",
         }
     )
+
+
+@app.post("/api/transcribe_audio")
+async def transcribe_audio_endpoint(
+    audio: UploadFile = File(...),
+    language: str = Form(None)
+):
+    """
+    Transcribe audio using Whisper (speech recognition only).
+    Returns just the transcribed text without translation.
+    
+    Args:
+        audio: Audio file to transcribe
+        language: Optional ISO-639-1 language code (e.g., 'en', 'fr') for better accuracy
+    """
+    audio_bytes = await audio.read()
+    transcribed_text = transcribe_audio_whisper(
+        audio_bytes, 
+        filename=audio.filename or "audio.webm",
+        language=language
+    )
+    
+    if not transcribed_text:
+        return JSONResponse({"error": "Could not transcribe audio"}, status_code=400)
+    
+    return JSONResponse({"text": transcribed_text})
 
 
 @app.post("/api/translate_audio")

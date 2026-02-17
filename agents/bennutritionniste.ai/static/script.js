@@ -217,6 +217,165 @@ let sessionId = null; // Session ID for conversation context
 let recognition = null;
 let isRecording = false;
 
+// Whisper recording state (for STT)
+let useWhisper = true; // Use Whisper API instead of Web Speech API
+let mediaRecorder = null;
+let audioChunks = [];
+let whisperStream = null;
+let audioContext = null;
+let analyser = null;
+let silenceTimer = null;
+let maxDurationTimer = null;
+let warningTimer = null;
+let recordingAnimationInterval = null;
+
+// TTS state
+let ttsAudio = null;
+let activeTtsButton = null; // Track which button is currently playing
+
+// Keyboard state
+let isKeyboardVisible = false;
+let previousViewportHeight = window.innerHeight;
+
+// ===================================
+// MOBILE KEYBOARD DETECTION
+// ===================================
+
+/**
+ * Initialize mobile keyboard detection
+ * Detects when virtual keyboard appears or disappears on mobile devices
+ */
+function initKeyboardDetection() {
+    // Method 1: Visual Viewport API (modern browsers - most reliable)
+    if (window.visualViewport) {
+        let lastHeight = window.visualViewport.height;
+        
+        window.visualViewport.addEventListener('resize', () => {
+            const currentHeight = window.visualViewport.height;
+            const heightDiff = lastHeight - currentHeight;
+            
+            // Keyboard appears when viewport height decreases significantly
+            if (heightDiff > 150) {
+                if (!isKeyboardVisible) {
+                    isKeyboardVisible = true;
+                    onKeyboardShow();
+                }
+            }
+            // Keyboard disappears when viewport height increases significantly
+            else if (heightDiff < -150) {
+                if (isKeyboardVisible) {
+                    isKeyboardVisible = false;
+                    onKeyboardHide();
+                }
+            }
+            
+            lastHeight = currentHeight;
+        });
+    }
+    
+    // Method 2: Window resize fallback (older browsers)
+    window.addEventListener('resize', () => {
+        const currentHeight = window.innerHeight;
+        const heightDiff = previousViewportHeight - currentHeight;
+        
+        // Significant height decrease (keyboard likely appeared)
+        if (heightDiff > 150) {
+            if (!isKeyboardVisible) {
+                isKeyboardVisible = true;
+                onKeyboardShow();
+            }
+        }
+        // Significant height increase (keyboard likely disappeared)
+        else if (heightDiff < -150) {
+            if (isKeyboardVisible) {
+                isKeyboardVisible = false;
+                onKeyboardHide();
+            }
+        }
+        
+        previousViewportHeight = currentHeight;
+    });
+    
+    // Method 3: Focus/blur detection (additional indicator)
+    document.addEventListener('focusin', (e) => {
+        // Only track for input elements on mobile
+        if (isMobileDevice() && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) {
+            setTimeout(() => {
+                const currentHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+                const heightDiff = previousViewportHeight - currentHeight;
+                
+                if (heightDiff > 100 && !isKeyboardVisible) {
+                    isKeyboardVisible = true;
+                    onKeyboardShow();
+                }
+            }, 300);
+        }
+    });
+    
+    document.addEventListener('focusout', (e) => {
+        // Only track for input elements on mobile
+        if (isMobileDevice() && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) {
+            setTimeout(() => {
+                const currentHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+                const heightDiff = previousViewportHeight - currentHeight;
+                
+                if (Math.abs(heightDiff) < 100 && isKeyboardVisible) {
+                    isKeyboardVisible = false;
+                    onKeyboardHide();
+                }
+            }, 300);
+        }
+    });
+}
+
+/**
+ * Callback when keyboard appears
+ */
+function onKeyboardShow() {
+    console.log('Mobile keyboard shown');
+    document.body.classList.add('keyboard-visible');
+    
+    // Scroll to show bottom of last message
+    if (chatContainer && isMobileDevice()) {
+        setTimeout(() => {
+            // Scroll page to top
+            document.documentElement.scrollTop = 0;
+            document.body.scrollTop = 0;
+            window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+            
+            // Scroll chat container to show latest messages
+            chatContainer.scrollTo({
+                top: chatContainer.scrollHeight,
+                behavior: 'smooth'
+            });
+        }, 100);
+    }
+}
+
+/**
+ * Callback when keyboard disappears
+ */
+function onKeyboardHide() {
+    console.log('Mobile keyboard hidden');
+    document.body.classList.remove('keyboard-visible');
+    
+    // Scroll to show bottom of last message
+    if (isMobileDevice() && chatContainer) {
+        setTimeout(() => {
+            // Scroll page to top
+            document.documentElement.scrollTop = 0;
+            document.body.scrollTop = 0;
+            window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+            
+            // Scroll chat container to show latest messages
+            chatContainer.scrollTo({
+                top: chatContainer.scrollHeight,
+                behavior: 'smooth'
+            });
+        }, 100);
+    }
+}
+
 // ===================================
 // MOBILE INPUT HANDLING
 // ===================================
@@ -251,45 +410,6 @@ inputBox.addEventListener('focus', function() {
     }, 300); // Delay to allow keyboard animation
 });
 
-/**
- * Scroll all relevant containers and elements to the top and show latest messages
- */
-function scrollAllToTheTop() {
-    // Multiple approaches to ensure consistent scroll behavior across browsers
-    console.log('scrollAllToTheTop :');
-    document.documentElement.scrollTop = 0;
-    document.body.scrollTop = 0;
-    window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
-    // Scroll chat container to show latest messages
-    if (chatContainer) {
-        chatContainer.scrollTo({
-            top: chatContainer.scrollHeight,
-            behavior: 'smooth'
-        });
-        // If there's a user message, scroll to show it with some offset
-        if (userMessageDiv) {
-            chatContainer.scrollTo({
-                top: userMessageDiv.offsetTop - 70,
-                behavior: 'smooth'
-            });
-        }
-    }
-}
-
-/**
- * Handle input box blur (when keyboard disappears)
- * Restores normal view and scrolls to show latest messages
- */
-inputBox.addEventListener('blur', function() {
-    setTimeout(() => {
-        try {
-            console.log('Input blurred, attempting to scroll to top');
-            scrollAllToTheTop();
-        } catch (error) {
-            console.log('Input blur scroll failed:', error);
-        }
-    }, 300); // Delay to allow keyboard dismissal
-});
 
 // ===================================
 // SCROLL INDICATOR
@@ -579,16 +699,36 @@ function removePreviousSpacer() {
  * @param {HTMLElement} userMsgDiv - The user message element
  * @param {HTMLElement} assistantMsgDiv - The assistant message element
  */
-function createBottomSpacer(userMsgDiv, assistantMsgDiv) {
+function createBottomSpacer(userMsgDiv, assistantMsgDiv,offset = 10) {
     const bottomSpacer = document.createElement('div');
     bottomSpacer.id = 'chat-bottom-spacer';
-    const spacerHeight = chatContainer.clientHeight - userMsgDiv.offsetHeight - assistantMsgDiv.offsetHeight - 50;
-    bottomSpacer.style.height = (spacerHeight > 0 ? spacerHeight : 0) + 'px';
+
+    bottomSpacer.style.height =  offset + 'px';
     bottomSpacer.style.flexShrink = '0';
-    //bottomSpacer.style.border = 'red 1px solid '; // For debugging
-    return bottomSpacer
+    //set border for debugging
+    // bottomSpacer.style.border = '1px solid red';
+    return bottomSpacer;
 }
 
+
+/**
+ * Update the bottom spacer height based on current message sizes
+ * and scroll to keep the bottom of the assistant message visible
+ * @param {HTMLElement} assistantMsgDiv - The assistant message element
+ * @param {number} offset - Optional offset for scrolling
+ */
+function scrollToMessageBottom(assistantMsgDiv,offset = 0) {
+    // Update spacer to shrink as message grows
+    const spacer = document.getElementById('chat-bottom-spacer');
+    // Scroll so the bottom of the assistant message is visible
+    // console.log('Assistant message offsetTop:', assistantMsgDiv.offsetTop);
+    // console.log('Assistant message offsetHeight:', assistantMsgDiv.offsetHeight);
+    // console.log('Chat container clientHeight:', chatContainer.clientHeight);
+    const targetTop = assistantMsgDiv.offsetTop + assistantMsgDiv.offsetHeight - chatContainer.clientHeight + offset;
+    if (targetTop > 0) {
+        chatContainer.scrollTop = targetTop;
+    }
+}
 /**
  * Handle send button click
  */
@@ -600,16 +740,6 @@ sendButton.addEventListener('click', () => {
 
     sendMessage();
 
-    // After sending, scroll the user message to the top of chat container
-    setTimeout(() => {
-        if (userMessageDiv && chatContainer) {
-            console.log('Scrolling to user message:', userMessageDiv);
-            chatContainer.scrollTo({
-                top: userMessageDiv.offsetTop - chatContainer.offsetTop,
-                behavior: 'smooth'
-            });
-        }
-    }, 100);
 
     // Only blur if keyboard is visible
     if (isKeyboardVisible) {
@@ -617,25 +747,40 @@ sendButton.addEventListener('click', () => {
     }
 });
 
+
 /**
- * Handle suggestion card clicks
- * Fills input with suggestion text and sends message
+ * Detect if the device is mobile
+ * @returns {boolean} True if mobile device
  */
-document.querySelectorAll('.suggestion-card').forEach(card => {
-    card.addEventListener('click', function() {
-        const suggestionText = this.querySelector('p').textContent;
-        inputBox.value = suggestionText;
-        sendMessage();
-    });
-});
+function isMobileDevice() {
+    // Check screen width (mobile typically < 768px)
+    if (window.innerWidth <= 768) return true;
+    
+    // Check for touch capability
+    if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
+        // Further verify with screen size for tablets
+        if (window.innerWidth <= 1024) return true;
+    }
+    
+    return false;
+}
 
-
+/**
+ * Focus input box only on desktop browsers
+ */
+function handleFocus() {
+    if (inputBox && !isMobileDevice()) {
+        inputBox.focus();
+    }
+}
 
 /**
  * Main function to send user message and handle AI response
  * Manages UI state, streaming response, and error handling
  */
 async function sendMessage() {
+
+    
     const question = inputBox.value.trim();
     
     // Prevent sending empty messages or multiple simultaneous requests
@@ -666,7 +811,12 @@ async function sendMessage() {
     const spacerDiv = createBottomSpacer(userMessageDiv, messageDiv);
     chatContainer.appendChild(spacerDiv);
 
-    
+    // Scroll to show user message and loading indicator
+    // requestAnimationFrame(() => {
+    //     chatContainer.scrollTo({ top: chatContainer.scrollHeight, behavior: 'smooth' });
+    // });
+
+
     // Get message components for manipulation
     const contentDiv = messageDiv.querySelector('.message-text');
     const actionsDiv = messageDiv.querySelector('.message-actions');
@@ -676,16 +826,24 @@ async function sendMessage() {
     
     // Prepare UI for loading state
     prepareUIForLoading();
-    
+
+    // Auto-scroll to keep assistant message bottom visible
+    scrollToMessageBottom(contentDiv.closest('.message'));
+
     try {
         // Send request to backend and handle streaming response
-        await handleStreamingResponse(question, contentDiv, actionsDiv);
+        const result = await handleStreamingResponse(question, contentDiv, actionsDiv);
+
     } catch (error) {
         console.error('Message sending error:', error);
         contentDiv.textContent = t('messages.error');
     } finally {
         // Clean up and restore UI state
         cleanupAfterMessage(messageDiv);
+        // Focus input only on user action
+        handleFocus();
+         // Auto-scroll to keep assistant message bottom visible
+         scrollToMessageBottom(contentDiv.closest('.message'));
     }
 }
 
@@ -712,17 +870,20 @@ function createAssistantMessage() {
                 </div>
             </div>
             <div class="message-actions" style="display:none">
-                <button class="action-btn copy-btn" title="" style="border-radius:50%;padding:8px;background:#f3f3f3;border:none;box-shadow:0 1px 4px rgba(0,0,0,0.07);margin-right:6px;cursor:pointer;">
+                <button class="action-btn copy-btn" title="" style="border-radius:50%;padding:8px;background:#f3f3f3;border:none;box-shadow:0 1px 4px rgba(0,0,0,0.07);margin-right:6px;cursor:pointer;width:40px;height:40px;display:inline-flex;align-items:center;justify-content:center;">
                     <i class="bi bi-clipboard" style="font-size:1.3em;"></i>
                 </button>
-                <button class="action-btn share-btn" title="" style="border-radius:50%;padding:8px;background:#f3f3f3;border:none;box-shadow:0 1px 4px rgba(0,0,0,0.07);margin-right:6px;cursor:pointer;">
+                <button class="action-btn share-btn" title="" style="border-radius:50%;padding:8px;background:#f3f3f3;border:none;box-shadow:0 1px 4px rgba(0,0,0,0.07);margin-right:6px;cursor:pointer;width:40px;height:40px;display:inline-flex;align-items:center;justify-content:center;">
                     <i class="bi bi-share" style="font-size:1.3em;"></i>
                 </button>
-                <button class="action-btn like-btn" title="Like" style="border-radius:50%;padding:8px;background:#e6f9e6;border:none;box-shadow:0 1px 4px rgba(0,0,0,0.07);margin-left:6px;cursor:pointer;">
+                <button class="action-btn like-btn" title="Like" style="border-radius:50%;padding:8px;background:#e6f9e6;border:none;box-shadow:0 1px 4px rgba(0,0,0,0.07);margin-left:6px;cursor:pointer;width:40px;height:40px;display:inline-flex;align-items:center;justify-content:center;">
                     <i class="bi bi-hand-thumbs-up" style="font-size:1.3em;"></i>
                 </button>
-                <button class="action-btn dislike-btn" title="Dislike" style="border-radius:50%;padding:8px;background:#f9e6e6;border:none;box-shadow:0 1px 4px rgba(0,0,0,0.07);margin-left:2px;cursor:pointer;">
+                <button class="action-btn dislike-btn" title="Dislike" style="border-radius:50%;padding:8px;background:#f9e6e6;border:none;box-shadow:0 1px 4px rgba(0,0,0,0.07);margin-left:2px;cursor:pointer;width:40px;height:40px;display:inline-flex;align-items:center;justify-content:center;">
                     <i class="bi bi-hand-thumbs-down" style="font-size:1.3em;"></i>
+                </button>
+                <button class="action-btn tts-btn" title="" style="border-radius:50%;padding:8px;background:#c1ddf1;border:none;box-shadow:0 1px 4px rgba(0,0,0,0.07);margin-left:2px;cursor:pointer;width:40px;height:40px;display:inline-flex;align-items:center;justify-content:center;">
+                    <i class="bi bi-volume-up" style="font-size:1.3em;"></i>
                 </button>
             </div>
         </div>
@@ -739,60 +900,83 @@ function createAssistantMessage() {
 function setupMessageActions(messageDiv, contentDiv) {
     const copyBtn = messageDiv.querySelector('.copy-btn');
     const shareBtn = messageDiv.querySelector('.share-btn');
+    const ttsBtn = messageDiv.querySelector('.tts-btn');
     const commentBtn = messageDiv.querySelector('.comment-btn');
     const likeBtn = messageDiv.querySelector('.like-btn');
     const dislikeBtn = messageDiv.querySelector('.dislike-btn');
-    // Like/dislike buttons
-    if (likeBtn) {
-        likeBtn.addEventListener('click', async () => {
-            const questionId = likeBtn.dataset.questionId || (commentBtn && commentBtn.dataset.questionId);
-            if (!questionId) {
-                alert(t('messages.error'));
+    
+    // TTS button - speak the message text
+    if (ttsBtn) {
+        ttsBtn.addEventListener('click', () => {
+            const textToSpeak = contentDiv.textContent;
+            if (!textToSpeak || textToSpeak.trim().length === 0) {
                 return;
             }
-            likeBtn.disabled = true;
-            dislikeBtn && (dislikeBtn.disabled = true);
-            try {
-                const res = await fetch('/api/like_answer', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ question_id: questionId, like: true })
-                });
-                const result = await res.json();
-                if (result.status === 'success') {
-                    likeBtn.style.background = '#49fc49ff';
-                } else {
-                    alert(result.message || t('messages.error'));
-                }
-            } catch (e) {
-                alert(t('messages.network_error'));
+            
+            // If this button is already playing, stop it
+            if (activeTtsButton === ttsBtn && ttsAudio) {
+                stopTTS();
+                return;
             }
+            
+            // Stop any currently playing TTS
+            if (ttsAudio) {
+                stopTTS();
+            }
+            
+            speakText(textToSpeak, ttsBtn);
+        });
+    }
+    
+    // Like/dislike buttons
+    if (likeBtn) {
+        likeBtn.addEventListener('click', () => {
+            const questionId = likeBtn.dataset.questionId || (commentBtn && commentBtn.dataset.questionId);
+            if (!questionId) {
+                console.log('Like button clicked but no question_id available');
+                return;
+            }
+            // Immediate visual feedback (optimistic UI)
+            likeBtn.style.background = '#49fc49ff';
+            dislikeBtn && (dislikeBtn.style.background = '#f9e6e6');
+            
+            // Fire-and-forget API call (non-blocking)
+            fetch('/api/like_answer', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ question_id: questionId, like: true })
+            }).then(res => res.json())
+              .then(result => {
+                  if (result.status !== 'success') {
+                      console.log('Like vote failed:', result.message);
+                  }
+              })
+              .catch(e => console.log('Like vote error:', e));
         });
     }
     if (dislikeBtn) {
-        dislikeBtn.addEventListener('click', async () => {
+        dislikeBtn.addEventListener('click', () => {
             const questionId = dislikeBtn.dataset.questionId || (commentBtn && commentBtn.dataset.questionId);
             if (!questionId) {
-                alert(t('messages.error'));
+                console.log('Dislike button clicked but no question_id available');
                 return;
             }
-            dislikeBtn.disabled = true;
-            likeBtn && (likeBtn.disabled = true);
-            try {
-                const res = await fetch('/api/like_answer', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ question_id: questionId, like: false })
-                });
-                const result = await res.json();
-                if (result.status === 'success') {
-                    dislikeBtn.style.background = '#f86868ff';
-                } else {
-                    alert(result.message || t('messages.error'));
-                }
-            } catch (e) {
-                alert(t('messages.network_error'));
-            }
+            // Immediate visual feedback (optimistic UI)
+            dislikeBtn.style.background = '#f86868ff';
+            likeBtn && (likeBtn.style.background = '#e6f9e6');
+            
+            // Fire-and-forget API call (non-blocking)
+            fetch('/api/like_answer', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ question_id: questionId, like: false })
+            }).then(res => res.json())
+              .then(result => {
+                  if (result.status !== 'success') {
+                      console.log('Dislike vote failed:', result.message);
+                  }
+              })
+              .catch(e => console.log('Dislike vote error:', e));
         });
     }
 
@@ -943,6 +1127,8 @@ async function handleStreamingResponse(question, contentDiv, actionsDiv) {
                         } else {
                             contentDiv.textContent = fullText;
                         }
+                        // Auto-scroll to keep assistant message bottom visible
+                        scrollToMessageBottom(contentDiv.closest('.message'));
                     }
                   
                     updateScrollIndicator();
@@ -1007,6 +1193,31 @@ function cleanupAfterMessage(messageDiv) {
 // ===================================
 // UTILITY FUNCTIONS
 // ===================================
+/**
+ * Initialize suggestion card click handlers
+ * When clicked, populates input with example question and sends it
+ */
+function initSuggestionCards() {
+    document.querySelectorAll('.suggestion-card[data-category]').forEach(card => {
+        card.addEventListener('click', function() {
+            const category = this.getAttribute('data-category');
+            const langData = translations[currentLanguage] || translations['fr'];
+            const suggestionData = langData.suggestions && langData.suggestions[category];
+            
+            if (suggestionData && suggestionData.question) {
+                // Set the question in the input box
+                inputBox.value = suggestionData.question;
+                
+                // Resize input box to fit content
+                inputBox.style.height = 'auto';
+                inputBox.style.height = Math.min(inputBox.scrollHeight, 200) + 'px';
+                
+                // Auto-send the message
+                sendMessage();
+            }
+        });
+    });
+}
 
 /**
  * Add a new message to the chat container
@@ -1018,7 +1229,7 @@ function addMessage(text, role) {
     const messageDiv = document.createElement('div');
     messageDiv.className = `message ${role}`;
     messageDiv.innerHTML = `
-        <div class="message-icon">${role === 'user' ? 'U' : 'Ben'}</div>
+        <div class="message-icon">${role === 'user' ? 'U' : 'NIA'}</div>
         <div class="message-content">${escapeHtml(text)}</div>
     `;
     // Clear the text area
@@ -1110,18 +1321,28 @@ function initSpeechRecognition() {
  * Toggle voice recording
  */
 function toggleRecording() {
-    if (!recognition) {
-        alert(currentLanguage === 'en' 
-            ? 'Speech recognition is not supported in your browser.' 
-            : 'La reconnaissance vocale n\'est pas supportée par votre navigateur.');
-        return;
-    }
-    
     if (isRecording) {
-        sendMessage(); // Send message when stopping recording
-        stopRecording();
+        // Stop recording (Whisper or Web Speech API)
+        if (useWhisper) {
+            stopWhisperRecording();
+        } else {
+            stopRecording();
+        }
     } else {
-        startRecording();
+        // Start recording (Whisper or Web Speech API)
+        if (useWhisper) {
+            isRecording = true;
+            voiceButton.classList.add('recording');
+            initWhisperRecording();
+        } else {
+            if (!recognition) {
+                alert(currentLanguage === 'en' 
+                    ? 'Speech recognition is not supported in your browser.' 
+                    : 'La reconnaissance vocale n\'est pas supportée par votre navigateur.');
+                return;
+            }
+            startRecording();
+        }
     }
 }
 
@@ -1152,6 +1373,391 @@ function stopRecording() {
     }
 }
 
+/**
+ * Initialize Whisper recording (MediaRecorder API)
+ */
+async function initWhisperRecording() {
+    try {
+        // Clear input box when starting recording
+        inputBox.value = '';
+        inputBox.style.height = 'auto';
+        
+        // Disable input controls during recording
+        inputBox.disabled = true;
+        sendButton.disabled = true;
+        
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        whisperStream = stream;
+        
+        // Use webm format for better compatibility
+        const options = { mimeType: 'audio/webm' };
+        if (!MediaRecorder.isTypeSupported(options.mimeType)) {
+            options.mimeType = 'audio/ogg; codecs=opus';
+        }
+        if (!MediaRecorder.isTypeSupported(options.mimeType)) {
+            options.mimeType = ''; // Use default
+        }
+        
+        mediaRecorder = new MediaRecorder(stream, options);
+        
+        mediaRecorder.ondataavailable = (event) => {
+            if (event.data.size > 0) {
+                audioChunks.push(event.data);
+            }
+        };
+        
+        mediaRecorder.onstop = async () => {
+            if (audioChunks.length === 0) {
+                console.warn('No audio data recorded');
+                // Re-enable input controls
+                inputBox.disabled = false;
+                sendButton.disabled = false;
+                return;
+            }
+            
+            // Create audio blob
+            const audioBlob = new Blob(audioChunks, { type: mediaRecorder.mimeType || 'audio/webm' });
+            audioChunks = [];
+            
+            // Check if audio is too small (likely no speech, just silence)
+            const MIN_AUDIO_SIZE = 10000; // 10KB minimum
+            if (audioBlob.size < MIN_AUDIO_SIZE) {
+                console.log('Audio too small, likely no speech detected');
+                // Re-enable input controls
+                inputBox.disabled = false;
+                sendButton.disabled = false;
+                // Restore placeholder
+                inputBox.placeholder = t('input.placeholder') || 'Pose-moi une question...';
+                return;
+            }
+            
+            // Stop animation and show processing indicator
+            if (recordingAnimationInterval) {
+                clearInterval(recordingAnimationInterval);
+                recordingAnimationInterval = null;
+            }
+            
+            inputBox.placeholder = currentLanguage === 'en' 
+                ? '⏳ Processing audio...' 
+                : '⏳ Traitement audio...';
+            
+            // Send to backend for transcription
+            await transcribeWithWhisper(audioBlob);
+            
+            // Restore placeholder
+            inputBox.placeholder = t('input.placeholder') || 'Pose-moi une question...';
+        };
+        
+        mediaRecorder.onerror = (event) => {
+            console.error('MediaRecorder error:', event.error);
+            stopWhisperRecording();
+        };
+        
+        // Start recording
+        mediaRecorder.start();
+        
+            
+        // Set maximum recording duration (30 seconds)
+        const MAX_RECORDING_DURATION = 30000; // 30 seconds
+        const WARNING_TIME = 25000; // Show warning at 25 seconds (5s remaining)
+        
+        // Show warning at 25 seconds
+        warningTimer = setTimeout(() => {
+            if (isRecording) {
+                console.log('Recording warning: 5 seconds remaining');
+                // Update placeholder to show warning
+                inputBox.placeholder = currentLanguage === 'en' 
+                    ? '⏱️ Recording (5s remaining...)' 
+                    : '⏱️ Enregistrement (5s restantes...)';
+            }
+        }, WARNING_TIME);
+        
+        // Auto-stop at maximum duration
+        maxDurationTimer = setTimeout(() => {
+            if (isRecording) {
+                console.log('Maximum recording duration reached (30s) - auto-stopping');
+                stopWhisperRecording();
+            }
+        }, MAX_RECORDING_DURATION);
+        
+        // Animate placeholder during recording
+        let dots = 0;
+        const baseText = currentLanguage === 'en' 
+            ? '🎤 Recording' 
+            : '🎤 Enregistrement';
+        
+        recordingAnimationInterval = setInterval(() => {
+            // Stop animation if recording stopped
+            if (!isRecording) {
+                if (recordingAnimationInterval) {
+                    clearInterval(recordingAnimationInterval);
+                    recordingAnimationInterval = null;
+                }
+                return;
+            }
+            dots = (dots + 1) % 4;
+            inputBox.placeholder = baseText + '.'.repeat(dots) ;
+        }, 500);
+        
+        console.log('Whisper recording started with', mediaRecorder.mimeType);
+        
+    } catch (error) {
+        console.error('Failed to initialize Whisper recording:', error);
+        alert(currentLanguage === 'en' 
+            ? 'Could not access microphone. Please check permissions.' 
+            : 'Impossible d\'accéder au microphone. Vérifiez les permissions.');
+        isRecording = false;
+        voiceButton.classList.remove('recording');
+        
+        // Clean up audio context
+        if (audioContext) {
+            audioContext.close();
+            audioContext = null;
+            analyser = null;
+        }
+        
+        
+        // Clear max duration timers
+        if (maxDurationTimer) {
+            clearTimeout(maxDurationTimer);
+            maxDurationTimer = null;
+        }
+        if (warningTimer) {
+            clearTimeout(warningTimer);
+            warningTimer = null;
+        }
+        
+        // Stop animation on error
+        if (recordingAnimationInterval) {
+            clearInterval(recordingAnimationInterval);
+            recordingAnimationInterval = null;
+        }
+        
+        // Re-enable input controls on error
+        inputBox.disabled = false;
+        sendButton.disabled = false;
+    }
+}
+
+/**
+ * Stop Whisper recording
+ */
+function stopWhisperRecording() {
+    // Set recording flag to false immediately to stop animation interval
+    isRecording = false;
+    voiceButton.classList.remove('recording');
+    
+    if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+        mediaRecorder.stop();
+        console.log('Whisper recording stopped');
+    }
+    
+    if (whisperStream) {
+        whisperStream.getTracks().forEach(track => track.stop());
+        whisperStream = null;
+    }
+    
+    // Clean up audio context and analyser
+    if (audioContext) {
+        audioContext.close();
+        audioContext = null;
+        analyser = null;
+    }
+
+    // Clear max duration timers
+    if (maxDurationTimer) {
+        clearTimeout(maxDurationTimer);
+        maxDurationTimer = null;
+    }
+    if (warningTimer) {
+        clearTimeout(warningTimer);
+        warningTimer = null;
+    }
+    
+    // Stop animation
+    if (recordingAnimationInterval) {
+        clearInterval(recordingAnimationInterval);
+        recordingAnimationInterval = null;
+    }
+}
+
+/**
+ * Send audio to backend for Whisper transcription
+ */
+async function transcribeWithWhisper(audioBlob) {
+    try {
+        // Use interface language for transcription
+        const sourceLang = currentLanguage || 'fr';
+        
+        const formData = new FormData();
+        formData.append('audio', audioBlob, 'recording.webm');
+        formData.append('language', sourceLang);
+        
+        const response = await fetch('/api/transcribe_audio', {
+            method: 'POST',
+            body: formData
+        });
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const result = await response.json();
+        
+        if (result.text) {
+            // Filter out common Whisper hallucinations (occurs with silence/no speech)
+            const hallucinations = [
+                'thank you for watching',
+                'thanks for watching',
+                'thank you',
+                'bye',
+                'bye bye',
+                'goodbye'
+            ];
+            
+            const lowerText = result.text.toLowerCase().trim();
+            const isHallucination = hallucinations.some(phrase => 
+                lowerText === phrase || lowerText === phrase + '.'
+            );
+            
+            if (isHallucination) {
+                console.log('Whisper hallucination detected, ignoring:', result.text);
+                // Re-enable input controls without sending
+                inputBox.disabled = false;
+                sendButton.disabled = false;
+                return;
+            }
+            
+            // Append transcribed text to input box
+            const currentText = inputBox.value.trim();
+            inputBox.value = currentText ? currentText + ' ' + result.text : result.text;
+            
+            // Resize input box to fit content
+            inputBox.style.height = 'auto';
+            inputBox.style.height = Math.min(inputBox.scrollHeight, 200) + 'px';
+            
+            console.log('Whisper transcription:', result.text);
+            
+            // Re-enable input controls before sending
+            inputBox.disabled = false;
+            sendButton.disabled = false;
+            
+            // Automatically send the transcribed message
+            sendMessage();
+        } else if (result.error) {
+            console.error('Whisper transcription error:', result.error);
+            // Re-enable input controls on error
+            inputBox.disabled = false;
+            sendButton.disabled = false;
+        }
+        
+    } catch (error) {
+        console.error('Failed to transcribe with Whisper:', error);
+        alert(currentLanguage === 'en' 
+            ? 'Failed to transcribe audio. Please try again.' 
+            : 'Échec de la transcription. Veuillez réessayer.');
+        // Re-enable input controls on error
+        inputBox.disabled = false;
+        sendButton.disabled = false;
+    }
+}
+
+/**
+ * Stop currently playing TTS audio
+ */
+function stopTTS() {
+    if (ttsAudio) {
+        ttsAudio.pause();
+        ttsAudio.currentTime = 0;
+        ttsAudio = null;
+    }
+    if (activeTtsButton) {
+        activeTtsButton.innerHTML = '<i class="bi bi-volume-up" style="font-size:1.3em;"></i>';
+        activeTtsButton.disabled = false;
+        activeTtsButton = null;
+    }
+}
+
+/**
+ * Convert text to speech and play audio
+ * @param {string} text - Text to convert to speech
+ * @param {HTMLElement} button - The TTS button element
+ */
+async function speakText(text, button = null) {
+    try {
+        // Stop any currently playing TTS
+        if (ttsAudio) {
+            stopTTS();
+        }
+        
+        if (button) {
+            activeTtsButton = button;
+            // Show loading spinner
+            button.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
+            button.disabled = true;
+        }
+        
+        // Request TTS from backend
+        const response = await fetch('/api/tts', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                text: text,
+                language: currentLanguage || 'fr'
+            })
+        });
+        
+        if (!response.ok) {
+            throw new Error('TTS request failed');
+        }
+        
+        // Create audio element from response
+        const audioBlob = await response.blob();
+        const audioUrl = URL.createObjectURL(audioBlob);
+        ttsAudio = new Audio(audioUrl);
+        
+        // Update button to show stop icon when audio is ready
+        if (activeTtsButton) {
+            activeTtsButton.innerHTML = '<i class="bi bi-stop-fill" style="font-size:1.3em;"></i>';
+            activeTtsButton.disabled = false;
+        }
+        
+        // Play audio
+        await ttsAudio.play();
+        
+        // Clean up when audio finishes
+        ttsAudio.onended = () => {
+            URL.revokeObjectURL(audioUrl);
+            if (activeTtsButton) {
+                activeTtsButton.innerHTML = '<i class="bi bi-volume-up" style="font-size:1.3em;"></i>';
+                activeTtsButton = null;
+            }
+            ttsAudio = null;
+        };
+        
+        // Handle errors during playback
+        ttsAudio.onerror = (error) => {
+            console.error('TTS playback error:', error);
+            URL.revokeObjectURL(audioUrl);
+            if (activeTtsButton) {
+                activeTtsButton.innerHTML = '<i class="bi bi-volume-up" style="font-size:1.3em;"></i>';
+                activeTtsButton = null;
+            }
+            ttsAudio = null;
+        };
+        
+    } catch (error) {
+        console.error('TTS error:', error);
+        if (activeTtsButton) {
+            activeTtsButton.innerHTML = '<i class="bi bi-volume-up" style="font-size:1.3em;"></i>';
+            activeTtsButton.disabled = false;
+            activeTtsButton = null;
+        }
+    }
+}
+
 // Voice button click handler
 voiceButton.addEventListener('click', toggleRecording);
 
@@ -1172,8 +1778,15 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize speech recognition
     initSpeechRecognition();
     
+    // Initialize keyboard detection for mobile
+    initKeyboardDetection();
+    
+    // Initialize suggestion card click handlers
+    initSuggestionCards();
+    
     // Add language switcher for testing (comment out in production)
     // addLanguageSwitcher();
 });
+
 
 

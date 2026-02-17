@@ -81,19 +81,19 @@
                 <p data-i18n="intro.description">Dans mes temps libres, j'entraîne des humains… et des IA. J'ai coaché cette machine pour qu'elle réponde à vos questions.</p>
                 <p><strong data-i18n="intro.disclaimer">Elle apprend vite, mais souvenez-vous : elle ne remplacera jamais une vraie consultation. 💪</strong></p>
                 <div class="suggestions">
-                    <div class="suggestion-card">
+                    <div class="suggestion-card" data-category="nutrition">
                         <h3 data-i18n="suggestions.nutrition.title">🥗 Nutrition</h3>
                         <p data-i18n="suggestions.nutrition.description">Conseils alimentaires et nutrition</p>
                     </div>
-                    <div class="suggestion-card">
+                    <div class="suggestion-card" data-category="supplements">
                         <h3 data-i18n="suggestions.supplements.title">💊 Suppléments</h3>
                         <p data-i18n="suggestions.supplements.description">Questions sur les suppléments et leur utilisation</p>
                     </div>
-                    <div class="suggestion-card">
+                    <div class="suggestion-card" data-category="training">
                         <h3 data-i18n="suggestions.training.title">🏋️ Entraînement</h3>
                         <p data-i18n="suggestions.training.description">Performance et récupération sportive</p>
                     </div>
-                    <div class="suggestion-card">
+                    <div class="suggestion-card" data-category="health">
                         <h3 data-i18n="suggestions.health.title">💡 Santé</h3>
                         <p data-i18n="suggestions.health.description">Bien-être général et habitudes de vie</p>
                     </div>
@@ -110,17 +110,19 @@
                         data-i18n-placeholder="input.placeholder"
                         rows="1"
                     ></textarea>
-                    <button id="voice-button" class="voice-button" title="Enregistrer un message vocal" data-i18n-title="input.voiceButton">
-                        <svg viewBox="0 0 24 24">
-                            <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/>
-                            <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
-                        </svg>
-                    </button>
-                    <button id="send-button" class="send-button" title="" data-i18n-title="input.sendButton">
-                        <svg viewBox="0 0 24 24">
-                            <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
-                        </svg>
-                    </button>
+                    <div class="input-buttons">
+                        <button id="voice-button" class="voice-button" title="Enregistrer un message vocal" data-i18n-title="input.voiceButton">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/>
+                                <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
+                            </svg>
+                        </button>
+                        <button id="send-button" class="send-button" title="" data-i18n-title="input.sendButton">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+                            </svg>
+                        </button>
+                    </div>
                 </div>
                 <div class="input-disclaimer" data-i18n="input.disclaimer">
                     ⚠️ Peut contenir des erreurs. Ne remplace pas un avis professionnel.

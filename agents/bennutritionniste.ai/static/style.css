@@ -184,6 +184,14 @@ footer {
     flex: 1;
     padding: 1rem 0;
     overflow-y: auto;
+    padding-bottom: 1rem;
+}
+
+.footer-info {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid #e2e8f0;
+    background: #ffffff;
+    flex-shrink: 0;
 }
 
 .sidebar-link {
@@ -208,6 +216,44 @@ footer {
     flex-shrink: 0;
 }
 
+.language-selector-container {
+    padding: 1rem 1.5rem;
+    margin-top: 0.5rem;
+    border-top: 1px solid #e2e8f0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.language-selector-container label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #4a5568;
+}
+
+.language-selector {
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #cbd5e0;
+    border-radius: 8px;
+    background: #ffffff;
+    color: #2d3748;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+.language-selector:hover {
+    border-color: #6366f1;
+    background: #f8f9ff;
+}
+
+.language-selector:focus {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
 .overlay {
     position: fixed;
     top: 0;
@@ -226,7 +272,21 @@ footer {
     visibility: visible;
 }
 
-
+@media (max-width: 768px) {
+    .sidebar {
+        height: 100vh;
+        height: 100dvh; /* Dynamic viewport height for mobile */
+    }
+    
+    .sidebar-nav {
+        padding-bottom: 2rem;
+    }
+    
+    .footer-info {
+        padding: 0.75rem 1rem;
+        font-size: 0.85em !important;
+    }
+}
 
 @media (max-width: 768px) {
     .header {
@@ -383,6 +443,24 @@ footer {
     max-width: 800px;
     margin: 0 auto;
     position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0;
+}
+
+.input-wrapper .input-box {
+    flex: 1;
+    min-width: 0;
+}
+
+.input-buttons {
+    position: absolute;
+    right: 0.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    gap: 4px;
 }
 
 .input-disclaimer {
@@ -396,7 +474,7 @@ footer {
 
 .input-box {
     width: 100%;
-    padding: 1rem 5.5rem 1rem 1rem;
+    padding: 1rem 7rem 1rem 1rem;
     background: #ffffff;
     border: 1px solid #cbd5e0;
     border-radius: 12px;
@@ -426,9 +504,6 @@ footer {
 }
 
 .voice-button {
-    position: absolute;
-    right: 3.5rem;
-    bottom: 0.75rem;
     width: 32px;
     height: 32px;
     background: #10b981;
@@ -439,6 +514,7 @@ footer {
     align-items: center;
     justify-content: center;
     transition: background 0.2s, transform 0.1s;
+    flex-shrink: 0;
 }
 
 .voice-button:hover:not(:disabled) {
@@ -481,9 +557,6 @@ footer {
 }
 
 .send-button {
-    position: absolute;
-    right: 0.75rem;
-    bottom: 0.75rem;
     width: 32px;
     height: 32px;
     background: #6366f1;
@@ -494,6 +567,7 @@ footer {
     align-items: center;
     justify-content: center;
     transition: background 0.2s, transform 0.1s;
+    flex-shrink: 0;
 }
 
 .send-button:hover:not(:disabled) {
@@ -548,6 +622,28 @@ footer {
     40% {
         transform: scale(1);
     }
+}
+
+.spinner-border {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    vertical-align: middle;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: tts-spin 0.75s linear infinite;
+}
+
+.spinner-border-sm {
+    width: 12px;
+    height: 12px;
+    border-width: 2px;
+}
+
+@keyframes tts-spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
 
 .empty-state {
@@ -849,5 +945,31 @@ footer {
     .cookie-btn {
         width: 100%;
         padding: 0.875rem;
+    }
+}
+
+/* Keyboard visibility adjustments */
+body.keyboard-visible #chat-container {
+    /* Adjust chat container when keyboard appears */
+    padding-bottom: 0;
+}
+
+body.keyboard-visible .input-area {
+    /* Ensure input stays visible above keyboard */
+    position: sticky;
+    bottom: 0;
+    z-index: 100;
+}
+
+@media (max-width: 768px) {
+    body.keyboard-visible .content {
+        /* Adjust content height for mobile keyboard */
+        max-height: calc(100vh - env(safe-area-inset-bottom));
+    }
+    
+    body.keyboard-visible #chat-container {
+        /* Reduce padding when keyboard is visible */
+        padding: 1rem;
+        padding-bottom: 0;
     }
 }

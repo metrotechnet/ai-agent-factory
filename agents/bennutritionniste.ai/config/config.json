@@ -28,19 +28,23 @@
     "suggestions": {
       "nutrition": {
         "title": "🥗 Nutrition",
-        "description": "Conseils alimentaires et nutrition"
+        "description": "Conseils alimentaires et nutrition",
+        "question": "Quels sont les principes de base d'une alimentation équilibrée ?"
       },
       "supplements": {
         "title": "💊 Suppléments",
-        "description": "Questions sur les suppléments et leur utilisation"
+        "description": "Questions sur les suppléments et leur utilisation",
+        "question": "Comment choisir les bons suppléments pour mes besoins ?"
       },
       "training": {
         "title": "🏋️ Entraînement",
-        "description": "Performance et récupération sportive"
+        "description": "Performance et récupération sportive",
+        "question": "Quelle est l'importance de la nutrition dans la récupération sportive ?"
       },
       "health": {
         "title": "💡 Santé",
-        "description": "Bien-être général et habitudes de vie"
+        "description": "Bien-être général et habitudes de vie",
+        "question": "Quels sont les facteurs clés pour maintenir une bonne santé ?"
       }
     },
     "input": {
@@ -161,19 +165,23 @@
     "suggestions": {
       "nutrition": {
         "title": "🥗 Nutrition",
-        "description": "Food advice and nutrition"
+        "description": "Food and nutrition advice",
+        "question": "What are the basic principles of a balanced diet?"
       },
       "supplements": {
         "title": "💊 Supplements",
-        "description": "Questions about supplements and their use"
+        "description": "Questions about supplements and their use",
+        "question": "How do I choose the right supplements for my needs?"
       },
       "training": {
         "title": "🏋️ Training",
-        "description": "Performance and sports recovery"
+        "description": "Performance and sports recovery",
+        "question": "What is the importance of nutrition in sports recovery?"
       },
       "health": {
         "title": "💡 Health",
-        "description": "General wellness and lifestyle habits"
+        "description": "General wellness and lifestyle habits",
+        "question": "What are the key factors for maintaining good health?"
       }
     },
     "input": {

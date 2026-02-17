@@ -90,13 +90,14 @@ def translate_text_stream(text: str, target_language: str, source_language: str 
             yield chunk.choices[0].delta.content
 
 
-def transcribe_audio_whisper(audio_bytes: bytes, filename: str = "audio.webm") -> str:
+def transcribe_audio_whisper(audio_bytes: bytes, filename: str = "audio.webm", language: str = None) -> str:
     """
     Transcribe audio using OpenAI Whisper API.
 
     Args:
         audio_bytes: Raw audio bytes
         filename: Original filename for format detection
+        language: Optional ISO-639-1 language code (e.g., 'en', 'fr') for better accuracy
 
     Returns:
         str: Transcribed text
@@ -108,11 +109,15 @@ def transcribe_audio_whisper(audio_bytes: bytes, filename: str = "audio.webm") -
 
     try:
         with open(tmp_path, "rb") as audio_file:
-            transcript = client.audio.transcriptions.create(
-                model="whisper-1",
-                file=audio_file,
-                response_format="text"
-            )
+            params = {
+                "model": "whisper-1",
+                "file": audio_file,
+                "response_format": "text"
+            }
+            if language:
+                params["language"] = language
+            
+            transcript = client.audio.transcriptions.create(**params)
         return transcript.strip()
     finally:
         os.unlink(tmp_path)
