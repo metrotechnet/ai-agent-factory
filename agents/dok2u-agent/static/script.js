@@ -259,6 +259,7 @@ let sessionId = null; // Session ID for conversation context
 
 // TTS (Text-to-Speech) state
 let ttsAudio = null; // Current Audio object for playback
+let activeTtsButton = null; // Track which button is currently playing
 
 // Agent state
 let currentAgent = 'dok2u'; // 'dok2u' or 'translator'
@@ -964,6 +965,12 @@ function setupMessageActions(messageDiv, contentDiv) {
     // TTS button to read message aloud
     if (ttsBtn) {
         ttsBtn.addEventListener('click', () => {
+            // If this button is currently playing, stop it
+            if (activeTtsButton === ttsBtn && ttsAudio) {
+                stopTTS();
+                return;
+            }
+            
             let textToSpeak;
             
             // For translation messages, skip the language header
@@ -985,52 +992,50 @@ function setupMessageActions(messageDiv, contentDiv) {
         likeBtn.addEventListener('click', async () => {
             const questionId = likeBtn.dataset.questionId || (commentBtn && commentBtn.dataset.questionId);
             if (!questionId) {
-                alert(t('messages.error'));
+                console.log('Like button clicked but no question_id available');
                 return;
             }
-            likeBtn.disabled = true;
-            dislikeBtn && (dislikeBtn.disabled = true);
-            try {
-                const res = await fetch(`${BACKEND_URL}/api/like_answer`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ question_id: questionId, like: true })
-                });
-                const result = await res.json();
-                if (result.status === 'success') {
-                    likeBtn.style.background = '#49fc49ff';
-                } else {
-                    alert(result.message || t('messages.error'));
-                }
-            } catch (e) {
-                alert(t('messages.network_error'));
-            }
+            // Immediate visual feedback (optimistic UI)
+            likeBtn.style.background = '#49fc49ff';
+            dislikeBtn && (dislikeBtn.style.background = '#f9e6e6');
+            
+            // Fire-and-forget API call (non-blocking)
+            fetch(`${BACKEND_URL}/api/like_answer`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ question_id: questionId, like: true })
+            }).then(res => res.json())
+              .then(result => {
+                  if (result.status !== 'success') {
+                      console.log('Like vote failed:', result.message);
+                  }
+              })
+              .catch(e => console.log('Like vote error:', e));
         });
     }
     if (dislikeBtn) {
-        dislikeBtn.addEventListener('click', async () => {
+        dislikeBtn.addEventListener('click', () => {
             const questionId = dislikeBtn.dataset.questionId || (commentBtn && commentBtn.dataset.questionId);
             if (!questionId) {
-                alert(t('messages.error'));
+                console.log('Dislike button clicked but no question_id available');
                 return;
             }
-            dislikeBtn.disabled = true;
-            likeBtn && (likeBtn.disabled = true);
-            try {
-                const res = await fetch(`${BACKEND_URL}/api/like_answer`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ question_id: questionId, like: false })
-                });
-                const result = await res.json();
-                if (result.status === 'success') {
-                    dislikeBtn.style.background = '#f86868ff';
-                } else {
-                    alert(result.message || t('messages.error'));
-                }
-            } catch (e) {
-                alert(t('messages.network_error'));
-            }
+            // Immediate visual feedback (optimistic UI)
+            dislikeBtn.style.background = '#ff8686';
+            likeBtn && (likeBtn.style.background = '#e6f9e6');
+            
+            // Fire-and-forget API call (non-blocking)
+            fetch(`${BACKEND_URL}/api/like_answer`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ question_id: questionId, like: false })
+            }).then(res => res.json())
+              .then(result => {
+                  if (result.status !== 'success') {
+                      console.log('Dislike vote failed:', result.message);
+                  }
+              })
+              .catch(e => console.log('Dislike vote error:', e));
         });
     }
 
@@ -1281,10 +1286,6 @@ function escapeHtml(text) {
 // ===================================
 // VOICE RECOGNITION
 // ===================================
-
-/**
- * Initialize speech recognition
- */
 function initSpeechRecognition() {
     // Check for browser support
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -1330,8 +1331,13 @@ function initSpeechRecognition() {
     };
     
     recognition.onerror = function(event) {
-        console.error('Speech recognition error:', event.error);
-        stopRecording();
+        if (event.error === "no-speech") {
+            console.log("Restarting...");
+            setTimeout(() => recognition.start(), 1000);
+        } else {
+            console.error('Speech recognition error:', event.error);
+            stopRecording();
+        }
     };
     
     recognition.onend = function() {
@@ -1348,8 +1354,22 @@ function initSpeechRecognition() {
 
 /**
  * Toggle voice recording
+ * Routes to either Web Speech API or Whisper based on useWhisper flag
  */
 function toggleRecording() {
+    // Use Whisper if enabled
+    if (useWhisper) {
+        if (isRecording) {
+            stopWhisperRecording();
+        } else {
+            isRecording = true;
+            voiceButton.classList.add('recording');
+            initWhisperRecording();
+        }
+        return;
+    }
+    
+    // Fallback to Web Speech API
     if (!recognition) {
         alert(currentLanguage === 'en' 
             ? 'Speech recognition is not supported in your browser.' 
@@ -1358,7 +1378,6 @@ function toggleRecording() {
     }
     
     if (isRecording) {
-        sendMessage(); // Send message when stopping recording
         stopRecording();
     } else {
         startRecording();
@@ -1445,6 +1464,342 @@ function stopRecording() {
 
 // Voice button click handler
 voiceButton.addEventListener('click', toggleRecording);
+
+// ===================================
+// WHISPER SPEECH RECOGNITION (Alternative to Web Speech API)
+// ===================================
+
+// Whisper recording state
+let useWhisper = true; // Toggle between Web Speech API (false) and Whisper (true)
+let mediaRecorder = null;
+let audioChunks = [];
+let whisperStream = null;
+let recordingAnimationInterval = null;
+let silenceTimer = null;
+let audioContext = null;
+let analyser = null;
+let maxDurationTimer = null;
+let warningTimer = null;
+
+/**
+ * Initialize Whisper-based speech recognition
+ * Uses MediaRecorder to capture audio and sends to backend for transcription
+ */
+async function initWhisperRecording() {
+    try {
+        // Clear input box when starting recording
+        inputBox.value = '';
+        inputBox.style.height = 'auto';
+        
+        // Disable input controls during recording
+        inputBox.disabled = true;
+        sendButton.disabled = true;
+        
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        whisperStream = stream;
+        
+        // Use webm format for better compatibility
+        const options = { mimeType: 'audio/webm' };
+        if (!MediaRecorder.isTypeSupported(options.mimeType)) {
+            options.mimeType = 'audio/ogg; codecs=opus';
+        }
+        if (!MediaRecorder.isTypeSupported(options.mimeType)) {
+            options.mimeType = ''; // Use default
+        }
+        
+        mediaRecorder = new MediaRecorder(stream, options);
+        
+        mediaRecorder.ondataavailable = (event) => {
+            if (event.data.size > 0) {
+                audioChunks.push(event.data);
+            }
+        };
+        
+        mediaRecorder.onstop = async () => {
+            if (audioChunks.length === 0) {
+                console.warn('No audio data recorded');
+                // Re-enable input controls
+                inputBox.disabled = false;
+                sendButton.disabled = false;
+                return;
+            }
+            
+            // Create audio blob
+            const audioBlob = new Blob(audioChunks, { type: mediaRecorder.mimeType || 'audio/webm' });
+            audioChunks = [];
+            
+            // Check if audio is too small (likely no speech, just silence)
+            const MIN_AUDIO_SIZE = 10000; // 10KB minimum
+            if (audioBlob.size < MIN_AUDIO_SIZE) {
+                console.log('Audio too small, likely no speech detected');
+                // Re-enable input controls
+                inputBox.disabled = false;
+                sendButton.disabled = false;
+                // Restore placeholder
+                if (currentAgent === 'translator') {
+                    inputBox.placeholder = t('translator.placeholder') || 'Entrez le texte à traduire...';
+                } else {
+                    inputBox.placeholder = t('input.placeholder') || 'Pose-moi une question...';
+                }
+                return;
+            }
+            
+            // Stop animation and show processing indicator
+            if (recordingAnimationInterval) {
+                clearInterval(recordingAnimationInterval);
+                recordingAnimationInterval = null;
+            }
+            
+            inputBox.placeholder = currentLanguage === 'en' 
+                ? '⏳ Processing audio...' 
+                : '⏳ Traitement audio...';
+            
+            // Send to backend for transcription
+            await transcribeWithWhisper(audioBlob);
+            
+            // Restore placeholder
+            if (currentAgent === 'translator') {
+                inputBox.placeholder = t('translator.placeholder') || 'Entrez le texte à traduire...';
+            } else {
+                inputBox.placeholder = t('input.placeholder') || 'Pose-moi une question...';
+            }
+        };
+        
+        mediaRecorder.onerror = (event) => {
+            console.error('MediaRecorder error:', event.error);
+            stopWhisperRecording();
+        };
+        
+        // Start recording
+        mediaRecorder.start();
+        
+            
+        // Set maximum recording duration (30 seconds)
+        const MAX_RECORDING_DURATION = 30000; // 30 seconds
+        const WARNING_TIME = 25000; // Show warning at 25 seconds (5s remaining)
+        
+        // Show warning at 25 seconds
+        warningTimer = setTimeout(() => {
+            if (isRecording) {
+                console.log('Recording warning: 5 seconds remaining');
+                // Update placeholder to show warning
+                inputBox.placeholder = currentLanguage === 'en' 
+                    ? '⏱️ Recording (5s remaining...)' 
+                    : '⏱️ Enregistrement (5s restantes...)';
+            }
+        }, WARNING_TIME);
+        
+        // Auto-stop at maximum duration
+        maxDurationTimer = setTimeout(() => {
+            if (isRecording) {
+                console.log('Maximum recording duration reached (30s) - auto-stopping');
+                stopWhisperRecording();
+            }
+        }, MAX_RECORDING_DURATION);
+        
+        // Animate placeholder during recording
+        let dots = 0;
+        const baseText = currentLanguage === 'en' 
+            ? '🎤 Recording' 
+            : '🎤 Enregistrement';
+        
+        recordingAnimationInterval = setInterval(() => {
+            // Stop animation if recording stopped
+            if (!isRecording) {
+                if (recordingAnimationInterval) {
+                    clearInterval(recordingAnimationInterval);
+                    recordingAnimationInterval = null;
+                }
+                return;
+            }
+            dots = (dots + 1) % 4;
+            inputBox.placeholder = baseText + '.'.repeat(dots) ;
+        }, 500);
+        
+        console.log('Whisper recording started with', mediaRecorder.mimeType);
+        
+    } catch (error) {
+        console.error('Failed to initialize Whisper recording:', error);
+        alert(currentLanguage === 'en' 
+            ? 'Could not access microphone. Please check permissions.' 
+            : 'Impossible d\'accéder au microphone. Vérifiez les permissions.');
+        isRecording = false;
+        voiceButton.classList.remove('recording');
+        
+        // Clean up audio context
+        if (audioContext) {
+            audioContext.close();
+            audioContext = null;
+            analyser = null;
+        }
+        
+        
+        // Clear max duration timers
+        if (maxDurationTimer) {
+            clearTimeout(maxDurationTimer);
+            maxDurationTimer = null;
+        }
+        if (warningTimer) {
+            clearTimeout(warningTimer);
+            warningTimer = null;
+        }
+        
+        // Stop animation on error
+        if (recordingAnimationInterval) {
+            clearInterval(recordingAnimationInterval);
+            recordingAnimationInterval = null;
+        }
+        
+        // Re-enable input controls on error
+        inputBox.disabled = false;
+        sendButton.disabled = false;
+    }
+}
+
+/**
+ * Stop Whisper recording
+ */
+function stopWhisperRecording() {
+    // Set recording flag to false immediately to stop animation interval
+    isRecording = false;
+    voiceButton.classList.remove('recording');
+    
+    if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+        mediaRecorder.stop();
+        console.log('Whisper recording stopped');
+    }
+    
+    if (whisperStream) {
+        whisperStream.getTracks().forEach(track => track.stop());
+        whisperStream = null;
+    }
+    
+    // Clean up audio context and analyser
+    if (audioContext) {
+        audioContext.close();
+        audioContext = null;
+        analyser = null;
+    }
+
+    // Clear max duration timers
+    if (maxDurationTimer) {
+        clearTimeout(maxDurationTimer);
+        maxDurationTimer = null;
+    }
+    if (warningTimer) {
+        clearTimeout(warningTimer);
+        warningTimer = null;
+    }
+    
+    // Stop animation
+    if (recordingAnimationInterval) {
+        clearInterval(recordingAnimationInterval);
+        recordingAnimationInterval = null;
+    }
+}
+
+/**
+ * Send audio to backend for Whisper transcription
+ */
+async function transcribeWithWhisper(audioBlob) {
+    try {
+        // Determine source language based on agent and translation direction
+        let sourceLang;
+        if (currentAgent === 'translator') {
+            if (translationReversed) {
+                // Reversed: target becomes source
+                sourceLang = targetLanguageSelect ? targetLanguageSelect.value : 'en';
+            } else {
+                // Normal: interface language is source
+                sourceLang = currentLanguage || 'fr';
+            }
+        } else {
+            // Dok2u mode: use interface language
+            sourceLang = currentLanguage || 'en';
+        }
+        
+        const formData = new FormData();
+        formData.append('audio', audioBlob, 'recording.webm');
+        formData.append('language', sourceLang);
+        
+        const response = await fetch(`${BACKEND_URL}/api/transcribe_audio`, {
+            method: 'POST',
+            body: formData
+        });
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const result = await response.json();
+        
+        if (result.text) {
+            // Filter out common Whisper hallucinations (occurs with silence/no speech)
+            const hallucinations = [
+                'thank you for watching',
+                'thanks for watching',
+                'thank you',
+                'bye',
+                'bye bye',
+                'goodbye'
+            ];
+            
+            const lowerText = result.text.toLowerCase().trim();
+            const isHallucination = hallucinations.some(phrase => 
+                lowerText === phrase || lowerText === phrase + '.'
+            );
+            
+            if (isHallucination) {
+                console.log('Whisper hallucination detected, ignoring:', result.text);
+                // Re-enable input controls without sending
+                inputBox.disabled = false;
+                sendButton.disabled = false;
+                return;
+            }
+            
+            // Append transcribed text to input box
+            const currentText = inputBox.value.trim();
+            inputBox.value = currentText ? currentText + ' ' + result.text : result.text;
+            
+            // Resize input box to fit content
+            inputBox.style.height = 'auto';
+            inputBox.style.height = Math.min(inputBox.scrollHeight, 200) + 'px';
+            
+            console.log('Whisper transcription:', result.text);
+            
+            // Re-enable input controls before sending
+            inputBox.disabled = false;
+            sendButton.disabled = false;
+            
+            // Automatically send the transcribed message
+            sendMessage();
+        } else if (result.error) {
+            console.error('Whisper transcription error:', result.error);
+            // Re-enable input controls on error
+            inputBox.disabled = false;
+            sendButton.disabled = false;
+        }
+        
+    } catch (error) {
+        console.error('Failed to transcribe with Whisper:', error);
+        alert(currentLanguage === 'en' 
+            ? 'Failed to transcribe audio. Please try again.' 
+            : 'Échec de la transcription. Veuillez réessayer.');
+        // Re-enable input controls on error
+        inputBox.disabled = false;
+        sendButton.disabled = false;
+    }
+}
+
+/**
+ * Toggle between Web Speech API and Whisper
+ * Call this function to switch recognition methods
+ */
+function toggleRecognitionMethod() {
+    useWhisper = !useWhisper;
+    console.log('Recognition method switched to:', useWhisper ? 'Whisper' : 'Web Speech API');
+    // You can add UI feedback here to show which method is active
+}
 
 // ===================================
 // AGENT SWITCHING
@@ -1626,7 +1981,7 @@ async function sendTranslation() {
     
     // Change icon to globe for translator
     const iconDiv = messageDiv.querySelector('.message-icon');
-    if (iconDiv) iconDiv.textContent = '🌐';
+    if (iconDiv) iconDiv.textContent = 'D2U';
     
     chatContainer.appendChild(messageDiv);
 
@@ -1665,14 +2020,16 @@ async function sendTranslation() {
     const sourceLangName = languages[actualSourceLang] || actualSourceLang.toUpperCase();
     const targetLangName = languages[actualTargetLang] || actualTargetLang.toUpperCase();
     
+    let questionId = null;
+    
     try {
         const response = await fetch(`${BACKEND_URL}/api/translate`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 text: text,
-                target_language: actualTargetLang,
-                source_language: 'auto'
+                target_language: targetLangName,
+                source_language: sourceLangName
             })
         });
         
@@ -1697,6 +2054,14 @@ async function sendTranslation() {
                 `;
                 // Show action buttons
                 actionsDiv.style.display = '';
+                
+                // Set questionId on like/dislike buttons if available
+                if (questionId) {
+                    const likeBtn = actionsDiv.querySelector('.like-btn');
+                    const dislikeBtn = actionsDiv.querySelector('.dislike-btn');
+                    if (likeBtn) likeBtn.dataset.questionId = questionId;
+                    if (dislikeBtn) dislikeBtn.dataset.questionId = questionId;
+                }
                 break;
             }
             
@@ -1710,6 +2075,13 @@ async function sendTranslation() {
                 if (dataMatch) {
                     try {
                         const data = JSON.parse(dataMatch[1]);
+                        
+                        // Capture question_id from first chunk
+                        if (data.question_id && !questionId) {
+                            questionId = data.question_id;
+                            console.log('Translation question_id received:', questionId);
+                        }
+                        
                         if (data.chunk) {
                             const loadingDiv = contentDiv.querySelector('.loading');
                             if (loadingDiv) contentDiv.textContent = '';
@@ -1769,6 +2141,13 @@ function stopTTS() {
         ttsAudio.currentTime = 0;
         ttsAudio = null;
     }
+    
+    // Restore button icon
+    if (activeTtsButton) {
+        activeTtsButton.innerHTML = '<i class="bi bi-volume-up" style="font-size:1.3em;"></i>';
+        activeTtsButton.disabled = false;
+        activeTtsButton = null;
+    }
 }
 
 /**
@@ -1785,10 +2164,9 @@ async function speakText(text, button = null) {
     // Stop any previous playback
     stopTTS();
     
-    // Save original button content and show spinner
-    let originalContent = '';
+    // Save button reference and show spinner
     if (button) {
-        originalContent = button.innerHTML;
+        activeTtsButton = button;
         button.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" style="color: #1976d2; border-right-color: transparent;"></span>';
         button.disabled = true;
     }
@@ -1836,32 +2214,45 @@ async function speakText(text, button = null) {
         const audioUrl = URL.createObjectURL(audioBlob);
         ttsAudio = new Audio(audioUrl);
         
-        // Restore button after audio is loaded
+        // Change button to stop icon after audio is loaded
         if (button) {
-            button.innerHTML = originalContent;
+            button.innerHTML = '<i class="bi bi-stop-fill" style="font-size:1.3em;"></i>';
             button.disabled = false;
         }
         
         ttsAudio.addEventListener('ended', () => {
             URL.revokeObjectURL(audioUrl);
             ttsAudio = null;
+            // Restore button icon when playback ends
+            if (activeTtsButton) {
+                activeTtsButton.innerHTML = '<i class="bi bi-volume-up" style="font-size:1.3em;"></i>';
+                activeTtsButton = null;
+            }
         });
         
         ttsAudio.addEventListener('error', () => {
             console.error('TTS audio playback error');
             URL.revokeObjectURL(audioUrl);
             ttsAudio = null;
+            // Restore button icon on error
+            if (activeTtsButton) {
+                activeTtsButton.innerHTML = '<i class="bi bi-volume-up" style="font-size:1.3em;"></i>';
+                activeTtsButton = null;
+            }
         });
         
         await ttsAudio.play();
     } catch (error) {
         console.error('TTS error:', error);
         // Restore button on error
-        if (button) {
-            button.innerHTML = originalContent;
-            button.disabled = false;
+        if (activeTtsButton) {
+            activeTtsButton.innerHTML = '<i class="bi bi-volume-up" style="font-size:1.3em;"></i>';
+            activeTtsButton.disabled = false;
+            activeTtsButton = null;
         }
-        stopTTS();
+        if (ttsAudio) {
+            ttsAudio = null;
+        }
     }
 }
 
@@ -1890,6 +2281,30 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initialize speech recognition
     initSpeechRecognition();
+    
+    // Initialize speech method indicator and toggle
+    const speechMethodIndicator = document.getElementById('speech-method-indicator');
+    if (speechMethodIndicator) {
+        // Update indicator text based on current method
+        function updateIndicator() {
+            if (useWhisper) {
+                speechMethodIndicator.textContent = '🎤 Whisper';
+                speechMethodIndicator.style.background = '#4CAF50';
+            } else {
+                speechMethodIndicator.textContent = '🎤 Web Speech';
+                speechMethodIndicator.style.background = '#2196F3';
+            }
+        }
+        
+        // Click to toggle between methods
+        speechMethodIndicator.addEventListener('click', () => {
+            toggleRecognitionMethod();
+            updateIndicator();
+        });
+        
+        // Initialize display
+        updateIndicator();
+    }
     
     // Initialize mobile keyboard detection
     if (isMobileDevice()) {
