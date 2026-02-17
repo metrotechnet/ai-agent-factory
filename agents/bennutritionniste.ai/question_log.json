@@ -146,5 +146,12 @@
       "like": false,
       "timestamp": "2026-02-17T11:21:20.190809"
     }
+  },
+  {
+    "question_id": "6f7f1106-a040-480e-a432-59d54bb9aeae",
+    "question": "Quels sont les principes de base d'une alimentation équilibrée ?",
+    "response": "Les principes de base d'une alimentation équilibrée incluent :\n\n1. **Variété des aliments** : Consommer une large gamme d'aliments pour s'assurer d'obtenir tous les nutriments nécessaires.\n\n2. **Proportions adéquates** : Avoir un bon équilibre entre les différents groupes alimentaires : glucides complexes, protéines (végétales et animales), et bonnes graisses.\n\n3. **Écoute des signaux de faim et de satiété** : Honorer sa faim et ses envies, sans recourir à des régimes restrictifs.\n\n4. **Aliments de base accessibles** : Choisir des aliments abordables et nutritifs, comme les légumes, les fruits, les céréales complètes, les protéines maigres et les bonnes graisses.\n\n5. **Hydratation** : S'assurer de boire suffisamment d'eau tout au long de la journée.\n\n6. **Préparation et planification** : Structurer son environnement pour faciliter la consommation d'assiettes équilibrées, par exemple en utilisant le batch cooking ou en préparant des collations saines à l'avance.\n\nIl n’existe pas de solution universelle, et les effets dépendent du contexte et des quantités. La nutrition s'inscrit dans une approche globale, interconnectée avec le sommeil et l'activité physique.",
+    "timestamp": "2026-02-17T16:37:17.140579",
+    "comments": []
   }
 ]

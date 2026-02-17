@@ -860,7 +860,7 @@ function createAssistantMessage() {
 
     
     messageDiv.innerHTML = `
-        <div class="message-icon">Ben</div>
+        <div class="message-icon">Nutr</div>
         <div class="message-content">
             <div class="message-text">
                 <div class="loading">
