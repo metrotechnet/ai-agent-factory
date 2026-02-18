@@ -22,12 +22,15 @@ load_dotenv(dotenv_path=PROJECT_ROOT / '.env')
 # Extract config values from environment variables
 GDRIVE_FOLDER_ID = os.getenv("GDRIVE_FOLDER_ID", "")
 GDRIVE_CREDENTIALS_PATH = os.getenv("GDRIVE_CREDENTIALS_PATH", "")
+KNOWLEDGE_BASE = os.getenv("KNOWLEDGE_BASE", "nutria")
 
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
-DOCUMENTS_DIR = str(PROJECT_ROOT / "chroma_db" / "documents")
-EXTRACTED_DIR = str(PROJECT_ROOT / "extracted_texts")
-CHROMA_DB_DIR = str(PROJECT_ROOT / "chroma_db")
+# Knowledge base paths
+KB_PATH = PROJECT_ROOT / "knowledge-bases" / KNOWLEDGE_BASE
+DOCUMENTS_DIR = str(KB_PATH / "documents")
+EXTRACTED_DIR = str(KB_PATH / "extracted_texts")
+CHROMA_DB_DIR = str(KB_PATH / "chroma_db")
 
 # Setup folders
 os.makedirs(DOCUMENTS_DIR, exist_ok=True)

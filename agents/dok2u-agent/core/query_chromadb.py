@@ -21,6 +21,9 @@ collection = None
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 
+# Get knowledge base name from environment or use default
+KNOWLEDGE_BASE = os.getenv("KNOWLEDGE_BASE", "nutria")
+
 
 
 def load_style_guides():
@@ -58,10 +61,25 @@ def load_system_prompts():
         print(f"Error loading system prompts: {e}")
         return {}
 
-def load_prompts():
-    """Load prompts from JSON file"""
+def load_prompts(kb_name=None):
+    """
+    Load prompts from JSON file in the knowledge base folder
+    
+    Args:
+        kb_name: Name of the knowledge base (default: from KNOWLEDGE_BASE env var)
+    """
+    if kb_name is None:
+        kb_name = KNOWLEDGE_BASE
+    
     try:
-        with open(PROJECT_ROOT / 'config' / 'prompts.json', 'r', encoding='utf-8') as f:
+        kb_path = PROJECT_ROOT / "knowledge-bases" / kb_name
+        prompts_path = kb_path / 'prompts.json'
+        
+        # Fallback to config folder if not found in KB (for backward compatibility)
+        if not prompts_path.exists():
+            prompts_path = PROJECT_ROOT / 'config' / 'prompts.json'
+            
+        with open(prompts_path, 'r', encoding='utf-8') as f:
             return json.load(f)
     except Exception as e:
         print(f"Error loading prompts: {e}")
@@ -120,12 +138,28 @@ def build_prompt_from_template(language, context, question, history_text=""):
     
     return prompt
 
-def get_collection():
+def get_collection(kb_name=None):
+    """
+    Get or create ChromaDB collection for the specified knowledge base
+    
+    Args:
+        kb_name: Name of the knowledge base (default: from KNOWLEDGE_BASE env var)
+    """
     global chroma_client, collection
+    
+    if kb_name is None:
+        kb_name = KNOWLEDGE_BASE
+    
     if collection is None:
         try:
             import os
-            chroma_path = str(PROJECT_ROOT / "chroma_db")
+            kb_path = PROJECT_ROOT / "knowledge-bases" / kb_name
+            chroma_path = str(kb_path / "chroma_db")
+            
+            if not os.path.exists(chroma_path):
+                print(f"Warning: ChromaDB path not found: {chroma_path}")
+                print(f"Make sure knowledge base '{kb_name}' is indexed first.")
+                return None
             
             # Create ChromaDB client with optimized settings for Cloud Run
             chroma_client = chromadb.PersistentClient(
@@ -139,10 +173,13 @@ def get_collection():
             # Get collection (will create if doesn't exist)
             try:
                 collection = chroma_client.get_collection(name="transcripts")
-                print(f"Collection 'transcripts' loaded with {collection.count()} documents")
+                print(f"Collection 'transcripts' loaded from '{kb_name}' with {collection.count()} documents")
             except:
-                print("Creating new transcripts collection...")
-                collection = chroma_client.create_collection(name="transcripts")
+                print(f"Creating new transcripts collection for '{kb_name}'...")
+                collection = chroma_client.create_collection(
+                    name="transcripts",
+                    metadata={"kb_name": kb_name}
+                )
                 print("Empty collection created")
                 
         except Exception as e:

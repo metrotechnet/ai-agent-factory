@@ -29,12 +29,27 @@ dok2u-agent/
 │   └── __init__.py           # Core module init
 ├── scripts/
 │   ├── index_chromadb.py     # Index transcripts/documents to ChromaDB
+│   ├── create_knowledge_base.ps1  # Create new knowledge base structure
 │   └── __init__.py           # Scripts module init
 ├── config/
-│   ├── config.json           # UI translations (FR/EN), agent config, prompts
-│   ├── prompts.json          # System prompts for the assistant
-│   ├── refusal_patterns.json # Patterns to detect off-topic questions
-│   └── refusal_responses.json# Canned refusal responses
+│   └── config.json           # Shared UI translations (FR/EN) for all agents
+├── knowledge-bases/          # All knowledge bases and agent configs
+│   ├── common/              # Shared refusal engine configs
+│   │   ├── refusal_patterns.json  # Patterns to detect off-topic questions
+│   │   ├── refusal_responses.json # Canned refusal responses
+│   │   └── README_REFUSAL.md      # Refusal engine documentation
+│   ├── nutria/              # Nutrition knowledge base
+│   │   ├── config.json      # Nutrition agent-specific UI config
+│   │   ├── prompts.json     # Agent-specific system prompts
+│   │   ├── transcripts/     # Transcript .txt files
+│   │   ├── documents/       # Source documents
+│   │   ├── extracted_texts/ # Extracted text files
+│   │   └── chroma_db/       # Vector database
+│   ├── translator/          # Translator agent
+│   │   ├── config.json      # Translator agent-specific UI config
+│   │   └── prompts.json     # Translator system prompts (FR/EN)
+│   └── README.md            # Knowledge base documentation
+├── videos/                   # Downloaded videos (shared)
 ├── templates/
 │   └── index.html            # Main UI template (agent cards, selectors)
 ├── static/
@@ -43,11 +58,6 @@ dok2u-agent/
 │   ├── config.js             # Backend URL configuration (generated)
 │   ├── logo-dok2u.png        # Dok2U logo
 │   └── favicon.ico           # Favicon
-├── transcripts/              # Transcript .txt files
-├── videos/                   # Downloaded videos
-├── documents/                # Documents to index (JSON)
-├── extracted_texts/          # Texts extracted from documents
-├── chroma_db/                # Local ChromaDB storage
 ├── tests/
 │   ├── test_questions.json   # Test questions for validation
 │   └── __init__.py           # Tests module init
@@ -59,7 +69,10 @@ dok2u-agent/
 ├── deploy-backend.bat        # Cloud Run deployment (calls build.bat)
 ├── deploy-frontend.bat       # Firebase Hosting deployment
 ├── setup_scheduler.ps1       # Cloud Scheduler configuration
-├── start_server.ps1          # Local server startup (PowerShell)
+├── start_server.ps1          # Start both backend + frontend (PowerShell)
+├── start_backend.ps1         # Start backend only (PowerShell)
+├── start_frontend.ps1        # Start frontend only (PowerShell)
+├── serve_frontend.py         # Custom frontend server (serves index.html at root)
 ├── startup.sh                # Container startup script
 ├── .env                      # Environment variables (not in git)
 └── README.md                 # This file
@@ -90,16 +103,41 @@ Create a `.env` file with:
 
 ```env
 OPENAI_API_KEY=your-openai-api-key
-GCP_PROJECT_ID=your-gcp-project-id        # For Google Drive pipeline
+KNOWLEDGE_BASE=nutria               # Name of the knowledge base to use
+GCP_PROJECT_ID=your-gcp-project-id  # For Google Drive pipeline
 GCS_BUCKET_NAME=your-bucket-name
 GCS_REGION=us-east4
 CLOUD_RUN_MEMORY=1Gi
 CLOUD_RUN_TIMEOUT=300
 ```
 
-### 4. Add Documents
+### 4. Set Up Knowledge Base
 
-Place your transcript files (`.txt`) in `transcripts/` and/or document files (`.json`) in `documents/`.
+The project uses a modular knowledge base system located in `knowledge-bases/`. By default, the `nutria` knowledge base is included.
+
+**To create a new knowledge base**:
+
+```powershell
+# Using the helper script
+.\scripts\create_knowledge_base.ps1 -Name "my-kb"
+
+# Or manually create the structure
+mkdir knowledge-bases\my-kb
+mkdir knowledge-bases\my-kb\transcripts
+mkdir knowledge-bases\my-kb\documents
+mkdir knowledge-bases\my-kb\extracted_texts
+```
+
+See [knowledge-bases/README.md](knowledge-bases/README.md) for complete documentation.
+
+### 5. Add Documents
+
+### 5. Add Documents
+
+Place your files in the appropriate knowledge base folder:
+- Transcript files (`.txt`) in `knowledge-bases/nutria/transcripts/`
+- Document files (`.json`) in `knowledge-bases/nutria/documents/`
+- Extracted text files (`.txt`) in `knowledge-bases/nutria/extracted_texts/`
 
 ## 🛠️ Usage
 
@@ -112,11 +150,17 @@ Place your transcript files (`.txt`) in `transcripts/` and/or document files (`.
 # Navigate to the agent directory
 cd c:\dev\agent-factory\agents\dok2u-agent
 
-# Index transcripts to local ChromaDB
+# Index the default knowledge base (nutria)
 python scripts/index_chromadb.py
+
+# Index a specific knowledge base
+python scripts/index_chromadb.py my-kb extracted_texts
+
+# Index transcripts folder instead
+python scripts/index_chromadb.py nutria transcripts
 ```
 
-This will process transcripts from `transcripts/` and documents from `documents/`, creating a local vector database in `chroma_db/`.
+This will process files from the specified knowledge base folder, creating a vector database in `knowledge-bases/{kb-name}/chroma_db/`.
 
 ### Google Drive Pipeline
 
@@ -135,15 +179,45 @@ See [GDRIVE_SETUP.md](GDRIVE_SETUP.md) for Google Drive service account configur
 
 ### Run the Application
 
-```powershell
-# Use PowerShell script (automatically activates venv)
-.\start_server.ps1
+#### Option 1: Start Both Servers (Recommended)
 
-# Or manually with venv activated
+```powershell
+# Use PowerShell script to start both backend and frontend
+.\start_server.ps1
+```
+
+This will start:
+- **Backend API** at `http://localhost:8080`
+- **Frontend UI** at `http://localhost:3000`
+
+Access the application at **http://localhost:3000**
+
+#### Option 2: Start Servers Separately
+
+For development, you may want to start servers independently:
+
+```powershell
+# Terminal 1: Start backend only
+.\start_backend.ps1
+
+# Terminal 2: Start frontend only
+.\start_frontend.ps1
+```
+
+This is useful when you need to:
+- Restart one server without affecting the other
+- Debug backend or frontend independently
+- Run only the backend for API testing
+
+#### Option 3: Start Backend Only
+
+```powershell
+# Manually with venv activated
 python app.py
 ```
 
-Access the application at **http://localhost:8080**
+Access the API at **http://localhost:8080** (no UI, API only)
+
 
 ## 🤖 Agents
 
@@ -164,6 +238,124 @@ Real-time translation agent supporting 27 languages. Accepts both text and audio
 - `POST /api/translate_audio` — Transcribe & translate audio file (Whisper + GPT-4o-mini)
 
 **Supported Languages:** French, English, Spanish, German, Italian, Portuguese, Chinese, Japanese, Korean, Arabic, Russian, Hindi, Dutch, Polish, Swedish, Turkish, Vietnamese, Thai, Indonesian, Czech, Romanian, Hungarian, Greek, Hebrew, Danish, Finnish, Norwegian.
+
+## 📚 Knowledge Base System
+
+The application uses a modular knowledge base system that allows you to:
+- Maintain multiple separate knowledge bases
+- Switch between knowledge bases by changing `.env`
+- Create domain-specific agents with different document sets
+
+### Structure
+
+Each knowledge base is a self-contained folder in `knowledge-bases/`:
+
+```
+knowledge-bases/
+├── nutria/                     # Default: Nutrition knowledge base
+│   ├── transcripts/           # Audio transcriptions
+│   ├── documents/             # Source documents
+│   ├── extracted_texts/       # Processed texts
+│   └── chroma_db/             # Vector database
+└── other-domain/              # Example: Another knowledge base
+    ├── transcripts/
+    ├── documents/
+    ├── extracted_texts/
+    └── chroma_db/
+```
+
+### Creating a New Knowledge Base
+
+**Using the helper script**:
+```powershell
+.\scripts\create_knowledge_base.ps1 -Name "medical-kb"
+```
+
+**Manual creation**:
+```bash
+mkdir knowledge-bases/medical-kb
+mkdir knowledge-bases/medical-kb/{transcripts,documents,extracted_texts}
+```
+
+### Indexing a Knowledge Base
+
+```bash
+# Index specific knowledge base
+python scripts/index_chromadb.py medical-kb extracted_texts
+```
+
+### Switching Knowledge Bases
+
+Update `.env`:
+```env
+KNOWLEDGE_BASE=medical-kb
+```
+
+Then restart the application. The agent will automatically use the specified knowledge base.
+
+### Management
+
+See [knowledge-bases/README.md](knowledge-bases/README.md) for complete documentation including:
+- Creating and managing knowledge bases
+- Reindexing and clearing databases
+- Backup and restore procedures
+- Troubleshooting tips
+
+## ⚙️ Configuration System
+
+The application uses a **layered configuration system** that separates shared UI elements from agent-specific customizations. This allows each agent to have its own branding, suggestions, and interface elements while maintaining consistent legal disclaimers and privacy policies.
+
+### Configuration Files
+
+1. **Shared Config** (`config/config.json`)
+   - Application branding (title, description)
+   - Header and sidebar navigation
+   - Cookie consent banner
+   - Legal disclaimers and warnings
+   - Privacy policy
+   - About page
+   - Language translations (27 languages)
+   - Common message strings
+
+2. **Agent-Specific Configs**
+   - **Nutrition Agent**: `knowledge-bases/nutria/config.json`
+     - Custom app title: "Nutria | Agent Nutritionniste"
+     - Nutrition-focused suggestions (🥗 nutrition, 💊 supplements, 🏋️ training, 💡 health)
+     - Domain-specific disclaimers
+   - **Translator Agent**: `knowledge-bases/translator/config.json`
+     - Custom app title: "Traducteur IA | Agent Multilingue"
+     - Translation-specific UI (sourceLabel, targetLabel)
+     - Translation suggestions (📝 text, 🎤 audio)
+
+### How It Works
+
+When the frontend requests configuration via `/api/get_config?agent=nutria`, the backend:
+1. Loads the shared configuration
+2. Loads the agent-specific configuration
+3. Merges them (agent config overrides shared config)
+4. Returns the merged configuration
+
+```javascript
+// Example: Frontend config loading
+const config = await fetch('/api/get_config?agent=nutria').then(r => r.json());
+// config now contains merged shared + agent-specific values
+```
+
+### Adding New Agents
+
+To create a new agent with custom UI:
+
+1. Create agent-specific config:
+   ```bash
+   cp knowledge-bases/nutria/config.json knowledge-bases/my-agent/config.json
+   ```
+
+2. Customize the config:
+   - Update `app.title` with agent branding
+   - Modify `suggestions` with relevant actions
+   - Customize `input.placeholder` and disclaimers
+
+3. Update backend to recognize the new agent in `app.py`
 
 ## 🎯 Key Features
 
@@ -188,7 +380,9 @@ All UI text is stored in `config/config.json` under `fr` and `en` sections. The 
 
 ### Refusal Engine
 
-Configurable pattern matching to detect and refuse off-topic questions gracefully. Patterns and responses are defined in `config/refusal_patterns.json` and `config/refusal_responses.json`.
+Configurable pattern matching to detect and refuse off-topic questions gracefully. Patterns and responses are defined in `knowledge-bases/common/refusal_patterns.json` and `knowledge-bases/common/refusal_responses.json`.
+
+See [knowledge-bases/common/README_REFUSAL.md](knowledge-bases/common/README_REFUSAL.md) for detailed documentation on the refusal engine.
 
 ## 🔧 Technical Stack
 
@@ -238,7 +432,8 @@ This will:
 **CORS Configuration**: The backend is configured to allow requests from:
 - `https://dok2u-agent.web.app`
 - `https://dok2u-agent.firebaseapp.com`
-- `http://localhost:8080` (local development)
+- `http://localhost:3000` (local frontend development)
+- `http://localhost:8080` (local backend-only development)
 
 See [FIREBASE_DEPLOYMENT.md](FIREBASE_DEPLOYMENT.md) for detailed Firebase setup.
 

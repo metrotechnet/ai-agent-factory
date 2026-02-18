@@ -4,6 +4,7 @@
 # =====================================================
 
 import os
+import json
 import tempfile
 from pathlib import Path
 from openai import OpenAI
@@ -46,7 +47,31 @@ SUPPORTED_LANGUAGES = {
 }
 
 
-def translate_text_stream(text: str, target_language: str, source_language: str = "auto"):
+def load_translator_prompts(language: str = "en") -> dict:
+    """
+    Load translator prompts from prompts.json file.
+    
+    Args:
+        language: Language code ('en' or 'fr')
+    
+    Returns:
+        dict: Prompts for the specified language
+    """
+    prompts_path = PROJECT_ROOT / "knowledge-bases" / "translator" / "prompts.json"
+    try:
+        with open(prompts_path, 'r', encoding='utf-8') as f:
+            prompts = json.load(f)
+        return prompts.get(language, prompts.get("en", {}))
+    except FileNotFoundError:
+        # Fallback to English defaults if file not found
+        return {
+            "system_prompt": "You are a professional translator. {source_instruction} Translate the following text to {target_lang_name}. Provide ONLY the translation, no explanations, no notes, no original text. Maintain the original formatting, tone, and style. If the text is already in {target_lang_name}, return it as-is.",
+            "auto_detect_instruction": "Auto-detect the source language.",
+            "source_language_instruction": "The source language is {source_lang_name}."
+        }
+
+
+def translate_text_stream(text: str, target_language: str, source_language: str = "auto", prompt_language: str = "en"):
     """
     Translate text to target language using GPT-4o-mini with streaming.
     Uses Whisper-style translation approach through the OpenAI API.
@@ -55,6 +80,7 @@ def translate_text_stream(text: str, target_language: str, source_language: str 
         text: The text to translate
         target_language: Target language code (e.g., 'fr', 'en', 'es')
         source_language: Source language code or 'auto' for auto-detection
+        prompt_language: Language for the system prompt ('en' or 'fr')
 
     Yields:
         str: Translated text chunks
@@ -62,17 +88,18 @@ def translate_text_stream(text: str, target_language: str, source_language: str 
     target_lang_name = SUPPORTED_LANGUAGES.get(target_language, target_language)
     source_lang_name = SUPPORTED_LANGUAGES.get(source_language, "auto-detect")
 
+    # Load prompts from JSON file
+    prompts = load_translator_prompts(prompt_language)
+    
     if source_language == "auto":
-        source_instruction = "Auto-detect the source language."
+        source_instruction = prompts.get("auto_detect_instruction", "Auto-detect the source language.")
     else:
-        source_instruction = f"The source language is {source_lang_name}."
+        source_instruction = prompts.get("source_language_instruction", "The source language is {source_lang_name}.").format(source_lang_name=source_lang_name)
 
-    system_prompt = (
-        f"You are a professional translator. {source_instruction} "
-        f"Translate the following text to {target_lang_name}. "
-        f"Provide ONLY the translation, no explanations, no notes, no original text. "
-        f"Maintain the original formatting, tone, and style. "
-        f"If the text is already in {target_lang_name}, return it as-is."
+    # Format system prompt with variables
+    system_prompt = prompts.get("system_prompt", "").format(
+        source_instruction=source_instruction,
+        target_lang_name=target_lang_name
     )
 
     stream = client.chat.completions.create(

@@ -1,4 +1,5 @@
 import os
+import sys
 from dotenv import load_dotenv
 import chromadb
 from chromadb.config import Settings
@@ -12,24 +13,38 @@ PROJECT_ROOT = Path(__file__).parent.parent
 env_path = PROJECT_ROOT / '.env'
 load_dotenv(dotenv_path=env_path, override=True)
 
-
-# Initialize ChromaDB (stored locally) with explicit settings
-chroma_path = str(PROJECT_ROOT / "chroma_db")
-chroma_client = chromadb.PersistentClient(
-    path=chroma_path,
-    settings=Settings(
-        anonymized_telemetry=False,
-        allow_reset=False
-    )
-)
+# Initialize OpenAI client
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-# Get or create collection
-collection_name = "transcripts"
-collection = chroma_client.get_or_create_collection(
-    name=collection_name,
-    metadata={"description": "AI Ben Nutritionniste transcripts"}
-)
+
+def get_knowledge_base_path(kb_name="nutria"):
+    """Get the path to a specific knowledge base"""
+    return PROJECT_ROOT / "knowledge-bases" / kb_name
+
+
+def init_chromadb(kb_name="nutria"):
+    """Initialize ChromaDB client for a specific knowledge base"""
+    kb_path = get_knowledge_base_path(kb_name)
+    chroma_path = str(kb_path / "chroma_db")
+    
+    # Create directories if they don't exist
+    os.makedirs(chroma_path, exist_ok=True)
+    
+    chroma_client = chromadb.PersistentClient(
+        path=chroma_path,
+        settings=Settings(
+            anonymized_telemetry=False,
+            allow_reset=False
+        )
+    )
+    
+    collection_name = "transcripts"
+    collection = chroma_client.get_or_create_collection(
+        name=collection_name,
+        metadata={"description": f"Knowledge base: {kb_name}", "kb_name": kb_name}
+    )
+    
+    return chroma_client, collection
 
 def get_embeddings(texts):
     """Get embeddings from OpenAI"""
@@ -50,11 +65,24 @@ def chunk_text(text, chunk_size=500, overlap=50):
         start = end - overlap
     return chunks
 
-def index_text_files(folder_path=str(PROJECT_ROOT / "extracted_texts")):
-    """Index all .txt files from the extracted folder"""
+def index_text_files(kb_name="nutria", folder_type="extracted_texts"):
+    """
+    Index all .txt files from the specified folder in a knowledge base
+    
+    Args:
+        kb_name: Name of the knowledge base (default: "nutria")
+        folder_type: Type of folder to index ("extracted_texts", "transcripts", "documents")
+    """
+    kb_path = get_knowledge_base_path(kb_name)
+    folder_path = str(kb_path / folder_type)
+    
     if not os.path.exists(folder_path):
         print(f"❌ Folder '{folder_path}' not found")
+        print(f"   Make sure the knowledge base '{kb_name}' exists in knowledge-bases/")
         return
+    
+    # Initialize ChromaDB for this knowledge base
+    chroma_client, collection = init_chromadb(kb_name)
     
     txt_files = [f for f in os.listdir(folder_path) if f.endswith('.txt')]
     
@@ -121,6 +149,11 @@ def index_text_files(folder_path=str(PROJECT_ROOT / "extracted_texts")):
         print("❌ No data to index")
 
 if __name__ == "__main__":
-    print("Starting ChromaDB indexing...\n")
-    index_text_files()
-    print("\n✅ Indexing complete! Your documents are ready to be queried.")
+    # Get knowledge base name from command line or use default
+    kb_name = sys.argv[1] if len(sys.argv) > 1 else "nutria"
+    folder_type = sys.argv[2] if len(sys.argv) > 2 else "extracted_texts"
+    
+    print(f"Starting ChromaDB indexing for knowledge base: {kb_name}\n")
+    print(f"Indexing from folder: {folder_type}\n")
+    index_text_files(kb_name=kb_name, folder_type=folder_type)
+    print(f"\n✅ Indexing complete! Knowledge base '{kb_name}' is ready to be queried.")

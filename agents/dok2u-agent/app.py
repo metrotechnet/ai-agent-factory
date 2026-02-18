@@ -2,6 +2,7 @@
 # =====================================================
 # Imports - Importations des modules nécessaires
 # =====================================================
+from logging import config
 from fastapi import FastAPI, Body, Query, Request, UploadFile, File, Form
 from fastapi.responses import FileResponse, HTMLResponse, StreamingResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
@@ -36,9 +37,11 @@ app.add_middleware(
     allow_origins=[
         "https://dok2u-agent.web.app",
         "https://dok2u-agent.firebaseapp.com",
-        "http://localhost:8080",
+        "http://localhost:3000",  # Local frontend dev server
+        "http://localhost:8080",  # Local backend dev server
         "http://localhost:5000",
-        "http://127.0.0.1:8080",
+        "http://127.0.0.1:3000",  # Local frontend dev server
+        "http://127.0.0.1:8080",  # Local backend dev server
         "http://127.0.0.1:5000"
     ],
     allow_credentials=True,
@@ -409,16 +412,68 @@ def health():
     """
     return {"status": "ok"}
 
-@app.get("/api/get_config")
-def get_translations():
+def deep_merge(base_config: dict, override_config: dict) -> dict:
     """
-    Récupère les traductions pour le frontend.
+    Deep merge two configuration dictionaries.
+    Override values take precedence over base values.
+    
+    Args:
+        base_config: Base configuration dictionary
+        override_config: Override configuration dictionary
+        
+    Returns:
+        Merged configuration dictionary
+    """
+    result = base_config.copy()
+    
+    for key, value in override_config.items():
+        if key in result and isinstance(result[key], dict) and isinstance(value, dict):
+            # Recursively merge nested dictionaries
+            result[key] = deep_merge(result[key], value)
+        else:
+            # Override value
+            result[key] = value
+    
+    return result
+
+@app.get("/api/get_config")
+def get_translations(agent: Optional[str] = None):
+    """
+    Get configuration with optional agent-specific overrides.
+    
+    Args:
+        agent: Optional agent name ('nutria' or 'translator')
+        
+    Returns:
+        Configuration dictionary (merged if agent specified)
     """
     try:
-        translations_path = Path(__file__).parent / "config" / "config.json"
-        with open(translations_path, 'r', encoding='utf-8') as f:
-            translations = json.load(f)
-        return translations
+
+        # If no agent specified, return shared config
+        if not agent:
+            return {"error": "agent not specified"}
+        
+        # Load agent-specific configuration
+        agent_config_path = None
+                # Load shared configuration
+        if agent == "main":
+            agent_config_path = Path(__file__).parent / "knowledge-bases" / "common" / "config.json"
+        if agent == "nutria":
+            agent_config_path = Path(__file__).parent / "knowledge-bases" / "nutria" / "config.json"
+        elif agent == "translator":
+            agent_config_path = Path(__file__).parent / "knowledge-bases" / "translator" / "config.json"
+        else:
+            # Unknown agent, return shared config
+            return {"error": "agent not found"}
+        
+        # Load and merge agent config
+        if agent_config_path and agent_config_path.exists():
+            with open(agent_config_path, 'r', encoding='utf-8') as f:
+                agent_config = json.load(f)
+
+        
+        return agent_config
+        
     except FileNotFoundError:
         return {"error": "config not found"}
     except Exception as e:

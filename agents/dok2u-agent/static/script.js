@@ -11,6 +11,9 @@ console.log('Using BACKEND_URL:', BACKEND_URL);
 // ===================================
 
 let translations = {};
+let mainConfig = {};
+let translatorConfig = {};
+let nutriaConfig = {};
 let currentLanguage = 'fr';
 
 /**
@@ -22,12 +25,22 @@ function getUrlParameter(name) {
 }
 
 /**
- * Load translations from JSON file
+ * Load all configurations separately (main, translator, nutria)
  */
 async function loadTranslations() {
     try {
-        const response = await fetch(`${BACKEND_URL}/api/get_config`);
-        translations = await response.json();
+        // Load main config
+        const mainResponse = await fetch(`${BACKEND_URL}/api/get_config?agent=main`);
+        mainConfig = await mainResponse.json();
+        
+        // Load translator config
+        const translatorResponse = await fetch(`${BACKEND_URL}/api/get_config?agent=translator`);
+        translatorConfig = await translatorResponse.json();
+        
+        // Load nutria config
+        const nutriaResponse = await fetch(`${BACKEND_URL}/api/get_config?agent=nutria`);
+        nutriaConfig = await nutriaResponse.json();
+        
         
         // Language detection priority: URL parameter > browser language > stored preference
         const urlLang = getUrlParameter('lang');
@@ -59,11 +72,12 @@ async function loadTranslations() {
 
 }
 
+
 /**
  * Apply translations to all elements with data-i18n attributes
  */
 function applyTranslations(lang) {
-    const langData = translations[lang] || translations['fr'];
+    const langData = translatorConfig[lang] || translatorConfig['fr'];
     
     // Update text content
     document.querySelectorAll('[data-i18n]').forEach(element => {
@@ -149,7 +163,7 @@ function populateLanguageDropdown(lang) {
     const select = document.getElementById('target-language');
     if (!select) return;
     
-    const langData = translations[lang] || translations['fr'];
+    const langData = translatorConfig[lang] || translatorConfig['fr'];
     const languages = langData && langData.languages;
     if (!languages) return;
     
@@ -206,7 +220,7 @@ function switchLanguage(lang) {
 function updateSourceLanguageDisplay() {
     if (!sourceLanguageText) return;
     
-    const langData = translations[currentLanguage] || translations['fr'];
+    const langData = translatorConfig[currentLanguage] || translatorConfig['fr'];
     const languages = langData.languages || {};
     
     // Always display interface language (doesn't change with arrow direction)
@@ -219,7 +233,7 @@ function updateSourceLanguageDisplay() {
  * Get translation for a key
  */
 function t(key) {
-    const langData = translations[currentLanguage] || translations['fr'];
+    const langData = translatorConfig[currentLanguage] || translatorConfig['fr'];
     return getNestedValue(langData, key) || key;
 }
 
@@ -228,6 +242,15 @@ function t(key) {
  */
 function getCurrentLanguage() {
     return currentLanguage;
+}
+
+/**
+ * Switch active configuration based on agent
+ * @param {string} agent - Agent name ('translator' or 'dok2u')
+ */
+function switchActiveConfig(agent) {
+    currentAgent = agent;
+    applyTranslations(currentLanguage);
 }
 
 // ===================================
@@ -619,7 +642,7 @@ document.getElementById('about-link').addEventListener('click', (e) => {
  * Create and display legal notice popup with disclaimer text
  */
 function showLegalNotice() {
-    const langData = translations[currentLanguage] || translations['fr'];
+    const langData = translatorConfig[currentLanguage] || translatorConfig['fr'];
     const legalContent = langData.legal;
     let html = `<h2 style='margin-top:0;text-align:center;'>${legalContent.title}</h2>`;
     html += legalContent.content.map(line => {
@@ -643,7 +666,7 @@ function showLegalNotice() {
  * Create and display privacy policy popup
  */
 function showPrivacyPolicy() {
-    const langData = translations[currentLanguage] || translations['fr'];
+    const langData = translatorConfig[currentLanguage] || translatorConfig['fr'];
     const privacy = langData.privacy;
     let html = `<h2 style='margin-top:0;text-align:center;'>${privacy.title}</h2>`;
     if (privacy.lastUpdate) {
@@ -679,7 +702,7 @@ function showPrivacyPolicy() {
 
 function showAbout() {
 
-        const langData = translations[currentLanguage] || translations['fr'];
+        const langData = translatorConfig[currentLanguage] || translatorConfig['fr'];
         const about = langData.about || {};
         let html = `<h2 style='margin-top:0;text-align:center;'>${about.title}</h2>`;
 
@@ -939,7 +962,6 @@ function createAssistantMessage() {
             
         </div>
     `;
-    o
     return messageDiv;
 }
 
@@ -1813,6 +1835,11 @@ function switchAgent(agent, userInitiated) {
     currentAgent = agent;
     const isTranslator = agent === 'translator';
     
+    // Switch to the appropriate config when user switches agents
+    if (userInitiated) {
+        switchActiveConfig(agent);
+    }
+    
     // Reset translation direction to initial state when switching to translator
     if (isTranslator) {
         translationReversed = false;
@@ -1851,10 +1878,7 @@ function switchAgent(agent, userInitiated) {
         chatContainer.querySelectorAll('.message, #chat-bottom-spacer').forEach(el => el.remove());
         
         // Show agent welcome message
-        const welcomeKey = isTranslator ? 'agents.translator_welcome' : 'agents.dok2u_welcome';
-        const welcomeText = t(welcomeKey) || (isTranslator 
-            ? `Write in any language, I will automatically detect it and translate to ${currentLanguage === 'fr' ? 'French' : 'English'}.`
-            : 'Ask me your questions about nutrition and health.');
+        const welcomeText = isTranslator ? translatorConfig[currentLanguage]?.['agents'] ?.['welcome']: nutriaConfig[currentLanguage]?.['agents'] ?.['welcome'];
         const welcomeDiv = document.createElement('div');
         welcomeDiv.className = 'message assistant';
         welcomeDiv.innerHTML = `
@@ -2016,7 +2040,7 @@ async function sendTranslation() {
     console.log(`Translating from ${actualSourceLang} to ${actualTargetLang}`);
     
     // Get language names for display
-    const langData = translations[currentLanguage] || translations['fr'];
+    const langData = translatorConfig[currentLanguage] || translatorConfig['fr'];
     const languages = langData.languages || {};
     const sourceLangName = languages[actualSourceLang] || actualSourceLang.toUpperCase();
     const targetLangName = languages[actualTargetLang] || actualTargetLang.toUpperCase();
