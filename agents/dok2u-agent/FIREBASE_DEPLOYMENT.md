@@ -147,7 +147,12 @@ The frontend needs to know where the backend API is located. This is configured 
 1. **BACKEND_URL** in `.env` file
 2. Automatically injected into `public/static/config.js` during deployment
 
-Update your `script.js` to use the backend URL:
+The deployment script (`deploy-frontend.bat`) automatically:
+- Reads `BACKEND_URL` from `.env`
+- Creates `public/static/config.js` with the backend URL
+- Updates `index.html` to use relative paths for Firebase
+
+Your `script.js` should load the backend URL:
 
 ```javascript
 // Load backend URL from config if available
@@ -158,6 +163,31 @@ fetch(`${BACKEND_URL}/query`, {
   method: 'POST',
   // ...
 });
+```
+
+## CORS Configuration
+
+The backend must allow requests from your Firebase domain. In `app.py`:
+
+```python
+from fastapi.middleware.cors import CORSMiddleware
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "https://dok2u-agent.web.app",
+        "https://dok2u-agent.firebaseapp.com",
+        "http://localhost:8080"
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+```
+
+After updating CORS settings, redeploy the backend:
+```bash
+.\deploy-backend.bat
 ```
 
 ## Troubleshooting
@@ -179,8 +209,10 @@ firebase login --reauth
 
 ### API calls not working
 - Check `BACKEND_URL` in `.env`
-- Verify CORS settings on backend
+- Verify CORS settings on backend (should include Firebase domains)
 - Check browser console for errors
+- Verify backend is deployed and accessible
+- Test backend URL directly: `curl https://your-backend.run.app/api/get_config`
 
 ## Production Checklist
 

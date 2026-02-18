@@ -6,6 +6,7 @@ from fastapi import FastAPI, Body, Query, Request, UploadFile, File, Form
 from fastapi.responses import FileResponse, HTMLResponse, StreamingResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from core.query_chromadb import ask_question_stream, get_collection, get_pmids_from_contexts, is_substantial_question, client
 from core.pipeline_gdrive import run_pipeline
@@ -28,6 +29,22 @@ env_path = PROJECT_ROOT / '.env'
 load_dotenv(dotenv_path=env_path)
 
 app = FastAPI(title="Dok2u Multi Agent")
+
+# Configure CORS to allow Firebase hosting domain
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "https://dok2u-agent.web.app",
+        "https://dok2u-agent.firebaseapp.com",
+        "http://localhost:8080",
+        "http://localhost:5000",
+        "http://127.0.0.1:8080",
+        "http://127.0.0.1:5000"
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Mount static files and templates with absolute paths
 app.mount("/static", StaticFiles(directory=str(PROJECT_ROOT / "static")), name="static")

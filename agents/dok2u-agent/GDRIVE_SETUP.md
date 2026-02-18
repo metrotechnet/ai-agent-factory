@@ -93,15 +93,20 @@ for doc in docs:
 
 ### API Endpoint
 
-Ajoutez dans `app.py`:
+The endpoint is already configured in `app.py`:
 
 ```python
-from core.pipeline_gdrive import run_pipeline as run_gdrive_pipeline
+from core.pipeline_gdrive import run_pipeline
 
-@app.post("/update_gdrive")
-def update_gdrive_pipeline(limit: int = None):
-    result = run_gdrive_pipeline(limit=limit)
-    return result
+@app.post("/update")
+def update_pipeline(limit: int = Query(None)):
+    result = run_pipeline(limit=limit)
+    return JSONResponse(content=result)
+```
+
+Call via API:
+```bash
+curl -X POST "https://your-backend.run.app/update?limit=10"
 ```
 
 ## Structure des données

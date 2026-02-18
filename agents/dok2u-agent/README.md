@@ -25,9 +25,11 @@ dok2u-agent/
 │   ├── query_chromadb.py     # ChromaDB vector search + LLM streaming
 │   ├── translate.py          # Translation module (text + audio via Whisper/GPT)
 │   ├── pipeline_gdrive.py    # Pipeline: Google Drive → transcribe → index
-│   └── refusal_engine.py     # Pattern-based refusal for off-topic questions
+│   ├── refusal_engine.py     # Pattern-based refusal for off-topic questions
+│   └── __init__.py           # Core module init
 ├── scripts/
-│   └── index_chromadb.py     # Index transcripts/documents to ChromaDB
+│   ├── index_chromadb.py     # Index transcripts/documents to ChromaDB
+│   └── __init__.py           # Scripts module init
 ├── config/
 │   ├── config.json           # UI translations (FR/EN), agent config, prompts
 │   ├── prompts.json          # System prompts for the assistant
@@ -38,6 +40,7 @@ dok2u-agent/
 ├── static/
 │   ├── script.js             # Frontend JS (agent switching, translation, SSE)
 │   ├── style.css             # Styles (pill selectors, responsive, dark theme)
+│   ├── config.js             # Backend URL configuration (generated)
 │   ├── logo-dok2u.png        # Dok2U logo
 │   └── favicon.ico           # Favicon
 ├── transcripts/              # Transcript .txt files
@@ -45,13 +48,21 @@ dok2u-agent/
 ├── documents/                # Documents to index (JSON)
 ├── extracted_texts/          # Texts extracted from documents
 ├── chroma_db/                # Local ChromaDB storage
+├── tests/
+│   ├── test_questions.json   # Test questions for validation
+│   └── __init__.py           # Tests module init
 ├── requirements.txt          # Python dependencies
 ├── Dockerfile                # Container config
-├── build.bat                 # Cloud Build script
-├── deploy.bat                # Cloud Run deployment
+├── firebase.json             # Firebase Hosting configuration
+├── .firebaserc               # Firebase project reference
+├── build.bat                 # Cloud Build script (Docker image)
+├── deploy-backend.bat        # Cloud Run deployment (calls build.bat)
+├── deploy-frontend.bat       # Firebase Hosting deployment
+├── setup_scheduler.ps1       # Cloud Scheduler configuration
 ├── start_server.ps1          # Local server startup (PowerShell)
-├── startup.sh                # Container startup
-└── .env                      # Environment variables (not in git)
+├── startup.sh                # Container startup script
+├── .env                      # Environment variables (not in git)
+└── README.md                 # This file
 ```
 
 ## ⚙️ Setup
@@ -190,34 +201,46 @@ Configurable pattern matching to detect and refuse off-topic questions gracefull
 - **Cloud**: Google Cloud Run, Google Drive API
 - **Configuration**: Environment variables (`.env`) + `config/config.json`
 
-## 🚀 Deployment to Google Cloud Run
+## 🚀 Deployment
 
-### Step 1: Build Docker Image
-
-```bash
-.\build.bat
-```
-
-This will use Cloud Build to create and push the Docker image.
-
-### Step 2: Deploy to Cloud Run
+### Backend Deployment (Google Cloud Run)
 
 ```bash
-.\deploy.bat
+.\deploy-backend.bat
 ```
 
 This will:
-- Load configuration from `.env`
-- Deploy with all environment variables
-- Configure memory, timeout, and scaling
-- Output the service URL
+1. Automatically build the Docker image using Cloud Build
+2. Load configuration from `.env`
+3. Deploy to Cloud Run with all environment variables
+4. Configure CORS for Firebase hosting domain
+5. Output the service URL
 
-**Configuration**:
-- Memory: 1Gi (configurable in `.env`)
+**Configuration** (via `.env`):
+- Memory: 1Gi
 - Timeout: 300s (5 minutes)
 - Min instances: 1
 - Max instances: 10
 - CPU: 1
+
+### Frontend Deployment (Firebase Hosting)
+
+```bash
+.\deploy-frontend.bat
+```
+
+This will:
+1. Copy frontend files from `templates/` and `static/` to `public/`
+2. Update file paths for Firebase hosting
+3. Create config.js with backend URL
+4. Deploy to Firebase Hosting
+
+**CORS Configuration**: The backend is configured to allow requests from:
+- `https://dok2u-agent.web.app`
+- `https://dok2u-agent.firebaseapp.com`
+- `http://localhost:8080` (local development)
+
+See [FIREBASE_DEPLOYMENT.md](FIREBASE_DEPLOYMENT.md) for detailed Firebase setup.
 
 ## 🔐 Security
 
@@ -262,6 +285,12 @@ python scripts/index_chromadb.py
 - Verify Cloud Build API is enabled
 - Ensure billing is enabled on GCP project
 - Check IAM permissions for Cloud Build service account
+
+### CORS Errors
+
+- Verify backend allows your frontend domain in CORS middleware
+- Check backend URL in `static/config.js`
+- Ensure backend is deployed and accessible
 
 ## 💰 Cost Estimation
 
