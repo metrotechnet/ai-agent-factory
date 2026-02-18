@@ -32,15 +32,17 @@ async function loadTranslations() {
         // Load main config
         const mainResponse = await fetch(`${BACKEND_URL}/api/get_config?agent=main`);
         mainConfig = await mainResponse.json();
-        
+        console.log('Main config loaded:', mainConfig);
+
         // Load translator config
         const translatorResponse = await fetch(`${BACKEND_URL}/api/get_config?agent=translator`);
         translatorConfig = await translatorResponse.json();
-        
+        console.log('Translator config loaded:', translatorConfig);
+
         // Load nutria config
         const nutriaResponse = await fetch(`${BACKEND_URL}/api/get_config?agent=nutria`);
         nutriaConfig = await nutriaResponse.json();
-        
+        console.log('Nutria config loaded:', nutriaConfig);
         
         // Language detection priority: URL parameter > browser language > stored preference
         const urlLang = getUrlParameter('lang');

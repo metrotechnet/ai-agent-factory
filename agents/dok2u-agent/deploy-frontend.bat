@@ -61,36 +61,17 @@ echo window.BACKEND_URL = '%BACKEND_URL%'; > "public\static\config.js"
 echo.
 echo Files prepared successfully!
 echo.
-echo Choose deployment option:
-echo 1. Deploy to Firebase Hosting
-echo 2. Preview locally (Firebase emulator)
-echo 3. Exit
-echo.
-set /p choice="Enter your choice (1-3): "
-
-if "%choice%"=="1" (
+echo Deploying to Firebase Hosting...
+firebase deploy --only hosting
+if %errorlevel% equ 0 (
     echo.
-    echo Deploying to Firebase Hosting...
-    firebase deploy --only hosting
-    if %errorlevel% equ 0 (
-        echo.
-        echo ====================================
-        echo Deployment successful!
-        echo ====================================
-    ) else (
-        echo.
-        echo ERROR: Deployment failed!
-        pause
-        exit /b 1
-    )
-) else if "%choice%"=="2" (
-    echo.
-    echo Starting Firebase emulator...
-    firebase emulators:start --only hosting
+    echo ====================================
+    echo Deployment successful!
+    echo ====================================
 ) else (
     echo.
-    echo Deployment cancelled.
+    echo ERROR: Deployment failed!
+    exit /b 1
 )
 
 echo.
-pause

@@ -6,7 +6,8 @@ echo.
 
 echo Building Docker image first...
 call build.bat
-if %ERRORLEVEL% NEQ 0 (
+set BUILD_RESULT=%ERRORLEVEL%
+if %BUILD_RESULT% NEQ 0 (
     echo ERROR: Build failed!
     pause
     exit /b 1
