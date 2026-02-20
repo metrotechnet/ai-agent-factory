@@ -1,51 +1,5 @@
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-venv/
-env/
-ENV/
-*.egg-info/
-dist/
-build/
-
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-
-# Environment variables
+# Environment variables and secrets
 .env
+.env.local
+.env.*.local
 *.env
-
-# Google Drive credentials
-./config/gdrive_credentials.json
-
-# Deployment scripts with secrets
-deploy.bat
-deploy-only.bat
-build.bat
-
-
-# Data folders
-videos/
-transcripts/
-transcripts_extracted/
-chroma_db/
-extracted_texts/
-
-# OS
-.DS_Store
-Thumbs.db
-
-.venv/
-
-# Firebase
-public/
-.firebase/
-firebase-debug.log
-firestore-debug.log
-ui-debug.log

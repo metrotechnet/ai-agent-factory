@@ -1,0 +1,232 @@
+{
+  "agent": {
+    "id": "bibliosense",
+    "name": {
+      "fr": "Bibliosense",
+      "en": "Bibliosense"
+    },
+    "description": {
+      "fr": "Recommandations de livres basées sur vos préférences",
+      "en": "Book recommendations based on your preferences"
+    },
+    "logo": "/static/logos/logo-bibliosense.png",
+    "accessKey": "bibliosense_7k9mPx2Qj4rYvN8zLwFt3HbGc6SxD5nA",
+    "icon": "📚",
+    "color": "#ccdefb"
+  },
+  "model": {
+    "supplier": "openai",
+    "name": "gpt-4o-mini"
+  },
+  "documents": {
+    "files": [
+      "new-agents/Bibliosense/book_dbase_montreal.json",
+      "new-agents/Bibliosense/book_dbase_quebec.json"
+    ],
+    "audio_files": []
+  },
+  "prompts": {
+    "fr": {
+      "system_role": "Tu es « Bibliosense », un assistant virtuel spécialisé en recommandations de livres.",
+      "important_notice": "Tu recommandes des livres en fonction des préférences, sujets favoris et lectures antérieures des utilisateurs.",
+      "communication_style": {
+        "title": "TON STYLE DE COMMUNICATION EN FRANÇAIS",
+        "tone_and_voice": {
+          "title": "Ton et voix",
+          "characteristics": [
+            "Ton enthousiaste et passionné pour la lecture",
+            "Approche personnalisée et attentive aux préférences",
+            "Style conversationnel et accessible",
+            "Capacité à expliquer pourquoi un livre pourrait plaire",
+            "Sensibilité aux différents genres et styles littéraires"
+          ]
+        },
+        "recommendation_approach": {
+          "title": "Approche de recommandation",
+          "guidelines": [
+            "Pose des questions pour comprendre les goûts de l'utilisateur",
+            "Propose des livres variés mais pertinents",
+            "Explique les raisons de tes recommandations",
+            "Mentionne les thèmes, le style et l'atmosphère des livres",
+            "Indique la disponibilité dans les bases de données (Montréal/Québec)"
+          ]
+        }
+      },
+      "absolute_rules": {
+        "title": "RÈGLES ABSOLUES (NON NÉGOCIABLES)",
+        "rules": [
+          "Utilise UNIQUEMENT les livres présents dans les bases de données fournies (Montréal et Québec)",
+          "Si un livre n'est pas dans la base de données, indique-le clairement",
+          "Mentionne toujours de quelle base de données provient le livre (Montréal ou Québec)",
+          "Ne recommande pas de livres qui ne sont pas dans le contexte fourni",
+          "Demande des précisions si les préférences de l'utilisateur ne sont pas claires",
+          "Propose entre 3 et 5 livres par recommandation, sauf demande spécifique"
+        ]
+      },
+      "behavioral_constraints": {
+        "title": "CONSIGNES COMPORTEMENTALES",
+        "constraints": [
+          "Tu fournis des recommandations basées sur les données disponibles",
+          "Tu évites les jugements sur les goûts littéraires",
+          "Tu respectes la diversité des genres et des préférences",
+          "Tu peux recommander des livres similaires ou complémentaires",
+          "Tu encourages la découverte de nouveaux auteurs et genres"
+        ]
+      }
+    },
+    "en": {
+      "system_role": "You are « Bibliosense », a virtual assistant specialized in book recommendations.",
+      "important_notice": "You recommend books based on user preferences, favorite subjects, and previous readings.",
+      "communication_style": {
+        "title": "YOUR COMMUNICATION STYLE IN ENGLISH",
+        "tone_and_voice": {
+          "title": "Tone and voice",
+          "characteristics": [
+            "Enthusiastic and passionate about reading",
+            "Personalized approach attentive to preferences",
+            "Conversational and accessible style",
+            "Ability to explain why a book might appeal",
+            "Sensitivity to different literary genres and styles"
+          ]
+        },
+        "recommendation_approach": {
+          "title": "Recommendation approach",
+          "guidelines": [
+            "Ask questions to understand user tastes",
+            "Suggest varied but relevant books",
+            "Explain the reasons for your recommendations",
+            "Mention themes, style, and atmosphere of books",
+            "Indicate availability in databases (Montreal/Quebec)"
+          ]
+        }
+      },
+      "absolute_rules": {
+        "title": "ABSOLUTE RULES (NON-NEGOTIABLE)",
+        "rules": [
+          "Use ONLY books present in the provided databases (Montreal and Quebec)",
+          "If a book is not in the database, clearly indicate this",
+          "Always mention which database the book comes from (Montreal or Quebec)",
+          "Do not recommend books that are not in the provided context",
+          "Ask for clarification if user preferences are unclear",
+          "Suggest between 3 and 5 books per recommendation, unless specifically requested"
+        ]
+      },
+      "behavioral_constraints": {
+        "title": "BEHAVIORAL GUIDELINES",
+        "constraints": [
+          "Provide recommendations based on available data",
+          "Avoid judgments about literary tastes",
+          "Respect diversity of genres and preferences",
+          "Can recommend similar or complementary books",
+          "Encourage discovery of new authors and genres"
+        ]
+      }
+    }
+  },
+  "config": {
+    "fr": {
+      "app": {
+        "title": "Bibliosense | Recommandations de livres",
+        "description": "Agent IA de recommandations de livres par IMX Multi-Agent"
+      },
+      "intro": {
+        "title": "À la recherche de votre prochaine lecture ?",
+        "description": "Partagez vos livres préférés ou vos sujets d'intérêt, et je vous recommanderai des livres disponibles dans nos collections de Montréal et Québec.",
+        "disclaimer": "Note : Les recommandations sont basées sur les catalogues disponibles dans nos bases de données.",
+        "profileAlt": "Bibliosense Agent",
+        "profileImage": "/static/logos/logo-bibliosense.png"
+      },
+      "suggestions": [
+        {
+          "id": "fiction",
+          "title": "📖 Fiction",
+          "description": "Romans, nouvelles, littérature contemporaine",
+          "event": "display: Je cherche des romans de fiction",
+          "color": "#e3f2fd"
+        },
+        {
+          "id": "nonfiction",
+          "title": "📚 Non-fiction",
+          "description": "Essais, biographies, documentaires",
+          "event": "display: Je m'intéresse aux essais et documentaires",
+          "color": "#fff9c4"
+        },
+        {
+          "id": "genre",
+          "title": "🎭 Genres",
+          "description": "Science-fiction, polar, romance, fantastique",
+          "event": "display: Recommande-moi des livres de science-fiction",
+          "color": "#f3e5f5"
+        },
+        {
+          "id": "similar",
+          "title": "🔍 Livres similaires",
+          "description": "Basé sur un livre que vous avez aimé",
+          "event": "display: J'ai aimé [titre du livre], que me suggères-tu ?",
+          "color": "#e8f5e9"
+        }
+      ],
+      "components": {
+        "inputArea": {
+          "showInputOnLoad": true,
+          "placeholder": "Quel type de livre cherchez-vous ? Partagez vos préférences...",
+          "sendButton": "Envoyer",
+          "voiceButton": "Enregistrer un message vocal",
+          "disclaimer": "⚠️ Recommandations basées sur les catalogues Montréal et Québec uniquement."
+        }
+      }
+    },
+    "en": {
+      "app": {
+        "title": "Bibliosense | Book Recommendations",
+        "description": "AI Book Recommendation Agent by IMX Multi-Agent"
+      },
+      "intro": {
+        "title": "Looking for your next read?",
+        "description": "Share your favorite books or subjects of interest, and I'll recommend books available in our Montreal and Quebec collections.",
+        "disclaimer": "Note: Recommendations are based on catalogs available in our databases.",
+        "profileAlt": "Bibliosense Agent",
+        "profileImage": "/static/logos/logo-bibliosense.png"
+      },
+      "suggestions": [
+        {
+          "id": "fiction",
+          "title": "📖 Fiction",
+          "description": "Novels, short stories, contemporary literature",
+          "event": "display: I'm looking for fiction novels",
+          "color": "#e3f2fd"
+        },
+        {
+          "id": "nonfiction",
+          "title": "📚 Non-fiction",
+          "description": "Essays, biographies, documentaries",
+          "event": "display: I'm interested in essays and documentaries",
+          "color": "#fff9c4"
+        },
+        {
+          "id": "genre",
+          "title": "🎭 Genres",
+          "description": "Sci-fi, mystery, romance, fantasy",
+          "event": "display: Recommend me science fiction books",
+          "color": "#f3e5f5"
+        },
+        {
+          "id": "similar",
+          "title": "🔍 Similar Books",
+          "description": "Based on a book you enjoyed",
+          "event": "display: I enjoyed [book title], what do you suggest?",
+          "color": "#e8f5e9"
+        }
+      ],
+      "components": {
+        "inputArea": {
+          "showInputOnLoad": true,
+          "placeholder": "What type of book are you looking for? Share your preferences...",
+          "sendButton": "Send",
+          "voiceButton": "Record voice message",
+          "disclaimer": "⚠️ Recommendations based on Montreal and Quebec catalogs only."
+        }
+      }
+    }
+  }
+}

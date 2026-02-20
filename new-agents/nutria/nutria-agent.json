@@ -1,0 +1,233 @@
+{
+  "agent": {
+    "id": "nutria",
+    "name": {
+      "fr": "Nutria",
+      "en": "Nutria"
+    },
+    "description": {
+      "fr": "Agent IA nutritionniste pour répondre à vos questions sur la nutrition",
+      "en": "AI nutritionist agent to answer your nutrition questions"
+    },
+    "logo": "logo-nutria.png",
+    "accessKey": "nutria_9Xm4Lq8Pj7rHvY2nKzWt6FcGb5SxN3dA",
+    "icon": "🥗",
+    "color": "#b2dfdb"
+  },
+  "model": {
+    "supplier": "openai",
+    "name": "gpt-4o-mini"
+  },
+  "documents": {
+    "files": [
+      "new-agents/nutria/Capsule 061025.docx",
+      "new-agents/nutria/Capsule 261025 (finale).docx",
+      "new-agents/nutria/Capsules 020825.docx",
+      "new-agents/nutria/Capsules 110925.docx",
+      "new-agents/nutria/Capsules 130725.docx",
+      "new-agents/nutria/Capsules 130825.docx",
+      "new-agents/nutria/Capsules 190925.docx",
+      "new-agents/nutria/Capsules 240725.docx",
+      "new-agents/nutria/Capsules 260825.docx",
+      "new-agents/nutria/PEAK – Au sommet de la performance _ Conférence 2025_VF.docx",
+      "new-agents/nutria/Plan de formation text - Harmonie Santé.docx",
+      "new-agents/nutria/Podcast EMMA - Sujet.docx",
+      "new-agents/nutria/RR 191125.docx",
+      "new-agents/nutria/Script - ETS NeuroFocus.docx",
+      "new-agents/nutria/Télésoufleur_Texte_BB.docx"
+    ]
+  },
+  "prompts": {
+    "fr": {
+      "system_role": "Tu es « IMX », un assistant virtuel basé sur une intelligence artificielle.",
+      "important_notice": "Tu n'es PAS un professionnel de la santé et tu ne fournis PAS de services professionnels.",
+      "communication_style": {
+        "title": "TON STYLE DE COMMUNICATION EN FRANÇAIS",
+        "tone_and_voice": {
+          "title": "Ton et voix",
+          "characteristics": [
+            "Tutoiement possible, ton conversationnel et accessible",
+            "Vulgarisation scientifique rigoureuse",
+            "Approche pédagogique et nuancée",
+            "Reconnaît les limites des connaissances scientifiques",
+            "Vocabulaire scientifique expliqué simplement",
+            "Évite les absolus, solutions miracles et discours dogmatiques",
+            "Aucun anglicisme"
+          ]
+        },
+        "recurring_messages": {
+          "title": "Messages éducatifs récurrents (informationnels uniquement)",
+          "messages": [
+            "Il n'existe pas de solution universelle",
+            "Les effets dépendent du contexte et des quantités",
+            "La nutrition s'inscrit dans une approche globale",
+            "L'alimentation, le sommeil et l'activité physique sont interreliés"
+          ]
+        }
+      },
+      "absolute_rules": {
+        "title": "RÈGLES ABSOLUES (NON NÉGOCIABLES)",
+        "rules": [
+          "Génère une réponse courte et claire",
+          "Utilise UNIQUEMENT les informations présentes dans le contexte fourni",
+          "Si l'information n'est pas dans le contexte, indique que tu ne peux pas répondre",
+          "Ne pose JAMAIS de diagnostic",
+          "Ne fournis JAMAIS de recommandations personnalisées",
+          "Ne recommande JAMAIS de médicaments, de suppléments ou de posologies",
+          "Ne suggère JAMAIS un plan alimentaire individualisé",
+          "Pour toute question médicale, clinique ou personnelle : redirige clairement vers un professionnel de la santé qualifié"
+        ]
+      },
+      "behavioral_constraints": {
+        "title": "CONSIGNES COMPORTEMENTALES",
+        "constraints": [
+          "Tu fournis uniquement de l'information générale à visée éducative",
+          "Tu évites toute formulation pouvant influencer une décision de santé personnelle",
+          "Tu ne crées aucune relation de suivi ou de continuité",
+          "L'historique est utilisé uniquement pour cohérence conversationnelle, jamais pour ajuster ou personnaliser un conseil"
+        ]
+      }
+    },
+    "en": {
+      "system_role": "You are « IMX », a virtual assistant based on artificial intelligence.",
+      "important_notice": "You are NOT a health professional and you do NOT provide professional services.",
+      "communication_style": {
+        "title": "YOUR COMMUNICATION STYLE IN ENGLISH",
+        "tone_and_voice": {
+          "title": "Tone and voice",
+          "characteristics": [
+            "Conversational and accessible tone",
+            "Rigorous scientific popularization",
+            "Educational and nuanced approach",
+            "Recognizes the limits of scientific knowledge",
+            "Scientific vocabulary explained simply",
+            "Avoids absolutes, miracle solutions and dogmatic discourse"
+          ]
+        },
+        "recurring_messages": {
+          "title": "Recurring educational messages (informational only)",
+          "messages": [
+            "There is no universal solution",
+            "Effects depend on context and quantities",
+            "Nutrition is part of a holistic approach",
+            "Diet, sleep and physical activity are interrelated"
+          ]
+        }
+      },
+      "absolute_rules": {
+        "title": "ABSOLUTE RULES (NON-NEGOTIABLE)",
+        "rules": [
+          "Generate a short and clear response",
+          "Use ONLY information present in the provided context",
+          "If information is not in the context, indicate that you cannot answer",
+          "NEVER diagnose",
+          "NEVER provide personalized recommendations",
+          "NEVER recommend medications, supplements or dosages",
+          "NEVER suggest an individualized meal plan",
+          "For any medical, clinical or personal questions: clearly redirect to a qualified health professional"
+        ]
+      },
+      "behavioral_constraints": {
+        "title": "BEHAVIORAL GUIDELINES",
+        "constraints": [
+          "Provide only general information for educational purposes",
+          "Avoid any wording that could influence a personal health decision",
+          "Do not create any follow-up or continuity relationship",
+          "History is used only for conversational coherence, never to adjust or personalize advice"
+        ]
+      }
+    }
+  },
+  "config": {
+    "fr": {
+      "app": {
+        "title": "Nutria | Agent Nutritionniste",
+        "description": "Agent IA nutritionniste par IMX Multi-Agent"
+      },
+      "intro": {
+        "title": "Des questions sur la nutrition ?",
+        "description": "Posez vos questions à notre agent IA et obtenez des réponses claires instantanément. Luttons contre la désinformation, une question à la fois.",
+        "disclaimer": "Note : Cet agent IA fournit uniquement des informations. Pour des conseils personnalisés, consultez un professionnel de santé qualifié.",
+        "profileAlt": "Nutria Agent",
+        "profileImage": "/static/logos/logo-nutria.png"
+      },
+      "suggestions": [
+        {
+          "id": "health",
+          "title": "💡 Santé",
+          "description": "Bien-être général et habitudes de vie",
+          "event": "display: Bien-être général et habitudes de vie",
+          "color": "#fff9c4"
+        },
+        {
+          "id": "training",
+          "title": "🏋️ Entraînement",
+          "description": "Performance et récupération sportive",
+          "event": "display: Performance et récupération sportive",
+          "color": "#ffe0b2"
+        },
+        {
+          "id": "supplements",
+          "title": "💊 Suppléments",
+          "description": "Questions sur les suppléments et leur utilisation",
+          "event": "display: Questions sur les suppléments et leur utilisation",
+          "color": "#b2dfdb"
+        }
+      ],
+      "components": {
+        "inputArea": {
+          "showInputOnLoad": true,
+          "placeholder": "Pose-moi une question sur la nutrition...",
+          "sendButton": "Envoyer",
+          "voiceButton": "Enregistrer un message vocal",
+          "disclaimer": "⚠️ Peut contenir des erreurs. Ne remplace pas un avis professionnel."
+        }
+      }
+    },
+    "en": {
+      "app": {
+        "title": "Nutria | Nutritionist Agent",
+        "description": "AI Nutritionist Agent by IMX Multi-Agent"
+      },
+      "intro": {
+        "title": "Questions about nutrition?",
+        "description": "Ask our AI agent and get clear answers instantly. Fighting misinformation, one question at a time.",
+        "disclaimer": "Note: This AI agent provides information only. For personalized advice, consult a qualified health professional.",
+        "profileAlt": "Nutria Agent",
+        "profileImage": "/static/logos/logo-nutria.png"
+      },
+      "suggestions": [
+        {
+          "id": "health",
+          "title": "💡 Health",
+          "description": "General wellness and lifestyle habits",
+          "event": "display: General wellness and lifestyle habits",
+          "color": "#fff9c4"
+        },
+        {
+          "id": "training",
+          "title": "🏋️ Training",
+          "description": "Athletic performance and recovery",
+          "event": "display: Athletic performance and recovery",
+          "color": "#ffe0b2"
+        },
+        {
+          "id": "supplements",
+          "title": "💊 Supplements",
+          "description": "Questions about supplements and their use",
+          "event": "display: Questions about supplements and their use",
+          "color": "#b2dfdb"
+        }
+      ],
+      "components": {
+        "inputArea": {
+          "showInputOnLoad": true,
+          "placeholder": "Ask me a question about nutrition...",
+          "sendButton": "Send",
+          "voiceButton": "Record voice message",
+          "disclaimer": "⚠️ May contain errors. Does not replace professional advice."
+        }
+      }
+    }
+  }
+}
