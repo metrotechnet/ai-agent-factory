@@ -45,7 +45,7 @@ OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 client_openai = OpenAI(api_key=OPENAI_API_KEY)
 
 AGENTS_PARENT_DIR = MAIN_ROOT
-TEMPLATE_AGENT_DIR = MAIN_ROOT / "agent-template"
+TEMPLATE_AGENT_DIR = MAIN_ROOT / "template-agent"
 
 PROJECT_ROOT = ''
 KNOWLEDGE_BASES_DIR = ''
@@ -158,7 +158,7 @@ def copy_logo(agent_dir: Path, config: dict, config_file_path: Path):
     agent_id = agent.get("id")
     logo_path_config = agent.get("logo", "")
     
-    # Extract logo filename from config path (e.g., "/static/logos/logo-nutria.png" -> "logo-nutria.png")
+    # Extract logo filename from config path (e.g., "/static/logos/logo-agent.png" -> "logo-agent.png")
     if logo_path_config:
         logo_filename = Path(logo_path_config).name
     else:

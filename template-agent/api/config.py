@@ -1,0 +1,58 @@
+"""
+Configuration Management - Configuration loading and merging
+"""
+from pathlib import Path
+import json
+from typing import Optional
+
+
+PROJECT_ROOT = Path(__file__).parent.parent
+
+
+def deep_merge(base_config: dict, override_config: dict) -> dict:
+    """
+    Deep merge two configuration dictionaries.
+    Override values take precedence over base values.
+    
+    Args:
+        base_config: Base configuration dictionary
+        override_config: Override configuration dictionary
+        
+    Returns:
+        Merged configuration dictionary
+    """
+    result = base_config.copy()
+    
+    for key, value in override_config.items():
+        if key in result and isinstance(result[key], dict) and isinstance(value, dict):
+            # Recursively merge nested dictionaries
+            result[key] = deep_merge(result[key], value)
+        else:
+            # Override value
+            result[key] = value
+    
+    return result
+
+
+def get_config():
+    """
+    Get configuration for single-agent deployment.
+    Returns the agent configuration.
+    
+    Returns:
+        Configuration dictionary for agent
+    """
+    try:
+        # Single-agent setup - always return config
+        agent_config_path = PROJECT_ROOT / "knowledge-base" / "agent" / "config.json"
+        
+        if agent_config_path.exists():
+            with open(agent_config_path, 'r', encoding='utf-8') as f:
+                return json.load(f)
+        
+        return {"error": "config not found"}
+        
+    except FileNotFoundError:
+        return {"error": "config not found"}
+    except Exception as e:
+        return {"error": f"Error loading config: {str(e)}"}

@@ -5,12 +5,38 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python Debugger: Create Agent - Nutria",
+            "name": "create_agent - Nutria",
             "type": "debugpy",
             "request": "launch",
             "program": "${workspaceFolder}/create_agent.py",
             "console": "integratedTerminal",
             "args": ["new-agents/nutria/nutria-agent.json"]
+        },
+         {
+            "name": "Nutria - FastAPI",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "uvicorn",
+            "args": [
+                "app:app",
+                "--host", "0.0.0.0",
+                "--port", "8080",
+                "--reload"
+            ],
+            "jinja": true,
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}/template-agent"
+            },
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal"
+        },
+         {
+            "name": "index_chromadb_json - Nutria",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/template-agent/core/index_chromadb_json.py",
+            "console": "integratedTerminal",
+            "args": ["${workspaceFolder}/template-agent/knowledge-base/agent"]
         }
     ]
 }
