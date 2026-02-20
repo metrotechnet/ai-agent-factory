@@ -1,0 +1,151 @@
+{
+  "agent": {
+    "id": "my-agent",
+    "name": {
+      "fr": "Mon Agent Personnalisé",
+      "en": "My Custom Agent"
+    },
+    "description": {
+      "fr": "Un agent IA spécialisé pour mon domaine",
+      "en": "A specialized AI agent for my domain"
+    },
+    "logo": "/static/logos/logo-my-agent.png",
+    "accessKey": "your-secure-access-key-here",
+    "icon": "🤖",
+    "color": "#e0e0e0"
+  },
+  "model": {
+    "supplier": "openai",
+    "name": "gpt-4o-mini"
+  },
+  "documents": {
+    "files": [
+      "path/to/document1.pdf",
+      "path/to/document2.docx",
+      "path/to/document3.txt",
+      "path/to/data.json"
+    ],
+    "audio_files": [
+      {
+        "path": "path/to/audio1.mp3",
+        "language": "fr",
+        "output_name": "Transcript 1.txt"
+      },
+      {
+        "path": "path/to/audio2.m4a",
+        "language": "en",
+        "output_name": "Transcript 2.txt"
+      }
+    ]
+  },
+  "prompts": {
+    "fr": {
+      "system_role": "Tu es un assistant virtuel spécialisé.",
+      "important_notice": "Tu fournis uniquement des informations générales.",
+      "communication_style": {
+        "title": "TON STYLE DE COMMUNICATION EN FRANÇAIS",
+        "tone_and_voice": {
+          "title": "Ton et voix",
+          "characteristics": [
+            "Ton conversationnel et accessible",
+            "Vulgarisation claire et rigoureuse",
+            "Approche pédagogique"
+          ]
+        }
+      },
+      "absolute_rules": {
+        "title": "RÈGLES ABSOLUES",
+        "rules": [
+          "Génère une réponse courte et claire",
+          "Utilise UNIQUEMENT les informations présentes dans le contexte fourni"
+        ]
+      }
+    },
+    "en": {
+      "system_role": "You are a specialized virtual assistant.",
+      "important_notice": "You provide only general information.",
+      "communication_style": {
+        "title": "YOUR COMMUNICATION STYLE IN ENGLISH",
+        "tone_and_voice": {
+          "title": "Tone and voice",
+          "characteristics": [
+            "Conversational and accessible tone",
+            "Clear and rigorous communication",
+            "Pedagogical approach"
+          ]
+        }
+      },
+      "absolute_rules": {
+        "title": "ABSOLUTE RULES",
+        "rules": [
+          "Generate short and clear responses",
+          "Use ONLY information present in the provided context"
+        ]
+      }
+    }
+  },
+  "config": {
+    "fr": {
+      "app": {
+        "title": "Mon Agent | Titre",
+        "description": "Description de mon agent"
+      },
+      "intro": {
+        "title": "Des questions ?",
+        "description": "Posez vos questions et obtenez des réponses instantanées.",
+        "disclaimer": "Note : Cet agent IA fournit uniquement des informations générales.",
+        "profileAlt": "Mon Agent",
+        "profileImage": "/static/logos/logo-my-agent.png"
+      },
+      "suggestions": [
+        {
+          "id": "topic1",
+          "title": "📚 Sujet 1",
+          "description": "Description du sujet 1",
+          "event": "display: Description du sujet 1",
+          "color": "#fff9c4"
+        }
+      ],
+      "components": {
+        "inputArea": {
+          "showInputOnLoad": true,
+          "placeholder": "Pose-moi une question...",
+          "sendButton": "Envoyer",
+          "voiceButton": "Enregistrer un message vocal",
+          "disclaimer": "⚠️ Peut contenir des erreurs."
+        }
+      }
+    },
+    "en": {
+      "app": {
+        "title": "My Agent | Title",
+        "description": "Description of my agent"
+      },
+      "intro": {
+        "title": "Questions?",
+        "description": "Ask questions and get instant answers.",
+        "disclaimer": "Note: This AI agent provides only general information.",
+        "profileAlt": "My Agent",
+        "profileImage": "/static/logos/logo-my-agent.png"
+      },
+      "suggestions": [
+        {
+          "id": "topic1",
+          "title": "📚 Topic 1",
+          "description": "Description of topic 1",
+          "event": "display: Description of topic 1",
+          "color": "#fff9c4"
+        }
+      ],
+      "components": {
+        "inputArea": {
+          "showInputOnLoad": true,
+          "placeholder": "Ask me a question...",
+          "sendButton": "Send",
+          "voiceButton": "Record voice message",
+          "disclaimer": "⚠️ May contain errors."
+        }
+      }
+    }
+  }
+}
