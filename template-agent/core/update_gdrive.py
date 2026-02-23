@@ -22,8 +22,6 @@ load_dotenv(dotenv_path=PROJECT_ROOT / '.env')
 # Extract config values from environment variables
 GDRIVE_FOLDER_ID = os.getenv("GDRIVE_FOLDER_ID", "")
 GDRIVE_CREDENTIALS_PATH = os.getenv("GDRIVE_CREDENTIALS_PATH", "")
-KNOWLEDGE_BASE = os.getenv("KNOWLEDGE_BASE", "agent")
-
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
 # Clients (initialized globally, paths determined per agent)

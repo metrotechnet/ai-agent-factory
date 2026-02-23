@@ -3,6 +3,7 @@
 .env.local
 .env.*.local
 *.env
+.backend-url.tmp
 
 # Google Cloud credentials and keys
 keys/

@@ -19,8 +19,6 @@ collection = None
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 
-# Get knowledge base name from environment or use default
-KNOWLEDGE_BASE = os.getenv("KNOWLEDGE_BASE", "agent")
 
 
 def load_style_guides():
@@ -136,16 +134,16 @@ def get_collection(kb_name=None):
     Get or create ChromaDB collection for the specified knowledge base
     
     Args:
-        kb_name: Name of the knowledge base (default: from KNOWLEDGE_BASE env var)
+        kb_name: Name of the knowledge base (default: from "agent" env var)
     """
     global chroma_client, collection
     
     if kb_name is None:
-        kb_name = KNOWLEDGE_BASE
+        kb_name = "agent"
     
     if collection is None:
         try:
-            kb_path = PROJECT_ROOT / "knowledge-base" / "agent"
+            kb_path = PROJECT_ROOT / "knowledge-base" / kb_name
             chroma_path = str(kb_path / "chroma_db")
             
             if not os.path.exists(chroma_path):

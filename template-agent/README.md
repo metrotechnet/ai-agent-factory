@@ -96,7 +96,6 @@ template-agent/
 ├── startup.sh                # Container startup script
 ├── .env                      # Environment variables (not in git)
 ├── agent-config.example.json # Example configuration for creating agents
-├── AGENT_CREATION.md         # Agent creation guide and reference
 └── README.md                 # This file
 ```
 
@@ -119,21 +118,24 @@ pip install -r requirements.txt
 
 ### 3. Configure Environment
 
-Create a `.env` file with:
+Create a `.env` file by copying from `.env.example`:
 
-```env
-OPENAI_API_KEY=your-openai-api-key
-KNOWLEDGE_BASE=nutria               # Name of the knowledge base to use
-GCP_PROJECT_ID=your-gcp-project-id  # For Google Drive pipeline
-GCS_BUCKET_NAME=your-bucket-name
-GCS_REGION=us-east4
-CLOUD_RUN_MEMORY=1Gi
-CLOUD_RUN_TIMEOUT=300
+```bash
+cp .env.example .env
 ```
+
+Then edit `.env` with your actual values. See [.env.example](.env.example) for all available configuration parameters with descriptions, including:
+
+- **API Keys**: OpenAI, Gemini
+- **Knowledge Base**: Which knowledge base folder to use (defaults to `agent`)
+- **GCP Settings**: Project ID, Region, Service Name, Memory, Timeout
+- **Google Drive**: Folder ID for knowledge base sync
+- **Frontend**: Backend URL for Firebase deployment
+- **Optional**: Instagram credentials for social media integration
 
 ### 4. Set Up Knowledge Base
 
-The project uses a modular knowledge base system located in `knowledge-base/`. By default, the `nutria` knowledge base is included.
+The project uses a modular knowledge base system located in `knowledge-base/`. By default, the `agent` knowledge base is used. The `nutria` nutrition knowledge base is included as an example.
 
 **To create a new knowledge base**:
 
@@ -155,9 +157,11 @@ See [knowledge-base/README.md](knowledge-base/README.md) for complete documentat
 ### 5. Add Documents
 
 Place your files in the appropriate knowledge base folder:
-- Transcript files (`.txt`) in `knowledge-base/nutria/transcripts/`
-- Document files (`.json`) in `knowledge-base/nutria/documents/`
-- Extracted text files (`.txt`) in `knowledge-base/nutria/extracted_texts/`
+- Transcript files (`.txt`) in `knowledge-base/agent/transcripts/`
+- Document files (`.json`) in `knowledge-base/agent/documents/`
+- Extracted text files (`.txt`) in `knowledge-base/agent/extracted_texts/`
+
+**Note**: To use a different knowledge base (like `nutria`), set `KNOWLEDGE_BASE=nutria` in your `.env` file.
 
 ## 🛠️ Usage
 
@@ -170,14 +174,14 @@ Place your files in the appropriate knowledge base folder:
 # Navigate to the project directory
 cd c:\dev\template-agent
 
-# Index the default knowledge base (nutria)
+# Index the default knowledge base (agent)
 python scripts/index_chromadb.py
 
 # Index a specific knowledge base
 python scripts/index_chromadb.py my-kb extracted_texts
 
 # Index transcripts folder instead
-python scripts/index_chromadb.py nutria transcripts
+python scripts/index_chromadb.py agent transcripts
 ```
 
 This will process files from the specified knowledge base folder, creating a vector database in `knowledge-base/{kb-name}/chroma_db/`.
@@ -192,7 +196,7 @@ python -c "from core.update_gdrive import run_pipeline; run_pipeline()"
 Or via API:
 
 ```bash
-curl -X POST http://localhost:8080/update?agent=nutria
+curl -X POST http://localhost:8080/update
 ```
 
 See [GDRIVE_SETUP.md](GDRIVE_SETUP.md) for Google Drive service account configuration.
@@ -214,7 +218,9 @@ nano my-agent-config.json
 ### 2. Run Creation Script
 
 ```bash
-python core/create_agent.py my-agent-config.json
+# From agent-factory root (parent directory)
+cd ..
+python scripts/create_agent.py my-agent-config.json
 ```
 
 This will:
@@ -235,7 +241,7 @@ cp my-logo.png static/logos/logo-my-agent.png
 
 Restart the backend server and your agent will appear in the interface.
 
-**📖 See [AGENT_CREATION.md](AGENT_CREATION.md) for complete guide and configuration reference.**
+**📖 See [AGENT_CREATION.md](../doc/AGENT_CREATION.md) for complete guide and configuration reference.**
 
 ## 🏗️ Manual Knowledge Base Setup
 
@@ -326,16 +332,20 @@ Each knowledge base is a self-contained folder in `knowledge-base/`:
 
 ```
 knowledge-base/
-├── nutria/                     # Default: Nutrition knowledge base
+├── agent/                      # Default knowledge base
 │   ├── transcripts/           # Audio transcriptions
 │   ├── documents/             # Source documents
 │   ├── extracted_texts/       # Processed texts
 │   └── chroma_db/             # Vector database
-└── other-domain/              # Example: Another knowledge base
-    ├── transcripts/
-    ├── documents/
-    ├── extracted_texts/
-    └── chroma_db/
+├── nutria/                    # Example: Nutrition knowledge base
+│   ├── transcripts/
+│   ├── documents/
+│   ├── extracted_texts/
+│   └── chroma_db/
+└── common/                    # Shared configuration
+    ├── config.json            # Shared UI elements
+    ├── refusal_patterns.json
+    └── refusal_responses.json
 ```
 
 ### Creating a New Knowledge Base
@@ -362,10 +372,12 @@ python scripts/index_chromadb.py medical-kb extracted_texts
 
 Update `.env`:
 ```env
-KNOWLEDGE_BASE=medical-kb
+KNOWLEDGE_BASE=nutria
 ```
 
-Then restart the application. The agent will automatically use the specified knowledge base.
+Then restart the application (or redeploy to Cloud Run). The agent will automatically use the specified knowledge base.
+
+**Important for Deployment**: When deploying to Cloud Run, the `KNOWLEDGE_BASE` environment variable is automatically set from your `.env` file. Make sure to rebuild and redeploy after changing knowledge bases.
 
 ### Management
 
@@ -479,15 +491,23 @@ See [knowledge-base/common/README_REFUSAL.md](knowledge-base/common/README_REFUS
 ### Backend Deployment (Google Cloud Run)
 
 ```bash
+# First build the Docker image
+.\build-backend.bat
+
+# Then deploy
 .\deploy-backend.bat
 ```
 
 This will:
 1. Automatically build the Docker image using Cloud Build
-2. Load configuration from `.env`
+2. Load configuration from `.env` (including `KNOWLEDGE_BASE`)
 3. Deploy to Cloud Run with all environment variables
 4. Configure CORS for Firebase hosting domain
-5. Output the service URL
+5. Save backend URL to `.env` and `.backend-url.tmp`
+
+**Important Files**:
+- `.gcloudignore`: Controls which files are uploaded to Cloud Build (excludes .env, credentials, but **includes** knowledge-base JSON files)
+- `.dockerignore`: Controls which files are copied into the Docker image
 
 **Configuration** (via `.env`):
 - Memory: 1Gi
