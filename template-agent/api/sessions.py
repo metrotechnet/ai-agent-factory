@@ -81,3 +81,33 @@ def get_session_info(session_id: str):
             "last_activity": session['last_activity'].isoformat()
         }
     return {"exists": False}
+
+
+def is_session_rate_limited(session_id: str, max_requests_per_hour: int = 50) -> bool:
+    """
+    Check if a session has exceeded rate limit.
+    
+    Args:
+        session_id: Session ID to check
+        max_requests_per_hour: Maximum requests allowed per hour (default: 50)
+        
+    Returns:
+        True if rate limited, False otherwise
+    """
+    if not session_id or session_id not in conversation_sessions:
+        return False
+    
+    session = conversation_sessions[session_id]
+    messages = session.get('messages', [])
+    
+    # Count user messages in the last hour
+    now = datetime.now()
+    one_hour_ago = now - timedelta(hours=1)
+    
+    recent_user_messages = [
+        msg for msg in messages
+        if msg.get('role') == 'user' and 
+        datetime.fromisoformat(msg['timestamp']) > one_hour_ago
+    ]
+    
+    return len(recent_user_messages) >= max_requests_per_hour

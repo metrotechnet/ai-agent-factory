@@ -1,1 +1,1 @@
-window.BACKEND_URL = 'https://imx-nutria-1029904908119.us-east4.run.app'; 
+window.BACKEND_URL = 'https://imx-nutria-4ykvm5teta-uk.a.run.app'; 

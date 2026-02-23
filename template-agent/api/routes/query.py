@@ -1,31 +1,45 @@
 """
 Query Routes - Main query endpoint for streaming responses
 """
-from fastapi import APIRouter
-from fastapi.responses import StreamingResponse
+from fastapi import APIRouter, Request
+from fastapi.responses import StreamingResponse, JSONResponse
 from datetime import datetime
 import json
 import uuid
+from slowapi import Limiter
+from slowapi.util import get_remote_address
 
 from api.models import QueryRequest
-from api.sessions import get_or_create_session
+from api.sessions import get_or_create_session, is_session_rate_limited
 from api.logging import save_question_response, contains_medical_disclaimer
 from core.query_chromadb import ask_question_stream
 
 router = APIRouter()
+limiter = Limiter(key_func=get_remote_address)
 
 
 @router.post("/query")
-async def query_agent(request: QueryRequest):
+@limiter.limit("10/hour")  # Max 10 questions per hour per IP
+async def query_agent(request: Request, query_request: QueryRequest):
     """
     Main endpoint to ask questions to the agent and receive streaming responses
     """
-    session_id, session = get_or_create_session(request.session_id)
+    # Check session-based rate limiting
+    if query_request.session_id and is_session_rate_limited(query_request.session_id):
+        return JSONResponse(
+            status_code=429,
+            content={
+                "error": "Rate limit exceeded",
+                "message": "Trop de requêtes. Veuillez patienter quelques instants."
+            }
+        )
+    
+    session_id, session = get_or_create_session(query_request.session_id)
     
     conversation_history = session['messages']
     user_message = {
         'role': 'user',
-        'content': request.question,
+        'content': query_request.question,
         'timestamp': datetime.now().isoformat()
     }
     conversation_history.append(user_message)
@@ -41,14 +55,14 @@ async def query_agent(request: QueryRequest):
             is_refusal = False
             
             for chunk in ask_question_stream(
-                request.question,
-                language=request.language,
-                timezone=request.timezone,
-                locale=request.locale,
+                query_request.question,
+                language=query_request.language,
+                timezone=query_request.timezone,
+                locale=query_request.locale,
                 conversation_history=conversation_history,
                 session=session,
                 question_id=question_id,
-                agent=request.agent
+                agent=query_request.agent
             ):
                 # Detect refusal marker
                 if chunk == "__REFUSAL__":
@@ -59,7 +73,7 @@ async def query_agent(request: QueryRequest):
                 yield f"data: {json.dumps({'chunk': chunk})}\n\n"
             
             # Save question and response to log (including refused ones)
-            save_question_response(question_id, request.question, assistant_response)
+            save_question_response(question_id, query_request.question, assistant_response)
             
             # Check if response contains medical disclaimer (don't show links)
             has_medical_disclaimer = contains_medical_disclaimer(assistant_response)

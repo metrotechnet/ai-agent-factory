@@ -1,16 +1,21 @@
 """
 TTS Routes - Text-to-Speech endpoint
 """
-from fastapi import APIRouter, Body
+from fastapi import APIRouter, Body, Request
 from fastapi.responses import Response, JSONResponse
 import openai
 import os
+from slowapi import Limiter
+from slowapi.util import get_remote_address
 
 router = APIRouter()
+limiter = Limiter(key_func=get_remote_address)
 
 
 @router.post("/api/tts")
+@limiter.limit("10/hour")  # Max 10 TTS requests per hour per IP (TTS is expensive)
 async def text_to_speech(
+    request: Request,
     text: str = Body(..., embed=True),
     language: str = Body("fr", embed=True)
 ):

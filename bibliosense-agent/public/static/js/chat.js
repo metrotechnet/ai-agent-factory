@@ -28,7 +28,7 @@ function addMessage(text, role) {
     const messageDiv = document.createElement('div');
     messageDiv.className = `message ${role}`;
     messageDiv.innerHTML = `
-        <div class="message-icon">${role === 'user' ? 'U' : 'D2U'}</div>
+        <div class="message-icon">${role === 'user' ? 'U' : 'IMX'}</div>
         <div class="message-content">${escapeHtml(text)}</div>
     `;
     
@@ -49,7 +49,7 @@ function createAssistantMessage() {
     messageDiv.className = 'message assistant';
     
     messageDiv.innerHTML = `
-        <div class="message-icon">D2U</div>
+        <div class="message-icon">IMX</div>
         <div class="message-content">
             <div class="message-text">
                 <div class="loading">

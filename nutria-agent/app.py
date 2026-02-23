@@ -8,6 +8,9 @@ from fastapi.templating import Jinja2Templates
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 from pathlib import Path
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
 
 # Import route modules
 from api.routes import query, translation, tts, report, config as config_routes, sessions, update
@@ -20,6 +23,14 @@ env_path = PROJECT_ROOT / '.env'
 load_dotenv(dotenv_path=env_path)
 
 app = FastAPI(title="IMX Agent Factory")
+
+# =====================================================
+# Rate Limiting Configuration
+# =====================================================
+# Initialize rate limiter
+limiter = Limiter(key_func=get_remote_address, default_limits=["300 per day", "100 per hour"])
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 # Configure CORS with dynamic origins
 import os

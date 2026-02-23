@@ -12,6 +12,10 @@ let isLoading = false;
 let sessionId = null;
 let userMessageDiv = document.createElement('div');
 
+// Rate limiting - Debouncing
+let lastRequestTime = 0;
+const MIN_REQUEST_INTERVAL = 2000; // 2 seconds minimum between requests
+
 /**
  * Escape HTML to prevent XSS
  */
@@ -28,7 +32,7 @@ function addMessage(text, role) {
     const messageDiv = document.createElement('div');
     messageDiv.className = `message ${role}`;
     messageDiv.innerHTML = `
-        <div class="message-icon">${role === 'user' ? 'U' : 'D2U'}</div>
+        <div class="message-icon">${role === 'user' ? 'U' : 'IMX'}</div>
         <div class="message-content">${escapeHtml(text)}</div>
     `;
     
@@ -49,7 +53,7 @@ function createAssistantMessage() {
     messageDiv.className = 'message assistant';
     
     messageDiv.innerHTML = `
-        <div class="message-icon">D2U</div>
+        <div class="message-icon">IMX</div>
         <div class="message-content">
             <div class="message-text">
                 <div class="loading">
@@ -293,6 +297,13 @@ async function handleStreamingResponse(question, contentDiv, actionsDiv) {
     });
 
     if (!response.ok) {
+        if (response.status === 429) {
+            const lang = getCurrentLanguage();
+            const rateLimitMsg = lang === 'fr' 
+                ? 'Limite de requêtes atteinte. Vous avez dépassé le nombre maximum de questions autorisées (10 par heure). Veuillez réessayer plus tard.'
+                : 'Rate limit reached. You have exceeded the maximum number of allowed questions (10 per hour). Please try again later.';
+            throw new Error(rateLimitMsg);
+        }
         throw new Error(`HTTP error! status: ${response.status}`);
     }
 
@@ -420,6 +431,21 @@ async function sendMessage() {
     const question = inputBox ? inputBox.value.trim() : '';
     if (!question || isLoading) return;
     
+    // Rate limiting - Check minimum interval between requests
+    const now = Date.now();
+    if (now - lastRequestTime < MIN_REQUEST_INTERVAL) {
+        console.log('Please wait before sending another message');
+        // Optional: Show a brief visual feedback
+        if (inputBox) {
+            inputBox.style.borderColor = '#ff9800';
+            setTimeout(() => {
+                inputBox.style.borderColor = '';
+            }, 500);
+        }
+        return;
+    }
+    lastRequestTime = now;
+    
     // Stop voice recording
     if (window.VoiceRecognitionModule && window.VoiceRecognitionModule.stopRecording) {
         window.VoiceRecognitionModule.stopRecording();
@@ -455,8 +481,16 @@ async function sendMessage() {
         await handleStreamingResponse(question, contentDiv, actionsDiv);
     } catch (error) {
         console.error('Message sending error:', error);
-        const { t } = window.ConfigModule;
-        contentDiv.textContent = t('messages.error');
+        const { t, getCurrentLanguage } = window.ConfigModule;
+        
+        // Check if it's a rate limit error
+        if (error.message && (error.message.includes('Limite de requêtes') || error.message.includes('Rate limit'))) {
+            contentDiv.innerHTML = `<div style="color: #d32f2f; padding: 10px; background: #ffebee; border-radius: 4px; border-left: 4px solid #d32f2f;">
+                <strong>⚠️ ${error.message}</strong>
+            </div>`;
+        } else {
+            contentDiv.textContent = t('messages.error');
+        }
     } finally {
         cleanupAfterMessage(messageDiv);
         const { handleFocus } = window.UIUtilsModule || {};

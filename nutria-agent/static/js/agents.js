@@ -135,7 +135,7 @@ async function sendTranslation() {
     const messageDiv = createAssistantMessage();
     
     const iconDiv = messageDiv.querySelector('.message-icon');
-    if (iconDiv) iconDiv.textContent = 'D2U';
+    if (iconDiv) iconDiv.textContent = 'IMX';
     
     if (chatContainer) {
         chatContainer.appendChild(userMessageDiv);
