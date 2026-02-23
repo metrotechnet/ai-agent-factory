@@ -106,12 +106,27 @@ This creates a new folder `nutria-agent/` with:
 
 Index your documents to ChromaDB vector database.
 
+### Option 1: Using the Build Script (Recommended)
+
+```powershell
+cd nutria-agent
+.\build-database.bat
+```
+
+This convenient script will:
+- Verify your knowledge base folder structure
+- Run the indexing process
+- Provide clear progress output
+- Show helpful error messages if something goes wrong
+
+### Option 2: Manual Command
+
 ```powershell
 cd nutria-agent
 python.exe .\core\index_chromadb_json.py .\knowledge-base\agent\
 ```
 
-This will:
+Both methods will:
 - Process all documents in `knowledge-base/agent/documents/`
 - Create embeddings using OpenAI
 - Index to ChromaDB at `knowledge-base/agent/chroma_db/`
@@ -119,12 +134,22 @@ This will:
 
 **Output:**
 ```
+========================================
+  Building ChromaDB Vector Database
+========================================
+
+[INFO] Indexing documents from knowledge-base\agent\
+
 📊 Indexing documents to ChromaDB...
 Processing: Capsule 061025.txt
 Processing: Capsule 261025.txt
 ...
 ✅ Indexed 427 chunks from 15 documents
 ✅ ChromaDB collection: gdrive_documents
+
+========================================
+  Database Built Successfully!
+========================================
 ```
 
 ---
@@ -332,9 +357,14 @@ Then regenerate the agent by running Step 1.4 again.
 
 ### ChromaDB Not Found
 
-**Cause:** Forgot to run `index_chromadb_json.py`
+**Cause:** Forgot to run database indexing
 
-**Fix:** Run Step 2 again:
+**Fix:** Run the database build script:
+```powershell
+.\build-database.bat
+```
+
+Or use the manual command:
 ```powershell
 python.exe .\core\index_chromadb_json.py .\knowledge-base\agent\
 ```
