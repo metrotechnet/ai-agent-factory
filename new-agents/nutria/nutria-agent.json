@@ -86,7 +86,9 @@
           "Tu ne crées aucune relation de suivi ou de continuité",
           "L'historique est utilisé uniquement pour cohérence conversationnelle, jamais pour ajuster ou personnaliser un conseil"
         ]
-      }
+      },
+          "template": "{system_role}\n\nIMPORTANT :\n{important_notice}\n\n# {communication_style_title}\n{communication_style_content}\n\n# {absolute_rules_title}\n{absolute_rules_content}\n\n# {behavioral_constraints_title}\n{behavioral_constraints_content}\n\nCONTEXTE DISPONIBLE:\n{context}\n{history}\n\nQUESTION DE L'UTILISATEUR: {question}"
+
     },
     "en": {
       "system_role": "You are « IMX », a virtual assistant based on artificial intelligence.",
@@ -135,7 +137,9 @@
           "Do not create any follow-up or continuity relationship",
           "History is used only for conversational coherence, never to adjust or personalize advice"
         ]
-      }
+      },
+          "template": "{system_role}\n\nIMPORTANT:\n{important_notice}\n\n# {communication_style_title}\n{communication_style_content}\n\n# {absolute_rules_title}\n{absolute_rules_content}\n\n# {behavioral_constraints_title}\n{behavioral_constraints_content}\n\nAVAILABLE CONTEXT (GENERAL INFORMATION ONLY):\n{context}\n{history}\n\nUSER QUESTION:\n{question}"
+
     }
   },
   "config": {

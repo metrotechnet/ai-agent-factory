@@ -59,7 +59,9 @@
           "Génère une réponse courte et claire",
           "Utilise UNIQUEMENT les informations présentes dans le contexte fourni"
         ]
-      }
+      },
+      "template": "{system_role}\n\nIMPORTANT:\n{important_notice}\n\n# {communication_style_title}\n{communication_style_content}\n\n# {absolute_rules_title}\n{absolute_rules_content}\n\n# {behavioral_constraints_title}\n{behavioral_constraints_content}\n\nAVAILABLE CONTEXT (GENERAL INFORMATION ONLY):\n{context}\n{history}\n\nUSER QUESTION:\n{question}"
+
     },
     "en": {
       "system_role": "You are a specialized virtual assistant.",
@@ -81,7 +83,9 @@
           "Generate short and clear responses",
           "Use ONLY information present in the provided context"
         ]
-      }
+      },
+      "template": "{system_role}\n\nIMPORTANT:\n{important_notice}\n\n# {communication_style_title}\n{communication_style_content}\n\n# {absolute_rules_title}\n{absolute_rules_content}\n\n# {behavioral_constraints_title}\n{behavioral_constraints_content}\n\nAVAILABLE CONTEXT (GENERAL INFORMATION ONLY):\n{context}\n{history}\n\nUSER QUESTION:\n{question}"
+
     }
   },
   "config": {

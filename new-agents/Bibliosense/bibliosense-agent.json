@@ -72,7 +72,9 @@
           "Tu peux recommander des livres similaires ou complémentaires",
           "Tu encourages la découverte de nouveaux auteurs et genres"
         ]
-      }
+      },
+          "template": "{system_role}\n\nIMPORTANT:\n{important_notice}\n\n# {communication_style_title}\n{communication_style_content}\n\n# {absolute_rules_title}\n{absolute_rules_content}\n\n# {behavioral_constraints_title}\n{behavioral_constraints_content}\n\nAVAILABLE CONTEXT (GENERAL INFORMATION ONLY):\n{context}\n{history}\n\nUSER QUESTION:\n{question}"
+
     },
     "en": {
       "system_role": "You are « Bibliosense », a virtual assistant specialized in book recommendations.",
@@ -120,7 +122,9 @@
           "Can recommend similar or complementary books",
           "Encourage discovery of new authors and genres"
         ]
-      }
+      },
+      "template": "{system_role}\n\nIMPORTANT:\n{important_notice}\n\n# {communication_style_title}\n{communication_style_content}\n\n# {absolute_rules_title}\n{absolute_rules_content}\n\n# {behavioral_constraints_title}\n{behavioral_constraints_content}\n\nAVAILABLE CONTEXT (GENERAL INFORMATION ONLY):\n{context}\n{history}\n\nUSER QUESTION:\n{question}"
+
     }
   },
   "config": {

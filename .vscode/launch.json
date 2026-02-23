@@ -25,7 +25,7 @@
             ],
             "jinja": true,
             "env": {
-                "PYTHONPATH": "${workspaceFolder}/template-agent"
+                "PYTHONPATH": "${workspaceFolder}/nutria-agent"
             },
             "cwd": "${workspaceFolder}",
             "console": "integratedTerminal"
@@ -34,9 +34,9 @@
             "name": "index_chromadb_json - Nutria",
             "type": "debugpy",
             "request": "launch",
-            "program": "${workspaceFolder}/template-agent/core/index_chromadb_json.py",
+            "program": "${workspaceFolder}/nutria-agent/core/index_chromadb_json.py",
             "console": "integratedTerminal",
-            "args": ["${workspaceFolder}/template-agent/knowledge-base/agent"]
+            "args": ["${workspaceFolder}/nutria-agent/knowledge-base/agent"]
         }
     ]
 }
