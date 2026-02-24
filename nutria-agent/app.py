@@ -28,7 +28,7 @@ app = FastAPI(title="IMX Agent Factory")
 # Rate Limiting Configuration
 # =====================================================
 # Initialize rate limiter
-limiter = Limiter(key_func=get_remote_address, default_limits=["300 per day", "100 per hour"])
+limiter = Limiter(key_func=get_remote_address, default_limits=["30 per day", "10 per hour"])
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 

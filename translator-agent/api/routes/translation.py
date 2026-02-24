@@ -1,10 +1,12 @@
 """
 Translation Routes - Translation and audio transcription endpoints
 """
-from fastapi import APIRouter, UploadFile, File, Form
+from fastapi import APIRouter, UploadFile, File, Form, Request
 from fastapi.responses import StreamingResponse, JSONResponse
 import json
 import uuid
+from slowapi import Limiter
+from slowapi.util import get_remote_address
 
 from api.models import TranslateRequest
 from api.logging import save_question_response
@@ -16,6 +18,7 @@ from core.translate import (
 )
 
 router = APIRouter()
+limiter = Limiter(key_func=get_remote_address)
 
 
 @router.get("/api/languages")
@@ -25,7 +28,8 @@ def get_languages():
 
 
 @router.post("/api/translate")
-async def translate_text_endpoint(request: TranslateRequest):
+@limiter.limit("20/hour")
+async def translate_text_endpoint(request_obj: Request, request: TranslateRequest):
     """Translate text to target language using GPT with streaming."""
     question_id = str(uuid.uuid4())
     
