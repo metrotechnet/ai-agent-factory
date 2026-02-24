@@ -86,13 +86,8 @@ def generate_transcripts_json(agent_dir: Path):
         json_files = list(documents_dir.glob("*.json"))
         if json_files:
             print(f"📚 Processing {len(json_files)} JSON files...")
-            print(f"🐛 DEBUG MODE: Processing only first 50 entries per JSON file")
-            
-            max_entries_per_file = -1  # DEBUG: Limit to 50 entries per JSON file
             
             for json_file in tqdm(json_files, desc="Processing JSON files"):
-                file_entry_count = 0  # Reset counter for each file
-                    
                 try:
                     with open(json_file, 'r', encoding='utf-8') as f:
                         json_data = json.load(f)
@@ -108,14 +103,8 @@ def generate_transcripts_json(agent_dir: Path):
                     
                     # Create a document for each entry
                     for entry in entries:
-                        if file_entry_count >= max_entries_per_file and max_entries_per_file > 0:
-                            print(f"  ✋ {json_file.name}: Stopped at {max_entries_per_file} entries")
-                            break
-                            
                         if not isinstance(entry, dict):
                             continue
-                        
-                        file_entry_count += 1
                         
                         # Generate readable text from the entry
                         text_parts = []
@@ -147,21 +136,10 @@ def generate_transcripts_json(agent_dir: Path):
                             cat = entry.get("categorie") or entry.get("category")
                             text_parts.append(f"\nCatégorie: {cat}")
                         
-                        if "editeur" in entry or "publisher" in entry:
-                            editeur = entry.get("editeur") or entry.get("publisher")
-                            if editeur:
-                                text_parts.append(f"Éditeur: {editeur}")
-                        
-                        if "parution" in entry:
-                            text_parts.append(f"Parution: {entry['parution']}")
-                        
-                        if "pages" in entry:
-                            text_parts.append(f"Pages: {entry['pages']}")
-                        
-                        if "langue" in entry or "language" in entry:
-                            langue = entry.get("langue") or entry.get("language")
-                            if langue:
-                                text_parts.append(f"Langue: {langue}")
+                        # Add any other important fields
+                        for key in ["editeur", "publisher", "parution", "pages", "langue", "language"]:
+                            if key in entry and entry[key]:
+                                text_parts.append(f"{key.capitalize()}: {entry[key]}")
                         
                         # Combine all parts
                         text = "\n".join(text_parts)
@@ -174,29 +152,17 @@ def generate_transcripts_json(agent_dir: Path):
                         doc_id = f"doc_{doc_counter:04d}_{entry_id}"
                         doc_counter += 1
                         
-                        # Build metadata from ALL entry fields
+                        # Build metadata from entry fields
                         metadata = {
                             "source": json_file.name,
                             "type": entry.get("type", "json_entry"),
                             "entry_id": entry_id
                         }
                         
-                        # Extract bibliotheque from filename (e.g., book_dbase_montreal.json -> montreal)
-                        if "montreal" in json_file.name.lower():
-                            metadata["bibliotheque"] = "montreal"
-                        elif "quebec" in json_file.name.lower() or "québec" in json_file.name.lower():
-                            metadata["bibliotheque"] = "quebec"
-                        elif "bibliotheque" in entry:
-                            metadata["bibliotheque"] = entry["bibliotheque"]
-                        
-                        # Add ALL fields from entry to metadata
-                        for key, value in entry.items():
-                            if value is not None and value != "" and key not in metadata:
-                                # Convert value to string if it's a list or dict
-                                if isinstance(value, (list, dict)):
-                                    metadata[key] = json.dumps(value, ensure_ascii=False)
-                                else:
-                                    metadata[key] = str(value)
+                        # Add relevant fields to metadata
+                        for key in ["categorie", "category", "editeur", "publisher", "langue", "language"]:
+                            if key in entry and entry[key]:
+                                metadata[key] = entry[key]
                         
                         # Add to documents array
                         documents.append({

@@ -37,6 +37,32 @@
             "program": "${workspaceFolder}/bibliosense-agent/core/index_chromadb_json.py",
             "console": "integratedTerminal",
             "args": ["${workspaceFolder}/bibliosense-agent/knowledge-base/agent"]
+        },
+         {
+            "name": "Translator - FastAPI",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "uvicorn",
+            "args": [
+                "app:app",
+                "--host", "0.0.0.0",
+                "--port", "8080",
+                "--reload"
+            ],
+            "jinja": true,
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}/translator-agent"
+            },
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal"
+        },
+         {
+            "name": "index_chromadb_json - Translator",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/translator-agent/core/index_chromadb_json.py",
+            "console": "integratedTerminal",
+            "args": ["${workspaceFolder}/translator-agent/knowledge-base/agent"]
         }
     ]
 }

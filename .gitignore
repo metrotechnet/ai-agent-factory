@@ -3,3 +3,15 @@
 .env.local
 .env.*.local
 *.env
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyc
+*.pyo
