@@ -7,7 +7,6 @@ from openai import OpenAI
 import chromadb
 from chromadb.config import Settings
 import google.generativeai as genai
-from core.refusal_engine import validate_user_query
 
 # Get project root directory
 PROJECT_ROOT = Path(__file__).parent.parent
@@ -111,6 +110,12 @@ def build_prompt_from_template(language, context, question, history_text="", age
     for constraint in constraints.get('constraints', []):
         constraints_content += f"- {constraint}\n"
     
+    # Build output format content
+    output_format = lang_data.get('output_format', {})
+    output_format_content = ""
+    for format_rule in output_format.get('format_rules', []):
+        output_format_content += f"- {format_rule}\n"
+    
     # Build the final prompt using the template
     template = lang_data.get('template', '')
     prompt = template.format(
@@ -122,6 +127,8 @@ def build_prompt_from_template(language, context, question, history_text="", age
         absolute_rules_content=rules_content,
         behavioral_constraints_title=constraints.get('title', ''),
         behavioral_constraints_content=constraints_content,
+        output_format_title=output_format.get('title', ''),
+        output_format_content=output_format_content,
         context=context,
         history=history_text,
         question=question
@@ -257,32 +264,34 @@ def get_links_from_contexts(contexts, metadatas=None, agent=None):
     
     return list(links)
 
-def ask_question_stream(question, language="fr", timezone="UTC", locale="fr-FR", top_k=5, conversation_history=None, session=None, question_id=None, agent=None):
+def ask_question_stream(question, language="fr", timezone="UTC", locale="fr-FR", top_k=15, conversation_history=None, session=None, question_id=None, agent=None, bibliotheque="all"):
     """Streaming version of ask_question with language support and conversation history"""
     # Use conversation_history if provided, otherwise empty list
     if conversation_history is None:
         conversation_history = []
 
-    # Build history_text for refusal_engine
+    # Build history_text for prompt template
     history_text = ""
+    # Extract previously recommended books from history to avoid repetition
+    previously_recommended = set()
+    
     if conversation_history and len(conversation_history) > 1:
         history_text = "\n\nHISTORIQUE DE LA CONVERSATION:\n"
         recent_history = conversation_history[-7:-1] if len(conversation_history) > 1 else []
         for msg in recent_history:
             role_label = "Utilisateur" if msg['role'] == 'user' else "Assistant"
             history_text += f"{role_label}: {msg['content']}\n"
-
-    # context is not available yet (need ChromaDB), so pass empty string for now
-    refusal_result = validate_user_query(question, llm_call_fn=None, language=language)
-    if refusal_result and refusal_result.get("decision") == "refuse":
-        # Store empty links list in session for refusal
-        if session is not None and question_id is not None:
-            if 'links' not in session:
-                session['links'] = {}
-            session['links'][question_id] = []
-        yield "__REFUSAL__"
-        yield refusal_result["answer"]
-        return
+            
+            # Extract book titles from assistant responses (look for ### **Title** pattern)
+            if msg['role'] == 'assistant':
+                titles = re.findall(r'###\s*\*\*(.+?)\*\*', msg['content'])
+                previously_recommended.update(titles)
+    
+    # Add note about previously recommended books
+    if previously_recommended:
+        history_text += f"\n\nLIVRES DÉJÀ RECOMMANDÉS (à éviter pour varier les recommandations):\n"
+        for title in previously_recommended:
+            history_text += f"- {title}\n"
 
     col = get_collection()
     if col is None:
@@ -296,21 +305,45 @@ def ask_question_stream(question, language="fr", timezone="UTC", locale="fr-FR",
             input=question
         ).data[0].embedding
 
-        # Query ChromaDB
-        results = col.query(
-            query_embeddings=[query_emb],
-            n_results=top_k,
-            include=['documents', 'metadatas']
-        )
+        # Build where filter for library selection
+        where_filter = None
+        if bibliotheque and bibliotheque != "all":
+            where_filter = {"bibliotheque": bibliotheque}
+
+        # Query ChromaDB with optional library filter
+        query_params = {
+            "query_embeddings": [query_emb],
+            "n_results": top_k,
+            "include": ['documents', 'metadatas']
+        }
+        if where_filter:
+            query_params["where"] = where_filter
+        
+        results = col.query(**query_params)
 
         if not results['documents'] or not results['documents'][0]:
             yield "No relevant information found. Please make sure you have indexed some transcripts."
             return
 
-        # Build context from results
+        # Build context from results with metadata
         contexts = []
+        metadatas = results.get('metadatas', [[]])[0]
         for i, doc in enumerate(results['documents'][0]):
-            contexts.append(doc)
+            # Include metadata with each document
+            metadata = metadatas[i] if i < len(metadatas) else {}
+            context_entry = f"Document {i+1}:\n{doc}"
+            
+            # Add relevant metadata fields
+            if metadata:
+                metadata_str = "\nMétadonnées:"
+                for key, value in metadata.items():
+                    if key in ['image', 'couverture', 'cover', 'image_url', 'cover_url', 'titre', 'title', 
+                               'auteur', 'author', 'lien', 'resume', 'summary', 'categorie', 'category',
+                               'editeur', 'publisher', 'parution', 'publication', 'pages', 'langue', 'language', 'bibliotheque']:
+                        metadata_str += f"\n- {key}: {value}"
+                context_entry += metadata_str
+            
+            contexts.append(context_entry)
         context = "\n\n".join(contexts)
 
         # Extraire les liens du contexte (with source metadata lookup)
@@ -386,7 +419,7 @@ def ask_question_stream(question, language="fr", timezone="UTC", locale="fr-FR",
         yield f"Error processing your question: {str(e)}"
 
 
-def ask_question_stream_gemini(question, language="fr", timezone="UTC", locale="fr-FR", top_k=5, conversation_history=None, session=None, question_id=None, model_name="gemini-2.0-flash-exp", agent=None):
+def ask_question_stream_gemini(question, language="fr", timezone="UTC", locale="fr-FR", top_k=15, conversation_history=None, session=None, question_id=None, model_name="gemini-2.0-flash-exp", agent=None, bibliotheque="all"):
     """Streaming answer using Gemini with new template system. 
     This function now uses build_prompt_from_template for consistency.
     """
@@ -394,25 +427,28 @@ def ask_question_stream_gemini(question, language="fr", timezone="UTC", locale="
     if conversation_history is None:
         conversation_history = []
 
-    # Build history_text for refusal_engine
+    # Build history_text for prompt template
     history_text = ""
+    # Extract previously recommended books from history to avoid repetition
+    previously_recommended = set()
+    
     if conversation_history and len(conversation_history) > 1:
         history_text = "\n\nHISTORIQUE DE LA CONVERSATION:\n"
         recent_history = conversation_history[-7:-1] if len(conversation_history) > 1 else []
         for msg in recent_history:
             role_label = "Utilisateur" if msg['role'] == 'user' else "Assistant"
             history_text += f"{role_label}: {msg['content']}\n"
-
-    # Refusal engine check
-    refusal_result = validate_user_query(question, llm_call_fn=None, language=language)
-    if refusal_result and refusal_result.get("decision") == "refuse":
-        if session is not None and question_id is not None:
-            if 'links' not in session:
-                session['links'] = {}
-            session['links'][question_id] = []
-        yield "__REFUSAL__"
-        yield refusal_result["answer"]
-        return
+            
+            # Extract book titles from assistant responses (look for ### **Title** pattern)
+            if msg['role'] == 'assistant':
+                titles = re.findall(r'###\s*\*\*(.+?)\*\*', msg['content'])
+                previously_recommended.update(titles)
+    
+    # Add note about previously recommended books
+    if previously_recommended:
+        history_text += f"\n\nLIVRES DÉJÀ RECOMMANDÉS (à éviter pour varier les recommandations):\n"
+        for title in previously_recommended:
+            history_text += f"- {title}\n"
 
     col = get_collection(kb_name=agent)
     if col is None:
@@ -426,21 +462,45 @@ def ask_question_stream_gemini(question, language="fr", timezone="UTC", locale="
             input=question
         ).data[0].embedding
 
-        # Query ChromaDB
-        results = col.query(
-            query_embeddings=[query_emb],
-            n_results=top_k,
-            include=['documents', 'metadatas']
-        )
+        # Build where filter for library selection
+        where_filter = None
+        if bibliotheque and bibliotheque != "all":
+            where_filter = {"bibliotheque": bibliotheque}
+
+        # Query ChromaDB with optional library filter
+        query_params = {
+            "query_embeddings": [query_emb],
+            "n_results": top_k,
+            "include": ['documents', 'metadatas']
+        }
+        if where_filter:
+            query_params["where"] = where_filter
+        
+        results = col.query(**query_params)
 
         if not results['documents'] or not results['documents'][0]:
             yield "No relevant information found. Please make sure you have indexed some transcripts."
             return
 
-        # Build context from results
+        # Build context from results with metadata
         contexts = []
+        metadatas = results.get('metadatas', [[]])[0]
         for i, doc in enumerate(results['documents'][0]):
-            contexts.append(doc)
+            # Include metadata with each document
+            metadata = metadatas[i] if i < len(metadatas) else {}
+            context_entry = f"Document {i+1}:\n{doc}"
+            
+            # Add relevant metadata fields
+            if metadata:
+                metadata_str = "\nMétadonnées:"
+                for key, value in metadata.items():
+                    if key in ['image', 'couverture', 'cover', 'image_url', 'cover_url', 'titre', 'title', 
+                               'auteur', 'author', 'lien', 'resume', 'summary', 'categorie', 'category',
+                               'editeur', 'publisher', 'parution', 'publication', 'pages', 'langue', 'language', 'bibliotheque']:
+                        metadata_str += f"\n- {key}: {value}"
+                context_entry += metadata_str
+            
+            contexts.append(context_entry)
         context = "\n\n".join(contexts)
 
         # Extract links from context

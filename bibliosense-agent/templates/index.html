@@ -20,12 +20,7 @@
             <button class="close-sidebar" id="close-sidebar" title="" data-i18n-title="sidebar.closeButton">×</button>
         </div>
         <nav class="sidebar-nav">
-            <a href="mailto:denis@imxtech.ca" class="sidebar-link" id="email-link" >
-                <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
-                </svg>
-                <span data-i18n="sidebar.contact">Me rejoindre</span>
-            </a>
+
             <a href="https://imxtech.ca/" target="_blank" rel="noopener noreferrer" class="sidebar-link" id="about-imx-link">
                 <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M12 7V3H2v18h20V7H12zM6 19H4v-2h2v2zm0-4H4v-2h2v2zm0-4H4V9h2v2zm0-4H4V5h2v2zm4 12H8v-2h2v2zm0-4H8v-2h2v2zm0-4H8V9h2v2zm0-4H8V5h2v2zm10 12h-8v-2h2v-2h-2v-2h2v-2h-2V9h8v10zm-2-8h-2v2h2v-2zm0 4h-2v2h2v-2z"/>
@@ -37,12 +32,6 @@
                     <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v2h-2zm0 4h2v6h-2z"/>
                 </svg>
                 <span data-i18n="sidebar.about">À propos</span>
-            </a>
-            <a href="#" class="sidebar-link" id="legal-link">
-                <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
-                </svg>
-                <span data-i18n="sidebar.legal">Avertissements</span>
             </a>
             <a href="/privacy.html" target="_blank" class="sidebar-link" id="privacy-link">
                 <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
@@ -70,6 +59,18 @@
             <span></span>
             <span></span>
         </button>
+        <div class="library-selector-container">
+            <label for="library-selector" class="library-label">
+                <svg viewBox="0 0 24 24" fill="white" style="width:18px;height:18px;margin-right:4px;">
+                    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                </svg>
+                <span data-i18n="components.librarySelector.label">Bibliothèque:</span>
+            </label>
+            <select id="library-selector" class="library-selector">
+                <option value="quebec" data-i18n="components.librarySelector.quebec">Ville de Québec</option>
+                <option value="montreal" data-i18n="components.librarySelector.montreal">Ville de Montréal</option>
+            </select>
+        </div>
     </header>
 
     <div class="content" id="chat-container">

@@ -132,6 +132,9 @@ function applyConfig(lang) {
     if (langSelector) {
         langSelector.value = lang;
     }
+    
+    // Update suggestion cards for the current language
+    populateSuggestionCards(lang);
 }
 
 /**

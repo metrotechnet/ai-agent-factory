@@ -13,7 +13,7 @@
             "args": ["new-agents/nutria/nutria-agent.json"]
         },
          {
-            "name": "Nutria - FastAPI",
+            "name": "bibliosense - FastAPI",
             "type": "debugpy",
             "request": "launch",
             "module": "uvicorn",
@@ -25,18 +25,18 @@
             ],
             "jinja": true,
             "env": {
-                "PYTHONPATH": "${workspaceFolder}/nutria-agent"
+                "PYTHONPATH": "${workspaceFolder}/bibliosense-agent"
             },
             "cwd": "${workspaceFolder}",
             "console": "integratedTerminal"
         },
          {
-            "name": "index_chromadb_json - Nutria",
+            "name": "index_chromadb_json - Bibliosense",
             "type": "debugpy",
             "request": "launch",
-            "program": "${workspaceFolder}/nutria-agent/core/index_chromadb_json.py",
+            "program": "${workspaceFolder}/bibliosense-agent/core/index_chromadb_json.py",
             "console": "integratedTerminal",
-            "args": ["${workspaceFolder}/nutria-agent/knowledge-base/agent"]
+            "args": ["${workspaceFolder}/bibliosense-agent/knowledge-base/agent"]
         }
     ]
 }

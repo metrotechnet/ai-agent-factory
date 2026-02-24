@@ -16,6 +16,41 @@ let userMessageDiv = document.createElement('div');
 let lastRequestTime = 0;
 const MIN_REQUEST_INTERVAL = 2000; // 2 seconds minimum between requests
 
+// Auto-scroll control
+let autoScrollEnabled = true;
+let isScrollingProgrammatically = false;
+
+// Configure marked.js to open links in new tab
+if (typeof marked !== 'undefined') {
+    const renderer = new marked.Renderer();
+    const linkRenderer = renderer.link;
+    renderer.link = (href, title, text) => {
+        const html = linkRenderer.call(renderer, href, title, text);
+        return html.replace(/^<a /, '<a target="_blank" rel="noopener noreferrer" ');
+    };
+    marked.setOptions({ renderer: renderer });
+}
+
+/**
+ * Check if text ends with incomplete markdown URL syntax
+ */
+function hasIncompleteUrl(text) {
+    // Check for incomplete markdown image: ![text](incomplete_url
+    // or incomplete markdown link: [text](incomplete_url
+    const imagePattern = /!\[[^\]]*\]\([^)]*$/;
+    const linkPattern = /\[[^\]]*\]\([^)]*$/;
+    
+    return imagePattern.test(text) || linkPattern.test(text);
+}
+
+/**
+ * Get selected library from selector
+ */
+function getSelectedLibrary() {
+    const selector = document.getElementById('library-selector');
+    return selector ? selector.value : 'all';
+}
+
 /**
  * Escape HTML to prevent XSS
  */
@@ -75,9 +110,7 @@ function createAssistantMessage() {
                 <button class="action-btn dislike-btn" title="Dislike" style="border-radius:50%;padding:8px;background:#f9e6e6;border:none;box-shadow:0 1px 4px rgba(0,0,0,0.07);margin-left:2px;cursor:pointer;width:40px;height:40px;display:inline-flex;align-items:center;justify-content:center;">
                     <i class="bi bi-hand-thumbs-down" style="font-size:1.3em;"></i>
                 </button>
-                <button class="action-btn tts-btn" title="" style="border-radius:50%;padding:8px;background:#c1ddf1;border:none;box-shadow:0 1px 4px rgba(0,0,0,0.07);margin-left:2px;cursor:pointer;width:40px;height:40px;display:inline-flex;align-items:center;justify-content:center;">
-                    <i class="bi bi-volume-up" style="font-size:1.3em;"></i>
-                </button>
+
             </div>
         </div>
     `;
@@ -214,16 +247,22 @@ function createBottomSpacer(userMsgDiv, assistantMsgDiv, offset = 10) {
 }
 
 /**
- * Scroll to message bottom
+ * Scroll to message bottom (only if auto-scroll is enabled)
  */
 function scrollToMessageBottom(assistantMsgDiv, offset = 0) {
     const chatContainer = document.getElementById('chat-container');
-    if (!chatContainer) return;
+    if (!chatContainer || !autoScrollEnabled) return;
     
+    isScrollingProgrammatically = true;
     const targetTop = assistantMsgDiv.offsetTop + assistantMsgDiv.offsetHeight - chatContainer.clientHeight + offset;
     if (targetTop > 0) {
         chatContainer.scrollTop = targetTop;
     }
+    
+    // Allow scroll event to fire, then reset flag
+    setTimeout(() => {
+        isScrollingProgrammatically = false;
+    }, 50);
 }
 
 /**
@@ -231,6 +270,7 @@ function scrollToMessageBottom(assistantMsgDiv, offset = 0) {
  */
 function prepareUIForLoading() {
     isLoading = true;
+    autoScrollEnabled = true; // Enable auto-scroll for new message
     const sendButton = document.getElementById('send-button');
     const inputBox = document.getElementById('input-box');
     const voiceButton = document.getElementById('voice-button');
@@ -287,7 +327,8 @@ async function handleStreamingResponse(question, contentDiv, actionsDiv) {
         language: getCurrentLanguage(),
         timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC",
         locale: navigator.language || (getCurrentLanguage() === 'en' ? 'en-US' : 'fr-FR'),
-        session_id: sessionId
+        session_id: sessionId,
+        bibliotheque: getSelectedLibrary()
     };
 
     const response = await fetch(`${BACKEND_URL}/query`, {
@@ -395,11 +436,16 @@ async function handleStreamingResponse(question, contentDiv, actionsDiv) {
 
                     if (data.chunk) {
                         fullText += data.chunk;
-                        if (typeof marked !== 'undefined') {
-                            contentDiv.innerHTML = marked.parse(fullText);
-                        } else {
-                            contentDiv.textContent = fullText;
-                        }
+                        
+                        // Only parse markdown if we don't have an incomplete URL
+                        // This prevents showing broken image/link URLs during streaming
+                        if (!hasIncompleteUrl(fullText)) {
+                            if (typeof marked !== 'undefined') {
+                                contentDiv.innerHTML = marked.parse(fullText);
+                            } else {
+                                contentDiv.textContent = fullText;
+                            }
+                        } 
                         scrollToMessageBottom(contentDiv.closest('.message'));
                     }
                   
@@ -505,6 +551,42 @@ async function sendMessage() {
 function isMessageLoading() {
     return isLoading;
 }
+
+// Initialize scroll listener to detect manual scrolling
+(function initScrollListener() {
+    const chatContainer = document.getElementById('chat-container');
+    if (!chatContainer) {
+        // Retry when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initScrollListener);
+        }
+        return;
+    }
+    
+    let scrollTimeout;
+    chatContainer.addEventListener('scroll', () => {
+        // Ignore programmatic scrolls
+        if (isScrollingProgrammatically) return;
+        
+        // Debounce to avoid excessive checks
+        clearTimeout(scrollTimeout);
+        scrollTimeout = setTimeout(() => {
+            const scrollTop = chatContainer.scrollTop;
+            const scrollHeight = chatContainer.scrollHeight;
+            const clientHeight = chatContainer.clientHeight;
+            const distanceFromBottom = scrollHeight - scrollTop - clientHeight;
+            
+            // If user scrolled to within 50px of bottom, re-enable auto-scroll
+            if (distanceFromBottom < 50) {
+                autoScrollEnabled = true;
+            } else {
+                // User scrolled up, disable auto-scroll
+                autoScrollEnabled = false;
+                console.log('Auto-scroll disabled due to user scroll');
+            }
+        }, 100);
+    });
+})();
 
 // Export for use in other modules
 window.ChatModule = {

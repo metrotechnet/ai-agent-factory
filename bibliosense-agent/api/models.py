@@ -12,6 +12,7 @@ class QueryRequest(BaseModel):
     timezone: str = "UTC"
     locale: str = "fr-FR"
     session_id: Optional[str] = None
+    bibliotheque: str = "all"  # Library filter: 'all', 'quebec', or 'montreal'
 
 
 class TranslateRequest(BaseModel):

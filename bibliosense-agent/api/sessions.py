@@ -44,7 +44,6 @@ def get_or_create_session(session_id: str = None) -> tuple[str, dict]:
             'created_at': datetime.now(),
             'last_activity': datetime.now(),
             'links': {},  # question_id -> link list
-            'refusals': set(),  # question_ids that were refused
         }
     
     session = conversation_sessions[session_id]
@@ -52,10 +51,6 @@ def get_or_create_session(session_id: str = None) -> tuple[str, dict]:
     # Ensure links dict exists for backward compatibility
     if 'links' not in session:
         session['links'] = {}
-    
-    # Ensure refusals set exists for backward compatibility
-    if 'refusals' not in session:
-        session['refusals'] = set()
     
     session['last_activity'] = datetime.now()
     

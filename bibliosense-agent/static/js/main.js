@@ -200,5 +200,21 @@ document.addEventListener('DOMContentLoaded', async function() {
         updateIndicator();
     }
     
+    // Library selector - Restore selection from localStorage
+    const librarySelector = document.getElementById('library-selector');
+    if (librarySelector) {
+        // Restore saved library preference
+        const savedLibrary = localStorage.getItem('selectedLibrary');
+        if (savedLibrary) {
+            librarySelector.value = savedLibrary;
+        }
+        
+        // Save selection when changed
+        librarySelector.addEventListener('change', function() {
+            localStorage.setItem('selectedLibrary', this.value);
+            console.log('Library selection changed to:', this.value);
+        });
+    }
+    
     console.log('Application initialized successfully');
 });

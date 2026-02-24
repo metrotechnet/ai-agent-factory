@@ -66,7 +66,7 @@ app.add_middleware(
 # Mount static files and templates
 app.mount("/static", StaticFiles(directory=str(PROJECT_ROOT / "static")), name="static")
 templates = Jinja2Templates(directory=str(PROJECT_ROOT / "templates"))
-
+ 
 # =====================================================
 # Include API Routes
 # =====================================================
@@ -77,7 +77,7 @@ app.include_router(report.router, tags=["report"])
 app.include_router(config_routes.router, tags=["config"])
 app.include_router(sessions.router, tags=["sessions"])
 app.include_router(update.router, tags=["update"])
-
+ 
 # =====================================================
 # Main Routes
 # =====================================================
