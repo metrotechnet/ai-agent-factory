@@ -32,7 +32,25 @@ if not exist "knowledge-base\agent\transcripts\*.*" (
     )
 )
 
-echo [INFO] Indexing documents from knowledge-base\agent\
+echo [INFO] Generating transcripts_chromadb.json from source documents...
+echo.
+
+REM Generate transcripts_chromadb.json from transcripts and documents
+python.exe .\core\generate_transcripts_json.py .\knowledge-base\agent\
+
+if %ERRORLEVEL% NEQ 0 (
+    echo.
+    echo [ERROR] Failed to generate transcripts_chromadb.json!
+    echo Check that:
+    echo   1. You have added documents to knowledge-base\agent\transcripts\ or documents\
+    echo   2. Python is installed and in PATH
+    echo.
+    pause
+    exit /b 1
+)
+
+echo.
+echo [INFO] Indexing documents to ChromaDB...
 echo.
 
 REM Run the indexing script

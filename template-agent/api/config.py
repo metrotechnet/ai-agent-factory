@@ -38,7 +38,8 @@ def deep_merge(base_config: dict, override_config: dict) -> dict:
 def get_config():
     """
     Get configuration for single-agent deployment.
-    Returns the agent configuration.
+    Merges common config with agent-specific config.
+    Agent config takes precedence over common config.
     
     Returns:
         Configuration dictionary for agent
@@ -46,11 +47,27 @@ def get_config():
     try:
         # Get knowledge base from environment variable or use default
         knowledge_base = os.getenv("KNOWLEDGE_BASE", "agent")
+        
+        # Load common config (base configuration)
+        common_config_path = PROJECT_ROOT / "knowledge-base" / "common" / "config.json"
+        common_config = {}
+        if common_config_path.exists():
+            with open(common_config_path, 'r', encoding='utf-8') as f:
+                common_config = json.load(f)
+        
+        # Load agent-specific config (override configuration)
         agent_config_path = PROJECT_ROOT / "knowledge-base" / knowledge_base / "config.json"
         
         if agent_config_path.exists():
             with open(agent_config_path, 'r', encoding='utf-8') as f:
-                return json.load(f)
+                agent_config = json.load(f)
+            
+            # Merge: common config as base, agent config as override
+            return deep_merge(common_config, agent_config)
+        
+        # If agent config doesn't exist but common does, return common
+        if common_config:
+            return common_config
         
         # Provide detailed error with debugging info
         kb_dir = PROJECT_ROOT / "knowledge-base"
@@ -64,6 +81,7 @@ def get_config():
                 "project_root": str(PROJECT_ROOT),
                 "knowledge_base": knowledge_base,
                 "config_path": str(agent_config_path),
+                "common_config_path": str(common_config_path),
                 "kb_dir_exists": kb_dir.exists(),
                 "available_knowledge_bases": available_kbs
             }

@@ -167,14 +167,29 @@ def index_chromadb_json(kb_path):
         
         print(f"  ✅ Successfully prepared {doc_id}")
     
-    # Add all documents to ChromaDB in one batch
+    # Add all documents to ChromaDB in batches to avoid max batch size errors
     print(f"\n📊 Indexing {total_chunks} chunks into ChromaDB...")
-    collection.add(
-        ids=all_ids,
-        embeddings=all_embeddings,
-        documents=all_documents,
-        metadatas=all_metadatas
-    )
+    
+    BATCH_SIZE = 1000  # Safe batch size for ChromaDB
+    total_batches = (len(all_ids) + BATCH_SIZE - 1) // BATCH_SIZE
+    
+    for batch_idx in range(total_batches):
+        start_idx = batch_idx * BATCH_SIZE
+        end_idx = min((batch_idx + 1) * BATCH_SIZE, len(all_ids))
+        
+        batch_ids = all_ids[start_idx:end_idx]
+        batch_embeddings = all_embeddings[start_idx:end_idx]
+        batch_documents = all_documents[start_idx:end_idx]
+        batch_metadatas = all_metadatas[start_idx:end_idx]
+        
+        print(f"   Batch {batch_idx + 1}/{total_batches}: Adding {len(batch_ids)} chunks...")
+        
+        collection.add(
+            ids=batch_ids,
+            embeddings=batch_embeddings,
+            documents=batch_documents,
+            metadatas=batch_metadatas
+        )
     
     print(f"\n✅ Successfully indexed {total_chunks} chunks from {len(documents)} documents!")
     print(f"📦 Collection: {collection.name}")
