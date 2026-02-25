@@ -1,0 +1,132 @@
+{
+  "fr": {
+
+    "intro": {
+      "title": "Traduction Instantanée",
+      "description": "Traduisez vos textes dans plus de 25 langues. L'agent supporte la traduction de texte et audio.",
+      "disclaimer": "Note : Traduction automatique. Pour des documents officiels, consultez un traducteur professionnel.",
+      "profileAlt": "Agent Traducteur",
+      "profileImage": "/static/logos/logo-translator.png"
+    },
+    "suggestions": {
+      "text_translation": {
+        "title": "📝 Traduction de texte",
+        "description": "Traduisez du texte écrit dans n'importe quelle langue"
+      },
+      "audio_translation": {
+        "title": "🎤 Traduction audio",
+        "description": "Enregistrez ou uploadez de l'audio pour traduction"
+      }
+    },
+    "components": {
+      "inputArea": {
+        "showInputOnLoad": true,
+        "placeholder": "Écrivez votre texte à traduire...",
+        "sendButton": "Traduire",
+        "voiceButton": "Enregistrer un message vocal",
+        "disclaimer": "⚠️ Traduction automatique. Vérifiez toujours le résultat."
+      },
+      "languageSelector": {
+        "sourceLabel": "De",
+        "targetLabel": "Vers",
+        "reverseBtnTitle": "Inverser la direction de traduction",
+        "defaultSource": "fr",
+        "defaultTarget": "en",
+        "languages": {
+          "ar": "العربية (Arabe)",
+          "cs": "Čeština (Tchèque)",
+          "da": "Dansk (Danois)",
+          "de": "Deutsch (Allemand)",
+          "el": "Ελληνικά (Grec)",
+          "en": "English (Anglais)",
+          "es": "Español (Espagnol)",
+          "fi": "Suomi (Finnois)",
+          "fr": "Français (French)",
+          "he": "עברית (Hébreu)",
+          "hi": "हिन्दी (Hindi)",
+          "id": "Bahasa Indonesia (Indonésien)",
+          "it": "Italiano (Italien)",
+          "ja": "日本語 (Japonais)",
+          "ko": "한국어 (Coréen)",
+          "nl": "Nederlands (Néerlandais)",
+          "no": "Norsk (Norvégien)",
+          "pl": "Polski (Polonais)",
+          "pt": "Português (Portugais)",
+          "ro": "Română (Roumain)",
+          "ru": "Русский (Russe)",
+          "sv": "Svenska (Suédois)",
+          "th": "ไทย (Thaï)",
+          "tr": "Türkçe (Turc)",
+          "uk": "Українська (Ukrainien)",
+          "vi": "Tiếng Việt (Vietnamien)",
+          "zh": "中文 (Chinois)"
+        }
+      }
+    }
+  },
+  "en": {
+
+    "intro": {
+      "title": "Instant Translation",
+      "description": "Translate your texts into more than 25 languages. The agent supports text and audio translation.",
+      "disclaimer": "Note: Automatic translation. For official documents, consult a professional translator.",
+      "profileAlt": "Translator Agent",
+      "profileImage": "/static/logos/logo-translator.png"
+    },
+    "suggestions": {
+      "text_translation": {
+        "title": "📝 Text translation",
+        "description": "Translate written text in any language"
+      },
+      "audio_translation": {
+        "title": "🎤 Audio translation",
+        "description": "Record or upload audio for translation"
+      }
+    },
+    "components": {
+      "inputArea": {
+        "showInputOnLoad": true,
+        "placeholder": "Write your text to translate...",
+        "sendButton": "Translate",
+        "voiceButton": "Record voice message",
+        "disclaimer": "⚠️ Automatic translation. Always verify the result."
+      },
+      "languageSelector": {
+        "sourceLabel": "From",
+        "targetLabel": "To",
+        "reverseBtnTitle": "Reverse translation direction",
+        "defaultSource": "en",
+        "defaultTarget": "fr",
+        "languages": {
+          "ar": "العربية (Arabic)",
+          "cs": "Čeština (Czech)",
+          "da": "Dansk (Danish)",
+          "de": "Deutsch (German)",
+          "el": "Ελληνικά (Greek)",
+          "en": "English",
+          "es": "Español (Spanish)",
+          "fi": "Suomi (Finnish)",
+          "fr": "Français (French)",
+          "he": "עברית (Hebrew)",
+          "hi": "हिन्दी (Hindi)",
+          "id": "Bahasa Indonesia (Indonesian)",
+          "it": "Italiano (Italian)",
+          "ja": "日本語 (Japanese)",
+          "ko": "한국어 (Korean)",
+          "nl": "Nederlands (Dutch)",
+          "no": "Norsk (Norwegian)",
+          "pl": "Polski (Polish)",
+          "pt": "Português (Portuguese)",
+          "ro": "Română (Romanian)",
+          "ru": "Русский (Russian)",
+          "sv": "Svenska (Swedish)",
+          "th": "ไทย (Thai)",
+          "tr": "Türkçe (Turkish)",
+          "uk": "Українська (Ukrainian)",
+          "vi": "Tiếng Việt (Vietnamese)",
+          "zh": "中文 (Chinese)"
+        }
+      }
+    }
+  }
+}

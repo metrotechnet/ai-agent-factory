@@ -12,8 +12,14 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy application files (including chroma_db)
-COPY . .
+# Copy application files explicitly
+COPY app.py .
+COPY startup.sh .
+COPY api/ ./api/
+COPY core/ ./core/
+COPY static/ ./static/
+COPY templates/ ./templates/
+COPY knowledge-base/ ./knowledge-base/
 
 # Make startup script executable
 RUN chmod +x startup.sh

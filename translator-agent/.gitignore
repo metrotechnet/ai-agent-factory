@@ -12,6 +12,7 @@ config/gdrive_credentials.json
 !firebase.json
 !package.json
 !tsconfig.json
+!knowledge-base/**/*.json
 *-credentials.json
 service-account*.json
 
