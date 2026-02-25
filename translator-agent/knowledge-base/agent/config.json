@@ -30,6 +30,7 @@
         "sourceLabel": "De",
         "targetLabel": "Vers",
         "reverseBtnTitle": "Inverser la direction de traduction",
+        "swapHint": "Cliquez pour inverser",
         "defaultSource": "fr",
         "defaultTarget": "en",
         "languages": {
@@ -95,6 +96,7 @@
         "sourceLabel": "From",
         "targetLabel": "To",
         "reverseBtnTitle": "Reverse translation direction",
+        "swapHint": "Click to swap",
         "defaultSource": "en",
         "defaultTarget": "fr",
         "languages": {

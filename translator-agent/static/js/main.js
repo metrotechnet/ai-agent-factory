@@ -162,6 +162,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     // ===================================
     // TRANSLATION DIRECTION BUTTON
     // ===================================
+    // Button to swap translation languages (e.g., FR→EN becomes EN→FR)
     
     if (translationDirectionBtn) {
         translationDirectionBtn.addEventListener('click', function() {

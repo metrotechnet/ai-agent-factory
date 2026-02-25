@@ -80,11 +80,14 @@
                 <select id="source-language" class="language-select">
                     <!-- Populated dynamically from config.json -->
                 </select>
-                <button class="translation-direction-btn" id="translation-direction-btn" data-i18n-title="components.languageSelector.reverseBtnTitle" title="Inverser la direction de traduction">
-                    <svg viewBox="0 0 24 24" fill="currentColor" style="width:20px;height:20px;">
-                        <path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/>
-                    </svg>
-                </button>
+                <div class="swap-button-container">
+                    <button class="translation-direction-btn" id="translation-direction-btn" data-i18n-title="components.languageSelector.reverseBtnTitle" title="Inverser la direction de traduction">
+                        <svg viewBox="0 0 24 24" fill="currentColor" style="width:20px;height:20px;">
+                            <path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/>
+                        </svg>
+                    </button>
+                    <span class="swap-hint" data-i18n="components.languageSelector.swapHint">↑ Cliquez pour inverser</span>
+                </div>
                 <label for="target-language" data-i18n="components.languageSelector.targetLabel">Vers</label>
                 <select id="target-language" class="language-select">
                     <!-- Populated dynamically from config.json -->
@@ -95,8 +98,8 @@
                     <textarea 
                         id="input-box" 
                         class="input-box" 
-                        placeholder="Pose-moi une question..." 
-                        data-i18n-placeholder="input.placeholder"
+                        placeholder="Écrivez votre texte à traduire..." 
+                        data-i18n-placeholder="components.inputArea.placeholder"
                         rows="1"
                     ></textarea>
                     <div class="input-buttons">

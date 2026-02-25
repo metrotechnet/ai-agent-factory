@@ -205,6 +205,13 @@ async function sendTranslation() {
                 `;
                 actionsDiv.style.display = '';
                 
+                // Store target language in TTS button for later playback
+                const ttsBtn = actionsDiv.querySelector('.tts-btn');
+                if (ttsBtn) {
+                    ttsBtn.dataset.ttsLanguage = actualTargetLang;
+                    console.log('Stored TTS language in button:', actualTargetLang);
+                }
+                
                 if (questionId) {
                     const likeBtn = actionsDiv.querySelector('.like-btn');
                     const dislikeBtn = actionsDiv.querySelector('.dislike-btn');

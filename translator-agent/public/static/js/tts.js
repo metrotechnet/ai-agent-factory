@@ -30,8 +30,11 @@ function stopTTS() {
 
 /**
  * Speak text using OpenAI TTS
+ * @param {string} text - The text to speak
+ * @param {HTMLElement} button - The button that triggered TTS (optional)
+ * @param {string} languageOverride - Specific language code to use (optional, overrides interface language)
  */
-async function speakText(text, button = null) {
+async function speakText(text, button = null, languageOverride = null) {
     if (!text || text.trim().length === 0) {
         console.log('TTS skipped: empty text');
         return;
@@ -67,7 +70,10 @@ async function speakText(text, button = null) {
     if (!cleanText) return;
     
     const { BACKEND_URL, getCurrentLanguage } = window.ConfigModule;
-    console.log('TTS: speaking', cleanText.length, 'chars, language:', getCurrentLanguage());
+    
+    // Use languageOverride if provided, otherwise use interface language
+    const ttsLanguage = languageOverride || getCurrentLanguage();
+    console.log('TTS: speaking', cleanText.length, 'chars, language:', ttsLanguage, languageOverride ? '(override)' : '(interface)');
 
     try {
         const response = await fetch(`${BACKEND_URL}/api/tts`, {
@@ -75,7 +81,7 @@ async function speakText(text, button = null) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 text: cleanText,
-                language: getCurrentLanguage()
+                language: ttsLanguage
             })
         });
         

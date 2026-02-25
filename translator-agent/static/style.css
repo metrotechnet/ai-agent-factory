@@ -217,20 +217,34 @@ footer {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    background: #6366f1;
+    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
     border: none;
     border-radius: 50%;
     width: 36px;
     height: 36px;
-    margin: 0 8px;
+    margin: 0;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.3s ease;
     color: white;
     flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3), 
+                0 1px 3px rgba(0, 0, 0, 0.1);
+    position: relative;
+}
+
+.translation-direction-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
 }
 
 .translation-direction-btn svg {
     transition: transform 0.3s ease;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
 }
 
 .translation-direction-btn.reversed svg {
@@ -238,12 +252,37 @@ footer {
 }
 
 .translation-direction-btn:hover {
-    background: #4f46e5;
-    transform: scale(1.1);
+    background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4), 
+                0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.translation-direction-btn:hover::before {
+    opacity: 1;
 }
 
 .translation-direction-btn:active {
-    transform: scale(0.95);
+    transform: translateY(0) scale(0.95);
+    box-shadow: 0 1px 4px rgba(99, 102, 241, 0.3);
+    transition: all 0.1s ease;
+}
+
+.swap-button-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    margin: 0 8px;
+}
+
+.swap-hint {
+    font-size: 0.7rem;
+    color: #6366f1;
+    white-space: nowrap;
+    opacity: 0.7;
+    font-weight: 500;
+    text-align: center;
 }
 
 .language-select {
@@ -340,14 +379,31 @@ footer {
     }
 
     .translation-direction-btn {
-        width: 30px;
-        height: 30px;
-        margin: 0 4px;
+        width: 32px;
+        height: 32px;
+        margin: 0;
+        box-shadow: 0 2px 6px rgba(99, 102, 241, 0.3), 
+                    0 1px 2px rgba(0, 0, 0, 0.1);
+    }
+
+    .translation-direction-btn:active {
+        transform: scale(0.90);
+        box-shadow: 0 1px 3px rgba(99, 102, 241, 0.3);
     }
 
     .translation-direction-btn svg {
         width: 16px;
         height: 16px;
+    }
+
+    .swap-button-container {
+        margin: 0 4px;
+        gap: 2px;
+    }
+
+    .swap-hint {
+        font-size: 0.6rem;
+        display: none; /* Hide hint on mobile to save space */
     }
 
     .language-select {

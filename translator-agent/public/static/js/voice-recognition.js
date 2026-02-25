@@ -398,9 +398,9 @@ async function transcribeWithWhisper(audioBlob) {
             console.log('Whisper transcription:', result.text);
             
             // Automatically send the message
-            if (window.ChatModule && window.ChatModule.sendMessage) {
-                window.ChatModule.sendMessage();
-            }
+            // if (window.ChatModule && window.ChatModule.sendMessage) {
+            //     window.ChatModule.sendMessage();
+            // }
         } else if (result.error) {
             console.error('Whisper transcription error:', result.error);
             const inputBox = document.getElementById('input-box');

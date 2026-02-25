@@ -29,39 +29,53 @@ def get_languages():
 
 @router.post("/api/translate")
 @limiter.limit("20/hour")
-async def translate_text_endpoint(request_obj: Request, request: TranslateRequest):
+async def translate_text_endpoint(request: Request, translate_request: TranslateRequest):
     """Translate text to target language using GPT with streaming."""
-    question_id = str(uuid.uuid4())
-    
-    def generate():
-        # Send question_id in first chunk
-        yield f"data: {json.dumps({'question_id': question_id, 'chunk': ''})}\n\n"
+    try:
+        question_id = str(uuid.uuid4())
         
-        translated = ""
-        for chunk in translate_text_stream(
-            text=request.text,
-            target_language=request.target_language,
-            source_language=request.source_language
-        ):
-            translated += chunk
-            yield f"data: {json.dumps({'chunk': chunk})}\n\n"
-        
-        # Save translation to log
-        save_question_response(
-            question_id, 
-            f"[TRANSLATION {request.source_language}→{request.target_language}] {request.text}",
-            translated
-        )
+        def generate():
+            # Send question_id in first chunk
+            yield f"data: {json.dumps({'question_id': question_id, 'chunk': ''})}\n\n"
+            
+            translated = ""
+            for chunk in translate_text_stream(
+                text=translate_request.text,
+                target_language=translate_request.target_language,
+                source_language=translate_request.source_language
+            ):
+                translated += chunk
+                yield f"data: {json.dumps({'chunk': chunk})}\n\n"
+            
+            # Save translation to log
+            save_question_response(
+                question_id, 
+                f"[TRANSLATION {translate_request.source_language}→{translate_request.target_language}] {translate_request.text}",
+                translated
+            )
 
-    return StreamingResponse(
-        generate(),
-        media_type="text/event-stream",
-        headers={
-            "Cache-Control": "no-cache",
-            "X-Accel-Buffering": "no",
-            "Connection": "keep-alive",
-        }
-    )
+        # Get origin from request for CORS
+        origin = request.headers.get("origin", "*")
+        
+        return StreamingResponse(
+            generate(),
+            media_type="text/event-stream",
+            headers={
+                "Cache-Control": "no-cache",
+                "X-Accel-Buffering": "no",
+                "Connection": "keep-alive",
+                "Access-Control-Allow-Origin": origin,
+                "Access-Control-Allow-Credentials": "true",
+            }
+        )
+    except Exception as e:
+        print(f"[ERROR] Translation error: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return JSONResponse(
+            status_code=500,
+            content={"error": str(e)}
+        )
 
 
 @router.post("/api/transcribe_audio")

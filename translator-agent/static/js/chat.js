@@ -111,6 +111,14 @@ function setupMessageActions(messageDiv, contentDiv) {
             }
             
             let textToSpeak;
+            let ttsLanguage = null;
+            
+            // Check if button has stored language (for translations)
+            if (ttsBtn.dataset.ttsLanguage) {
+                ttsLanguage = ttsBtn.dataset.ttsLanguage;
+                console.log('Using stored TTS language from button:', ttsLanguage);
+            }
+            
             const translationResult = contentDiv.querySelector('.translation-result > div:last-child');
             if (translationResult) {
                 textToSpeak = translationResult.textContent || translationResult.innerText;
@@ -119,7 +127,7 @@ function setupMessageActions(messageDiv, contentDiv) {
             }
             
             if (textToSpeak && textToSpeak.trim()) {
-                speakText(textToSpeak, ttsBtn);
+                speakText(textToSpeak, ttsBtn, ttsLanguage);
             }
         });
     }

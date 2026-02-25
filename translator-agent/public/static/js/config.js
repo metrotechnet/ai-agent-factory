@@ -225,6 +225,9 @@ function switchLanguage(lang) {
     
     applyConfig(lang);
     
+    // Update suggestion cards with new language
+    populateSuggestionCards(lang);
+    
     // Update language selector value
     const langSelector = document.getElementById('language-selector');
     if (langSelector) {
