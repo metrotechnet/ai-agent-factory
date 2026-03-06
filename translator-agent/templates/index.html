@@ -12,6 +12,23 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- Marked.js for Markdown rendering -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    
+    <!-- Firebase Configuration -->
+    <script>
+        // Firebase project configuration (set via environment variables during deployment)
+        window.FIREBASE_PROJECT_ID = "{{FIREBASE_PROJECT_ID}}";
+        window.FIREBASE_API_KEY = "{{FIREBASE_API_KEY}}";
+        window.FIREBASE_AUTH_DOMAIN = "{{FIREBASE_AUTH_DOMAIN}}";
+        window.FIREBASE_STORAGE_BUCKET = "{{FIREBASE_STORAGE_BUCKET}}";
+        window.FIREBASE_MESSAGING_SENDER_ID = "{{FIREBASE_MESSAGING_SENDER_ID}}";
+        window.FIREBASE_APP_ID = "{{FIREBASE_APP_ID}}";
+        window.FIREBASE_MEASUREMENT_ID = "{{FIREBASE_MEASUREMENT_ID}}";
+        window.RECAPTCHA_SITE_KEY = "{{RECAPTCHA_SITE_KEY}}";
+        window.APP_CHECK_ENABLED = "{{APP_CHECK_ENABLED}}";        
+        window.APP_CHECK_DEBUG_TOKEN = "{{APP_CHECK_DEBUG_TOKEN}}"; // Debug token for local testing    
+    </script> 
+
+
 </head>
 <body style="display:none;">
     <div class="sidebar" id="sidebar">
@@ -75,20 +92,25 @@
     </div>
     <footer>
             <!-- Translation language selector (hidden by default, shown when translator agent is active) -->
+            <div class="swap-hint">
+                <span class="swap-hint-source" data-i18n="components.languageSelector.sourceLabel">De</span>
+                <span data-i18n="components.languageSelector.swapHint">Cliquez pour inverser</span>
+                <span class="swap-hint-target" data-i18n="components.languageSelector.targetLabel">Vers</span>
+            </div>
+
             <div class="translate-options" id="translate-options" style="display:none;">
-                <label for="source-language" data-i18n="components.languageSelector.sourceLabel">De</label>
                 <select id="source-language" class="language-select">
                     <!-- Populated dynamically from config.json -->
                 </select>
-                <div class="swap-button-container">
-                    <button class="translation-direction-btn" id="translation-direction-btn" data-i18n-title="components.languageSelector.reverseBtnTitle" title="Inverser la direction de traduction">
-                        <svg viewBox="0 0 24 24" fill="currentColor" style="width:20px;height:20px;">
-                            <path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/>
-                        </svg>
-                    </button>
-                    <span class="swap-hint" data-i18n="components.languageSelector.swapHint">↑ Cliquez pour inverser</span>
+                <div class="swap-wrapper">
+                    <div class="swap-button-container">
+                        <button class="translation-direction-btn" id="translation-direction-btn" data-i18n-title="components.languageSelector.reverseBtnTitle" title="Inverser la direction de traduction">
+                            <svg viewBox="0 0 24 24" fill="currentColor" style="width:20px;height:20px;">
+                                <path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/>
+                            </svg>
+                        </button>
+                    </div>
                 </div>
-                <label for="target-language" data-i18n="components.languageSelector.targetLabel">Vers</label>
                 <select id="target-language" class="language-select">
                     <!-- Populated dynamically from config.json -->
                 </select>
@@ -143,6 +165,8 @@
     <!-- Modular JavaScript files (load in dependency order) -->
     <!-- Backend URL configuration must load first -->
     <script src="/static/js/backend-url.js"></script>
+    <!-- Firebase App Check must load before making API calls -->
+    <script type="module" src="/static/js/firebase-config.js"></script>
     <script src="/static/js/config.js"></script>
     <script src="/static/js/components.js"></script>
     <script src="/static/js/ui-utils.js"></script>

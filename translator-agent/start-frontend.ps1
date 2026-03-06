@@ -11,7 +11,10 @@ Write-Host ""
 Write-Host "Frontend UI:  http://localhost:$PORT" -ForegroundColor Cyan
 Write-Host "========================================================" -ForegroundColor Cyan
 Write-Host ""
-Write-Host "NOTE: Make sure the backend is running at http://localhost:8080" -ForegroundColor Yellow
+Write-Host "NOTE: Frontend will connect to PRODUCTION backend:" -ForegroundColor Yellow
+Write-Host "      https://imx-translator-4ykvm5teta-uk.a.run.app" -ForegroundColor Cyan
+Write-Host ""
+Write-Host "To use LOCAL backend instead, edit static/js/backend-url.js" -ForegroundColor Gray
 Write-Host "Press Ctrl+C to stop the server" -ForegroundColor Yellow
 Write-Host ""
 
