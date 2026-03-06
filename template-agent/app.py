@@ -14,6 +14,7 @@ from slowapi.errors import RateLimitExceeded
 
 # Import route modules
 from api.routes import query, translation, tts, report, config as config_routes, sessions, update
+from api.app_check import verify_app_check_middleware
 
 # =====================================================
 # Configuration & Application Setup
@@ -62,6 +63,13 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# =====================================================
+# Firebase App Check Middleware
+# =====================================================
+# Verify App Check tokens to ensure requests come from legitimate app instances
+# Enable by setting APP_CHECK_ENABLED=true in environment variables
+app.middleware("http")(verify_app_check_middleware)
 
 # Mount static files and templates
 app.mount("/static", StaticFiles(directory=str(PROJECT_ROOT / "static")), name="static")
