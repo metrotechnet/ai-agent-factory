@@ -25,7 +25,7 @@ const firebaseConfig = {
 
 // App Check configuration
 const APP_CHECK_ENABLED = true;
-const RECAPTCHA_SITE_KEY = window.RECAPTCHA_SITE_KEY || "6LeI834sAAAAAN0tbvdmSeajxCYCj3uarepl_jSh";
+const RECAPTCHA_SITE_KEY = window.RECAPTCHA_SITE_KEY ;
 const APP_CHECK_DEBUG_TOKEN = window.APP_CHECK_DEBUG_TOKEN || ""; // Debug token for testing
 
 
