@@ -23,6 +23,8 @@ def contains_medical_disclaimer(response_text):
     
     # French patterns
     french_patterns = [
+        'je ne peux pas répondre',
+        'je ne peux pas répondre à cette question',
         'consulter un professionnel',
         'consulte un professionnel',
         'consultez un professionnel',
@@ -44,6 +46,8 @@ def contains_medical_disclaimer(response_text):
     
     # English patterns
     english_patterns = [
+        'i cannot answer',
+        'i cannot answer this question',
         'consult a professional',
         'consult your doctor',
         'see a doctor',

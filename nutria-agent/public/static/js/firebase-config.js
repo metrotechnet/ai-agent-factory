@@ -53,16 +53,16 @@ async function initializeFirebaseAppCheck() {
     try {
         // Initialize Firebase
         const app = initializeApp(firebaseConfig);
-        console.log('[App Check] Firebase initialized');
+        // console.log('[App Check] Firebase initialized');
 
         // Enable debug mode for localhost (generates debug token automatically)
         const isLocalhost = location.hostname === "localhost" || location.hostname === "127.0.0.1";
         if (isLocalhost) {
             self.FIREBASE_APPCHECK_DEBUG_TOKEN = true;
-            console.log('🔧 [App Check] Debug mode enabled for localhost');
-            console.log('⚠️ [App Check] IMPORTANT: Look for a message like "Firebase App Check debug token:" in the console');
-            console.log('⚠️ [App Check] Copy that token and add it to Firebase Console:');
-            console.log('   → https://console.firebase.google.com/u/0/project/' + firebaseConfig.projectId + '/appcheck/apps');
+            // console.log('🔧 [App Check] Debug mode enabled for localhost');
+            // console.log('⚠️ [App Check] IMPORTANT: Look for a message like "Firebase App Check debug token:" in the console');
+            // console.log('⚠️ [App Check] Copy that token and add it to Firebase Console:');
+            // console.log('   → https://console.firebase.google.com/u/0/project/' + firebaseConfig.projectId + '/appcheck/apps');
         }
 
         // Check for valid reCAPTCHA key
@@ -71,9 +71,9 @@ async function initializeFirebaseAppCheck() {
                                  !RECAPTCHA_SITE_KEY.includes('YOUR_');
 
         if (hasValidRecaptcha) {
-            console.log('[App Check] Using reCAPTCHA v3 with key:', RECAPTCHA_SITE_KEY.substring(0, 20) + '...');
-            console.log('[App Check] App ID:', firebaseConfig.appId);
-            console.log('[App Check] Project ID:', firebaseConfig.projectId);
+            // console.log('[App Check] Using reCAPTCHA v3 with key:', RECAPTCHA_SITE_KEY.substring(0, 20) + '...');
+            // console.log('[App Check] App ID:', firebaseConfig.appId);
+            // console.log('[App Check] Project ID:', firebaseConfig.projectId);
             
             // ReCaptchaV3Provider automatically handles debug tokens when FIREBASE_APPCHECK_DEBUG_TOKEN is set
             appCheck = initializeAppCheck(app, {
@@ -81,11 +81,11 @@ async function initializeFirebaseAppCheck() {
                 isTokenAutoRefreshEnabled: true
             });
             appCheckInitialized = true;
-            console.log('[App Check] ✅ Initialized with reCAPTCHA v3' + (isLocalhost ? ' (debug mode)' : ' (production mode)'));
+            // console.log('[App Check] ✅ Initialized with reCAPTCHA v3' + (isLocalhost ? ' (debug mode)' : ' (production mode)'));
             
             if (!isLocalhost) {
-                console.log('[App Check] Production mode - ensure your app is registered in Firebase Console:');
-                console.log('   → https://console.firebase.google.com/u/0/project/' + firebaseConfig.projectId + '/appcheck');
+                // console.log('[App Check] Production mode - ensure your app is registered in Firebase Console:');
+                // console.log('   → https://console.firebase.google.com/u/0/project/' + firebaseConfig.projectId + '/appcheck');
             }
         }
         else {
