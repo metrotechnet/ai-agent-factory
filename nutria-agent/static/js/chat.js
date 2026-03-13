@@ -16,6 +16,10 @@ let userMessageDiv = document.createElement('div');
 let lastRequestTime = 0;
 const MIN_REQUEST_INTERVAL = 2000; // 2 seconds minimum between requests
 
+// Auto-scroll control
+let autoScrollEnabled = true;
+let isScrollingProgrammatically = false;
+
 /**
  * Escape HTML to prevent XSS
  */
@@ -214,16 +218,22 @@ function createBottomSpacer(userMsgDiv, assistantMsgDiv, offset = 10) {
 }
 
 /**
- * Scroll to message bottom
+ * Scroll to message bottom (only if auto-scroll is enabled)
  */
 function scrollToMessageBottom(assistantMsgDiv, offset = 0) {
     const chatContainer = document.getElementById('chat-container');
-    if (!chatContainer) return;
+    if (!chatContainer || !autoScrollEnabled) return;
     
+    isScrollingProgrammatically = true;
     const targetTop = assistantMsgDiv.offsetTop + assistantMsgDiv.offsetHeight - chatContainer.clientHeight + offset;
     if (targetTop > 0) {
         chatContainer.scrollTop = targetTop;
     }
+    
+    // Allow scroll event to fire, then reset flag
+    setTimeout(() => {
+        isScrollingProgrammatically = false;
+    }, 50);
 }
 
 /**
@@ -231,6 +241,7 @@ function scrollToMessageBottom(assistantMsgDiv, offset = 0) {
  */
 function prepareUIForLoading() {
     isLoading = true;
+    autoScrollEnabled = true; // Enable auto-scroll for new message
     const sendButton = document.getElementById('send-button');
     const inputBox = document.getElementById('input-box');
     const voiceButton = document.getElementById('voice-button');
@@ -505,6 +516,49 @@ async function sendMessage() {
 function isMessageLoading() {
     return isLoading;
 }
+
+// ===================================
+// USER SCROLL DETECTION
+// ===================================
+
+/**
+ * Detect user scroll and disable auto-scroll
+ */
+(function initScrollListener() {
+    const chatContainer = document.getElementById('chat-container');
+    
+    if (!chatContainer) {
+        // If DOM not ready, wait for it
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initScrollListener);
+        }
+        return;
+    }
+    
+    let scrollTimeout;
+    chatContainer.addEventListener('scroll', () => {
+        // Ignore programmatic scrolls
+        if (isScrollingProgrammatically) return;
+        
+        // Debounce to avoid excessive checks
+        clearTimeout(scrollTimeout);
+        scrollTimeout = setTimeout(() => {
+            const scrollTop = chatContainer.scrollTop;
+            const scrollHeight = chatContainer.scrollHeight;
+            const clientHeight = chatContainer.clientHeight;
+            const distanceFromBottom = scrollHeight - scrollTop - clientHeight;
+            
+            // If user scrolled to within 50px of bottom, re-enable auto-scroll
+            if (distanceFromBottom < 50) {
+                autoScrollEnabled = true;
+            } else {
+                // User scrolled up, disable auto-scroll
+                autoScrollEnabled = false;
+                console.log('Auto-scroll disabled due to user scroll');
+            }
+        }, 100);
+    });
+})();
 
 // Export for use in other modules
 window.ChatModule = {

@@ -70,8 +70,6 @@ async def query_agent(request: Request, query_request: QueryRequest):
             # Save question and response to log
             save_question_response(question_id, query_request.question, assistant_response)
             
-            # Check if response contains medical disclaimer (don't show links)
-            has_medical_disclaimer = contains_medical_disclaimer(assistant_response)
             
             # Add to history
             assistant_message = {
@@ -81,8 +79,8 @@ async def query_agent(request: Request, query_request: QueryRequest):
             }
             conversation_history.append(assistant_message)
             
-            # Send links as final SSE event (empty if medical disclaimer)
-            links = session['links'].get(question_id, []) if not has_medical_disclaimer else []
+            # Send links as final SSE event
+            links = session['links'].get(question_id, [])
             yield f"data: {json.dumps({'links': links})}\n\n"
             
             # Send completion marker

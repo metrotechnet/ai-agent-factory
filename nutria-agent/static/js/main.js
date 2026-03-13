@@ -8,9 +8,48 @@
  */
 
 /**
+ * Warm up the backend to avoid cold start delay on first user query
+ */
+async function warmupBackend() {
+    const overlay = document.getElementById('initial-loading-overlay');
+    
+    try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+        
+        const response = await fetch(`${window.BACKEND_URL}/health`, {
+            method: 'GET',
+            signal: controller.signal
+        });
+        
+        clearTimeout(timeoutId);
+        
+        if (!response.ok) {
+            console.warn('Backend health check returned non-OK status:', response.status);
+        }
+    } catch (error) {
+        // If timeout or network error, continue anyway - don't block the app
+        console.warn('Backend warmup failed (continuing anyway):', error.message);
+    } finally {
+        // Hide loading overlay after warmup attempt
+        if (overlay) {
+            overlay.classList.add('hidden');
+            // Remove from DOM after fade out
+            setTimeout(() => {
+                if (overlay.parentNode) {
+                    overlay.parentNode.removeChild(overlay);
+                }
+            }, 500);
+        }
+    }
+}
+
+/**
  * Initialize all modules and event handlers
  */
 document.addEventListener('DOMContentLoaded', async function() {
+    // Warm up backend before initializing UI
+    await warmupBackend();
     // Get modules
     const { loadConfig, switchLanguage, getCurrentLanguage, getMainConfig, populateSuggestionCards } = window.ConfigModule;
     const { isMobileDevice, initKeyboardDetection, createScrollIndicator, updateScrollIndicator, 

@@ -11,10 +11,13 @@ from pathlib import Path
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
+from contextlib import asynccontextmanager
+import sys
 
 # Import route modules
 from api.routes import query, translation, tts, report, config as config_routes, sessions, update
 from api.app_check import verify_app_check_middleware
+from core.query_chromadb import get_collection
 
 # =====================================================
 # Configuration & Application Setup
@@ -23,7 +26,52 @@ PROJECT_ROOT = Path(__file__).parent
 env_path = PROJECT_ROOT / '.env'
 load_dotenv(dotenv_path=env_path)
 
-app = FastAPI(title="IMX Agent Factory")
+import os
+
+# =====================================================
+# Lifespan Event Handler
+# =====================================================
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """
+    Lifespan event handler for startup and shutdown
+    Preloads ChromaDB database on application startup
+    """
+    # Startup
+    print("=" * 60, flush=True)
+    print("🚀 Starting IMX Agent Factory...", flush=True)
+    print("=" * 60, flush=True)
+    
+    try:
+        kb_name = os.getenv("KNOWLEDGE_BASE", "agent")
+        print(f"📚 Loading ChromaDB for knowledge base: {kb_name}", flush=True)
+        
+        collection = get_collection(kb_name=kb_name)
+        
+        if collection:
+            # Get collection stats
+            count = collection.count()
+            print(f"✅ ChromaDB loaded successfully!", flush=True)
+            print(f"   - Collection: gdrive_documents", flush=True)
+            print(f"   - Documents: {count:,}", flush=True)
+            print(f"   - Knowledge base: {kb_name}", flush=True)
+        else:
+            print(f"⚠️  Warning: ChromaDB collection not found for '{kb_name}'", flush=True)
+            print(f"   Database will be loaded on first query", flush=True)
+    except Exception as e:
+        print(f"⚠️  Warning: Failed to preload ChromaDB: {str(e)}", flush=True)
+        print(f"   Database will be loaded on first query", flush=True)
+    
+    print("=" * 60, flush=True)
+    print("✅ Application startup complete", flush=True)
+    print("=" * 60, flush=True)
+    
+    yield
+    
+    # Shutdown
+    print("🛑 Shutting down IMX Agent Factory...", flush=True)
+
+app = FastAPI(title="IMX Agent Factory", lifespan=lifespan)
 
 # =====================================================
 # Rate Limiting Configuration

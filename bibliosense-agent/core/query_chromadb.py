@@ -148,15 +148,24 @@ def get_collection(kb_name=None):
     if kb_name is None:
         kb_name = "agent"
     
+    print(f"[get_collection] Called with kb_name: {kb_name}", flush=True)
+    print(f"[get_collection] Collection already loaded: {collection is not None}", flush=True)
+    
     if collection is None:
         try:
             kb_path = PROJECT_ROOT / "knowledge-base" / kb_name
             chroma_path = str(kb_path / "chroma_db")
             
+            print(f"[get_collection] KB path: {kb_path}", flush=True)
+            print(f"[get_collection] Chroma path: {chroma_path}", flush=True)
+            print(f"[get_collection] Path exists: {os.path.exists(chroma_path)}", flush=True)
+            
             if not os.path.exists(chroma_path):
+                print(f"[get_collection] ERROR: ChromaDB path does not exist!", flush=True)
                 return None
             
             # Create ChromaDB client with optimized settings for Cloud Run
+            print(f"[get_collection] Initializing ChromaDB client...", flush=True)
             chroma_client = chromadb.PersistentClient(
                 path=chroma_path,
                 settings=Settings(
@@ -164,17 +173,29 @@ def get_collection(kb_name=None):
                     allow_reset=False
                 )
             )
+            print(f"[get_collection] ChromaDB client initialized", flush=True)
             
             # Get collection (will create if doesn't exist)
             try:
+                print(f"[get_collection] Getting collection 'gdrive_documents'...", flush=True)
                 collection = chroma_client.get_collection(name="gdrive_documents")
-            except:
+                print(f"[get_collection] Collection loaded successfully", flush=True)
+                print(f"[get_collection] Collection document count: {collection.count()}", flush=True)
+            except Exception as e:
+                print(f"[get_collection] Collection not found, creating new one. Error: {e}", flush=True)
                 collection = chroma_client.create_collection(
                     name="gdrive_documents"
                 )
+                print(f"[get_collection] New collection created", flush=True)
                 
         except Exception as e:
+            print(f"[get_collection] ERROR during initialization: {str(e)}", flush=True)
+            import traceback
+            traceback.print_exc()
             return None
+    else:
+        print(f"[get_collection] Returning cached collection (count: {collection.count()})", flush=True)
+    
     return collection
 
 def is_substantial_question(question):

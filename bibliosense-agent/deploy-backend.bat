@@ -92,7 +92,8 @@ call gcloud run deploy %GCP_SERVICE_NAME% ^
   --timeout %CLOUD_RUN_TIMEOUT%s ^
   --min-instances 1 ^
   --max-instances 10 ^
-  --cpu 1
+  --cpu 2 ^
+  --concurrency 80
 
 if !ERRORLEVEL! NEQ 0 (
     echo.
