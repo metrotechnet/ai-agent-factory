@@ -1,6 +1,7 @@
 import os
 import json
 import re
+import random
 from pathlib import Path
 from dotenv import load_dotenv
 from openai import OpenAI
@@ -285,7 +286,7 @@ def get_links_from_contexts(contexts, metadatas=None, agent=None):
     
     return list(links)
 
-def ask_question_stream(question, language="fr", timezone="UTC", locale="fr-FR", top_k=15, conversation_history=None, session=None, question_id=None, agent=None, bibliotheque="all"):
+def ask_question_stream(question, language="fr", timezone="UTC", locale="fr-FR", top_k=25, conversation_history=None, session=None, question_id=None, agent=None, bibliotheque="all"):
     """Streaming version of ask_question with language support and conversation history"""
     # Use conversation_history if provided, otherwise empty list
     if conversation_history is None:
@@ -346,6 +347,16 @@ def ask_question_stream(question, language="fr", timezone="UTC", locale="fr-FR",
             yield "No relevant information found. Please make sure you have indexed some transcripts."
             return
 
+        # Randomize the order of results to vary recommendations
+        documents = results['documents'][0]
+        metadatas_list = results.get('metadatas', [[]])[0]
+        if documents and metadatas_list:
+            doc_meta_pairs = list(zip(documents, metadatas_list))
+            random.shuffle(doc_meta_pairs)
+            documents, metadatas_list = zip(*doc_meta_pairs)
+            results['documents'][0] = list(documents)
+            results['metadatas'][0] = list(metadatas_list)
+
         # Build context from results with metadata
         contexts = []
         metadatas = results.get('metadatas', [[]])[0]
@@ -398,7 +409,7 @@ def ask_question_stream(question, language="fr", timezone="UTC", locale="fr-FR",
                 messages=[
                     {"role": "user", "content": prompt}
                 ],
-                temperature=0.7,
+                temperature=1.0,
                 stream=True
             )
 
@@ -418,7 +429,7 @@ def ask_question_stream(question, language="fr", timezone="UTC", locale="fr-FR",
         elif model_supplier == 'gemini':
             # Gemini streaming
             model = genai.GenerativeModel(model_name, generation_config={
-                "temperature": 0.7
+                "temperature": 1.0
             })
             
             response = model.generate_content(prompt, stream=True)
@@ -503,6 +514,16 @@ def ask_question_stream_gemini(question, language="fr", timezone="UTC", locale="
             yield "No relevant information found. Please make sure you have indexed some transcripts."
             return
 
+        # Randomize the order of results to vary recommendations
+        documents = results['documents'][0]
+        metadatas_list = results.get('metadatas', [[]])[0]
+        if documents and metadatas_list:
+            doc_meta_pairs = list(zip(documents, metadatas_list))
+            random.shuffle(doc_meta_pairs)
+            documents, metadatas_list = zip(*doc_meta_pairs)
+            results['documents'][0] = list(documents)
+            results['metadatas'][0] = list(metadatas_list)
+
         # Build context from results with metadata
         contexts = []
         metadatas = results.get('metadatas', [[]])[0]
@@ -545,7 +566,7 @@ def ask_question_stream_gemini(question, language="fr", timezone="UTC", locale="
 
         # Configure Gemini model
         model = genai.GenerativeModel(model_name, generation_config={
-            "temperature": 0.7
+            "temperature": 1.0
         })
 
         # Stream tokens

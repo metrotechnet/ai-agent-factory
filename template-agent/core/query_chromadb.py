@@ -1,6 +1,7 @@
 import os
 import json
 import re
+import random
 from pathlib import Path
 from dotenv import load_dotenv
 from openai import OpenAI
@@ -365,7 +366,7 @@ def ask_question_stream(question, language="fr", timezone="UTC", locale="fr-FR",
                 messages=[
                     {"role": "user", "content": prompt}
                 ],
-                temperature=0.7,
+                temperature=1.0,
                 stream=True
             )
 
@@ -385,7 +386,7 @@ def ask_question_stream(question, language="fr", timezone="UTC", locale="fr-FR",
         elif model_supplier == 'gemini':
             # Gemini streaming
             model = genai.GenerativeModel(model_name, generation_config={
-                "temperature": 0.7
+                "temperature": 1.0
             })
             
             response = model.generate_content(prompt, stream=True)
