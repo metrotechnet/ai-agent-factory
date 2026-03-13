@@ -74,6 +74,10 @@ document.addEventListener('DOMContentLoaded', async function() {
     // Load  agent directly (single-agent setup)
     await loadConfig();
     
+    // Display agent intro (creates library selector dynamically)
+    const { displayAgentIntro } = window.AgentsModule;
+    if (displayAgentIntro) displayAgentIntro();
+    
     // Render initial components
     const mainConfig = getMainConfig();
     const langData = mainConfig[getCurrentLanguage()] || mainConfig['fr'];

@@ -183,6 +183,8 @@ function populateSuggestionCards(lang) {
                     if (inputBox && displayText) {
                         inputBox.value = displayText;
                         console.log(`Displaying text: ${displayText}`);
+                        // Trigger input event to adjust textarea height
+                        inputBox.dispatchEvent(new Event('input', { bubbles: true }));
                         inputBox.focus();
                     }
                 } else if (suggestion.event && suggestion.event.startsWith('switch:')) {

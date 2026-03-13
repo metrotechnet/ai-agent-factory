@@ -535,29 +535,70 @@ function isMessageLoading() {
         return;
     }
     
-    let scrollTimeout;
+    let lastScrollTop = chatContainer.scrollTop;
+    let touchStartY = 0;
+    let lastTouchY = 0;
+    let isTouching = false;
+    
+    // Desktop scroll event - detect scroll direction
     chatContainer.addEventListener('scroll', () => {
-        // Ignore programmatic scrolls
-        if (isScrollingProgrammatically) return;
+        if (isTouching || isScrollingProgrammatically) return;
         
-        // Debounce to avoid excessive checks
-        clearTimeout(scrollTimeout);
-        scrollTimeout = setTimeout(() => {
-            const scrollTop = chatContainer.scrollTop;
-            const scrollHeight = chatContainer.scrollHeight;
-            const clientHeight = chatContainer.clientHeight;
-            const distanceFromBottom = scrollHeight - scrollTop - clientHeight;
-            
-            // If user scrolled to within 50px of bottom, re-enable auto-scroll
-            if (distanceFromBottom < 50) {
+        const currentScrollTop = chatContainer.scrollTop;
+        const scrollHeight = chatContainer.scrollHeight;
+        const clientHeight = chatContainer.clientHeight;
+        const distanceFromBottom = scrollHeight - currentScrollTop - clientHeight;
+        
+        // Detect scroll direction
+        if (currentScrollTop < lastScrollTop) {
+            // Scrolling UP - disable auto-scroll
+            autoScrollEnabled = false;
+        } else if (currentScrollTop > lastScrollTop) {
+            // Scrolling DOWN - enable auto-scroll ONLY if near bottom
+            if (distanceFromBottom < 100) {
                 autoScrollEnabled = true;
-            } else {
-                // User scrolled up, disable auto-scroll
-                autoScrollEnabled = false;
-                console.log('Auto-scroll disabled due to user scroll');
             }
-        }, 100);
-    });
+        }
+        
+        lastScrollTop = currentScrollTop;
+    }, { passive: true });
+    
+    // Mobile touch events with direction detection
+    chatContainer.addEventListener('touchstart', (e) => {
+        if (isScrollingProgrammatically) return;
+        touchStartY = e.touches[0].clientY;
+        lastTouchY = touchStartY;
+        isTouching = true;
+    }, { passive: true });
+    
+    chatContainer.addEventListener('touchmove', (e) => {
+        if (isScrollingProgrammatically || !isTouching) return;
+        
+        const currentTouchY = e.touches[0].clientY;
+        const deltaY = currentTouchY - lastTouchY;
+        
+        const scrollTop = chatContainer.scrollTop;
+        const scrollHeight = chatContainer.scrollHeight;
+        const clientHeight = chatContainer.clientHeight;
+        const distanceFromBottom = scrollHeight - scrollTop - clientHeight;
+        
+        // Detect touch scroll direction
+        if (deltaY > 2) {
+            // Scrolling DOWN (pulling content down = scrolling up in content) - disable auto-scroll
+            autoScrollEnabled = false;
+        } else if (deltaY < -2) {
+            // Scrolling UP (pulling content up = scrolling down in content) - enable ONLY if near bottom
+            if (distanceFromBottom < 100) {
+                autoScrollEnabled = true;
+            }
+        }
+        
+        lastTouchY = currentTouchY;
+    }, { passive: true });
+    
+    chatContainer.addEventListener('touchend', () => {
+        isTouching = false;
+    }, { passive: true });
 })();
 
 // Export for use in other modules
