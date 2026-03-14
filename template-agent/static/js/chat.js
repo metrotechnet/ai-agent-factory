@@ -468,6 +468,16 @@ async function sendMessage() {
     const spacerDiv = createBottomSpacer(userMessageDiv, messageDiv);
     if (chatContainer) {
         chatContainer.appendChild(spacerDiv);
+        
+        // Set spacer height to push content up (viewport height - small offset)
+        spacerDiv.style.height = (chatContainer.clientHeight - 100) + 'px';
+        
+        // Scroll to show user message at the top (with header offset)
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                chatContainer.scrollTop = userMessageDiv.offsetTop - 80;
+            });
+        });
     }
 
     const contentDiv = messageDiv.querySelector('.message-text');
@@ -505,90 +515,6 @@ async function sendMessage() {
 function isMessageLoading() {
     return isLoading;
 }
-
-// ===================================
-// USER SCROLL DETECTION
-// ===================================
-
-/**
- * Detect user scroll and disable auto-scroll
- */
-(function initScrollListener() {
-    const chatContainer = document.getElementById('chat-container');
-    
-    if (!chatContainer) {
-        // If DOM not ready, wait for it
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', initScrollListener);
-        }
-        return;
-    }
-    
-    let lastScrollTop = chatContainer.scrollTop;
-    let touchStartY = 0;
-    let lastTouchY = 0;
-    let isTouching = false;
-    
-    // Desktop scroll event - detect scroll direction
-    chatContainer.addEventListener('scroll', () => {
-        if (isTouching || isScrollingProgrammatically) return;
-        
-        const currentScrollTop = chatContainer.scrollTop;
-        const scrollHeight = chatContainer.scrollHeight;
-        const clientHeight = chatContainer.clientHeight;
-        const distanceFromBottom = scrollHeight - currentScrollTop - clientHeight;
-        
-        // Detect scroll direction
-        if (currentScrollTop < lastScrollTop) {
-            // Scrolling UP - disable auto-scroll
-            autoScrollEnabled = false;
-        } else if (currentScrollTop > lastScrollTop) {
-            // Scrolling DOWN - enable auto-scroll ONLY if near bottom
-            if (distanceFromBottom < 100) {
-                autoScrollEnabled = true;
-            }
-        }
-        
-        lastScrollTop = currentScrollTop;
-    }, { passive: true });
-    
-    // Mobile touch events with direction detection
-    chatContainer.addEventListener('touchstart', (e) => {
-        if (isScrollingProgrammatically) return;
-        touchStartY = e.touches[0].clientY;
-        lastTouchY = touchStartY;
-        isTouching = true;
-    }, { passive: true });
-    
-    chatContainer.addEventListener('touchmove', (e) => {
-        if (isScrollingProgrammatically || !isTouching) return;
-        
-        const currentTouchY = e.touches[0].clientY;
-        const deltaY = currentTouchY - lastTouchY;
-        
-        const scrollTop = chatContainer.scrollTop;
-        const scrollHeight = chatContainer.scrollHeight;
-        const clientHeight = chatContainer.clientHeight;
-        const distanceFromBottom = scrollHeight - scrollTop - clientHeight;
-        
-        // Detect touch scroll direction
-        if (deltaY > 2) {
-            // Scrolling DOWN (pulling content down = scrolling up in content) - disable auto-scroll
-            autoScrollEnabled = false;
-        } else if (deltaY < -2) {
-            // Scrolling UP (pulling content up = scrolling down in content) - enable ONLY if near bottom
-            if (distanceFromBottom < 100) {
-                autoScrollEnabled = true;
-            }
-        }
-        
-        lastTouchY = currentTouchY;
-    }, { passive: true });
-    
-    chatContainer.addEventListener('touchend', () => {
-        isTouching = false;
-    }, { passive: true });
-})();
 
 // Export for use in other modules
 window.ChatModule = {

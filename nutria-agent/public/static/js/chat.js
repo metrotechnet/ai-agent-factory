@@ -214,16 +214,11 @@ function createBottomSpacer(userMsgDiv, assistantMsgDiv, offset = 10) {
 }
 
 /**
- * Scroll to message bottom
+ * Scroll to message bottom (disabled - no auto-scroll)
  */
 function scrollToMessageBottom(assistantMsgDiv, offset = 0) {
-    const chatContainer = document.getElementById('chat-container');
-    if (!chatContainer) return;
-    
-    const targetTop = assistantMsgDiv.offsetTop + assistantMsgDiv.offsetHeight - chatContainer.clientHeight + offset;
-    if (targetTop > 0) {
-        chatContainer.scrollTop = targetTop;
-    }
+    // Auto-scroll disabled
+    return;
 }
 
 /**
@@ -468,6 +463,13 @@ async function sendMessage() {
     const spacerDiv = createBottomSpacer(userMessageDiv, messageDiv);
     if (chatContainer) {
         chatContainer.appendChild(spacerDiv);
+        
+        spacerDiv.style.height = (chatContainer.clientHeight - 100) + 'px';
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                chatContainer.scrollTop = userMessageDiv.offsetTop - 80;
+            });
+        });
     }
 
     const contentDiv = messageDiv.querySelector('.message-text');
