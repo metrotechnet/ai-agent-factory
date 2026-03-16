@@ -45,6 +45,30 @@ function hasIncompleteUrl(text) {
 }
 
 /**
+ * Remove incomplete markdown images from text
+ * Removes everything from the last occurrence of ![
+ */
+function removeIncompleteImages(text) {
+    // Find the last occurrence of ![
+    const lastImageStart = text.lastIndexOf('![');
+    if (lastImageStart === -1) {
+        return text; // No image markdown found
+    }
+    
+    // Check if there's a complete image after this point
+    const afterImage = text.substring(lastImageStart);
+    // Complete image pattern: ![alt text](url)
+    const completeImagePattern = /^!\[([^\]]*)\]\(([^)]+)\)/;
+    
+    if (!completeImagePattern.test(afterImage)) {
+        // Incomplete image, remove from this point
+        return text.substring(0, lastImageStart);
+    }
+    
+    return text;
+}
+
+/**
  * Get selected library from selector
  */
 function getSelectedLibrary() {
@@ -376,11 +400,17 @@ async function handleStreamingResponse(question, contentDiv, actionsDiv) {
     let questionId = null;
     let fullText = '';
     let linksReceived = null;
-
+    let textToDisplay='';
+  
     while (true) {
         const { done, value } = await reader.read();
 
         if (done) {
+            // Wait for queue to finish processing
+            while (displayQueue.length > 0 || isProcessingQueue) {
+                await new Promise(resolve => setTimeout(resolve, 10));
+            }
+            
             actionsDiv.style.display = '';
             if (questionId) {
                 const likeBtn = actionsDiv.querySelector('.like-btn');
@@ -388,8 +418,8 @@ async function handleStreamingResponse(question, contentDiv, actionsDiv) {
                 if (likeBtn) likeBtn.dataset.questionId = questionId;
                 if (dislikeBtn) dislikeBtn.dataset.questionId = questionId;
             }
-            if (typeof marked !== 'undefined') {
-                contentDiv.innerHTML = marked.parse(fullText);
+            if (typeof marked !== 'undefined' && typeof DOMPurify !== 'undefined') {
+                contentDiv.innerHTML = DOMPurify.sanitize(marked.parse(fullText));
             } else {
                 contentDiv.textContent = fullText;
             }
@@ -412,7 +442,8 @@ async function handleStreamingResponse(question, contentDiv, actionsDiv) {
                 
                 // Check for [DONE] marker
                 if (rawData === '[DONE]') {
-                    // Stream is complete, exit the loop
+
+                    
                     actionsDiv.style.display = '';
                     if (questionId) {
                         const likeBtn = actionsDiv.querySelector('.like-btn');
@@ -420,8 +451,8 @@ async function handleStreamingResponse(question, contentDiv, actionsDiv) {
                         if (likeBtn) likeBtn.dataset.questionId = questionId;
                         if (dislikeBtn) dislikeBtn.dataset.questionId = questionId;
                     }
-                    if (typeof marked !== 'undefined') {
-                        contentDiv.innerHTML = marked.parse(fullText);
+                    if (typeof marked !== 'undefined' && typeof DOMPurify !== 'undefined') {
+                        contentDiv.innerHTML = DOMPurify.sanitize(marked.parse(fullText));
                     } else {
                         contentDiv.textContent = fullText;
                     }
@@ -457,15 +488,19 @@ async function handleStreamingResponse(question, contentDiv, actionsDiv) {
                     }
 
                     if (data.chunk) {
-                        fullText += data.chunk;
+                        textToDisplay += data.chunk;
+                        fullText = textToDisplay; // Keep fullText synchronized
+                        
+                        // Remove incomplete images before displaying
+                        const cleanText = removeIncompleteImages(textToDisplay);
                         
                         // Only parse markdown if we don't have an incomplete URL
                         // This prevents showing broken image/link URLs during streaming
-                        if (!hasIncompleteUrl(fullText)) {
-                            if (typeof marked !== 'undefined') {
-                                contentDiv.innerHTML = marked.parse(fullText);
+                        if (!hasIncompleteUrl(cleanText)) {
+                            if (typeof marked !== 'undefined' && typeof DOMPurify !== 'undefined') {
+                                contentDiv.innerHTML = DOMPurify.sanitize(marked.parse(cleanText));
                             } else {
-                                contentDiv.textContent = fullText;
+                                contentDiv.textContent = cleanText;
                             }
                         } 
                     }

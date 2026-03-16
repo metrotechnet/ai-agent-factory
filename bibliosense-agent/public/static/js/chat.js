@@ -376,11 +376,19 @@ async function handleStreamingResponse(question, contentDiv, actionsDiv) {
     let questionId = null;
     let fullText = '';
     let linksReceived = null;
+    
+    // Debouncing for rendering: wait for chunks to accumulate before displaying
+    let renderTimeout = null;
+    const RENDER_DELAY = 150; // milliseconds
 
     while (true) {
         const { done, value } = await reader.read();
 
         if (done) {
+            // Clear any pending render timeout
+            if (renderTimeout) {
+                clearTimeout(renderTimeout);
+            }
             actionsDiv.style.display = '';
             if (questionId) {
                 const likeBtn = actionsDiv.querySelector('.like-btn');
@@ -388,8 +396,8 @@ async function handleStreamingResponse(question, contentDiv, actionsDiv) {
                 if (likeBtn) likeBtn.dataset.questionId = questionId;
                 if (dislikeBtn) dislikeBtn.dataset.questionId = questionId;
             }
-            if (typeof marked !== 'undefined') {
-                contentDiv.innerHTML = marked.parse(fullText);
+            if (typeof marked !== 'undefined' && typeof DOMPurify !== 'undefined') {
+                contentDiv.innerHTML = DOMPurify.sanitize(marked.parse(fullText));
             } else {
                 contentDiv.textContent = fullText;
             }
@@ -413,6 +421,10 @@ async function handleStreamingResponse(question, contentDiv, actionsDiv) {
                 // Check for [DONE] marker
                 if (rawData === '[DONE]') {
                     // Stream is complete, exit the loop
+                    // Clear any pending render timeout
+                    if (renderTimeout) {
+                        clearTimeout(renderTimeout);
+                    }
                     actionsDiv.style.display = '';
                     if (questionId) {
                         const likeBtn = actionsDiv.querySelector('.like-btn');
@@ -420,8 +432,8 @@ async function handleStreamingResponse(question, contentDiv, actionsDiv) {
                         if (likeBtn) likeBtn.dataset.questionId = questionId;
                         if (dislikeBtn) dislikeBtn.dataset.questionId = questionId;
                     }
-                    if (typeof marked !== 'undefined') {
-                        contentDiv.innerHTML = marked.parse(fullText);
+                    if (typeof marked !== 'undefined' && typeof DOMPurify !== 'undefined') {
+                        contentDiv.innerHTML = DOMPurify.sanitize(marked.parse(fullText));
                     } else {
                         contentDiv.textContent = fullText;
                     }
@@ -459,15 +471,25 @@ async function handleStreamingResponse(question, contentDiv, actionsDiv) {
                     if (data.chunk) {
                         fullText += data.chunk;
                         
-                        // Only parse markdown if we don't have an incomplete URL
-                        // This prevents showing broken image/link URLs during streaming
-                        if (!hasIncompleteUrl(fullText)) {
-                            if (typeof marked !== 'undefined') {
-                                contentDiv.innerHTML = marked.parse(fullText);
-                            } else {
-                                contentDiv.textContent = fullText;
+                        // Clear any pending render
+                        if (renderTimeout) {
+                            clearTimeout(renderTimeout);
+                        }
+                        
+                        // Debounce rendering: wait for chunks to accumulate
+                        renderTimeout = setTimeout(() => {
+                            // Only parse markdown if we don't have an incomplete URL
+                            // This prevents showing broken image/link URLs during streaming
+                            if (!hasIncompleteUrl(fullText)) {
+                                if (typeof marked !== 'undefined' && typeof DOMPurify !== 'undefined') {
+                                    requestAnimationFrame(() => {
+                                        contentDiv.innerHTML = DOMPurify.sanitize(marked.parse(fullText));
+                                    });
+                                } else {
+                                    contentDiv.textContent = fullText;
+                                }
                             }
-                        } 
+                        }, RENDER_DELAY);
                     }
                   
                     if (updateScrollIndicator) updateScrollIndicator();

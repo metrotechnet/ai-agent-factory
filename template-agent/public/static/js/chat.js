@@ -354,8 +354,8 @@ async function handleStreamingResponse(question, contentDiv, actionsDiv) {
                 if (likeBtn) likeBtn.dataset.questionId = questionId;
                 if (dislikeBtn) dislikeBtn.dataset.questionId = questionId;
             }
-            if (typeof marked !== 'undefined') {
-                contentDiv.innerHTML = marked.parse(fullText);
+            if (typeof marked !== 'undefined' && typeof DOMPurify !== 'undefined') {
+                contentDiv.innerHTML = DOMPurify.sanitize(marked.parse(fullText));
             } else {
                 contentDiv.textContent = fullText;
             }
@@ -386,8 +386,8 @@ async function handleStreamingResponse(question, contentDiv, actionsDiv) {
                         if (likeBtn) likeBtn.dataset.questionId = questionId;
                         if (dislikeBtn) dislikeBtn.dataset.questionId = questionId;
                     }
-                    if (typeof marked !== 'undefined') {
-                        contentDiv.innerHTML = marked.parse(fullText);
+                    if (typeof marked !== 'undefined' && typeof DOMPurify !== 'undefined') {
+                        contentDiv.innerHTML = DOMPurify.sanitize(marked.parse(fullText));
                     } else {
                         contentDiv.textContent = fullText;
                     }
@@ -424,8 +424,8 @@ async function handleStreamingResponse(question, contentDiv, actionsDiv) {
 
                     if (data.chunk) {
                         fullText += data.chunk;
-                        if (typeof marked !== 'undefined') {
-                            contentDiv.innerHTML = marked.parse(fullText);
+                        if (typeof marked !== 'undefined' && typeof DOMPurify !== 'undefined') {
+                            contentDiv.innerHTML = DOMPurify.sanitize(marked.parse(fullText));
                         } else {
                             contentDiv.textContent = fullText;
                         }
