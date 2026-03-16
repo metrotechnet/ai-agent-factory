@@ -14,7 +14,7 @@ async function warmupBackend() {
     const overlay = document.getElementById('initial-loading-overlay');
     
     const startTime = Date.now();
-    const timeout = 10000; // 30 seconds total timeout
+    const timeout = 30000; // 30 seconds total timeout
     const retryDelay = 1000; // 1 second between retries
     let connectionSucceeded = false;
     

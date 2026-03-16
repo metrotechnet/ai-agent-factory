@@ -123,17 +123,17 @@ function createAssistantMessage() {
                 </div>
             </div>
             <div class="message-actions" style="display:none">
-                <button class="action-btn copy-btn" title="" style="border-radius:50%;padding:8px;background:#f3f3f3;border:none;box-shadow:0 1px 4px rgba(0,0,0,0.07);margin-right:6px;cursor:pointer;width:40px;height:40px;display:inline-flex;align-items:center;justify-content:center;">
-                    <i class="bi bi-clipboard" style="font-size:1.3em;"></i>
+                <button class="action-btn copy-btn" title="">
+                    <i class="bi bi-clipboard"></i>
                 </button>
-                <button class="action-btn share-btn" title="" style="border-radius:50%;padding:8px;background:#f3f3f3;border:none;box-shadow:0 1px 4px rgba(0,0,0,0.07);margin-right:6px;cursor:pointer;width:40px;height:40px;display:inline-flex;align-items:center;justify-content:center;">
-                    <i class="bi bi-share" style="font-size:1.3em;"></i>
+                <button class="action-btn share-btn" title="">
+                    <i class="bi bi-share"></i>
                 </button>
-                <button class="action-btn like-btn" title="Like" style="border-radius:50%;padding:8px;background:#e6f9e6;border:none;box-shadow:0 1px 4px rgba(0,0,0,0.07);margin-left:6px;cursor:pointer;width:40px;height:40px;display:inline-flex;align-items:center;justify-content:center;">
-                    <i class="bi bi-hand-thumbs-up" style="font-size:1.3em;"></i>
+                <button class="action-btn like-btn" title="Like">
+                    <i class="bi bi-hand-thumbs-up"></i>
                 </button>
-                <button class="action-btn dislike-btn" title="Dislike" style="border-radius:50%;padding:8px;background:#f9e6e6;border:none;box-shadow:0 1px 4px rgba(0,0,0,0.07);margin-left:2px;cursor:pointer;width:40px;height:40px;display:inline-flex;align-items:center;justify-content:center;">
-                    <i class="bi bi-hand-thumbs-down" style="font-size:1.3em;"></i>
+                <button class="action-btn dislike-btn" title="Dislike">
+                    <i class="bi bi-hand-thumbs-down"></i>
                 </button>
 
             </div>
@@ -231,10 +231,22 @@ function setupMessageActions(messageDiv, contentDiv) {
         });
     }
 
-    // Copy button
+    // Copy button - Copy HTML with images
     if (copyBtn) {
-        copyBtn.addEventListener('click', () => {
-            navigator.clipboard.writeText(contentDiv.textContent);
+        copyBtn.addEventListener('click', async () => {
+            try {
+                // Copy both HTML and plain text to clipboard
+                await navigator.clipboard.write([
+                    new ClipboardItem({
+                        'text/html': new Blob([contentDiv.innerHTML], { type: 'text/html' }),
+                        'text/plain': new Blob([contentDiv.textContent], { type: 'text/plain' })
+                    })
+                ]);
+            } catch (err) {
+                // Fallback to text-only if HTML copy fails
+                console.log('HTML copy failed, falling back to text:', err);
+                navigator.clipboard.writeText(contentDiv.textContent);
+            }
         });
     }
 
@@ -406,10 +418,6 @@ async function handleStreamingResponse(question, contentDiv, actionsDiv) {
         const { done, value } = await reader.read();
 
         if (done) {
-            // Wait for queue to finish processing
-            while (displayQueue.length > 0 || isProcessingQueue) {
-                await new Promise(resolve => setTimeout(resolve, 10));
-            }
             
             actionsDiv.style.display = '';
             if (questionId) {

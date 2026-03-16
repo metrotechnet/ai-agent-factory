@@ -45,6 +45,30 @@ function hasIncompleteUrl(text) {
 }
 
 /**
+ * Remove incomplete markdown images from text
+ * Removes everything from the last occurrence of ![
+ */
+function removeIncompleteImages(text) {
+    // Find the last occurrence of ![
+    const lastImageStart = text.lastIndexOf('![');
+    if (lastImageStart === -1) {
+        return text; // No image markdown found
+    }
+    
+    // Check if there's a complete image after this point
+    const afterImage = text.substring(lastImageStart);
+    // Complete image pattern: ![alt text](url)
+    const completeImagePattern = /^!\[([^\]]*)\]\(([^)]+)\)/;
+    
+    if (!completeImagePattern.test(afterImage)) {
+        // Incomplete image, remove from this point
+        return text.substring(0, lastImageStart);
+    }
+    
+    return text;
+}
+
+/**
  * Get selected library from selector
  */
 function getSelectedLibrary() {
@@ -99,17 +123,17 @@ function createAssistantMessage() {
                 </div>
             </div>
             <div class="message-actions" style="display:none">
-                <button class="action-btn copy-btn" title="" style="border-radius:50%;padding:8px;background:#f3f3f3;border:none;box-shadow:0 1px 4px rgba(0,0,0,0.07);margin-right:6px;cursor:pointer;width:40px;height:40px;display:inline-flex;align-items:center;justify-content:center;">
-                    <i class="bi bi-clipboard" style="font-size:1.3em;"></i>
+                <button class="action-btn copy-btn" title="">
+                    <i class="bi bi-clipboard"></i>
                 </button>
-                <button class="action-btn share-btn" title="" style="border-radius:50%;padding:8px;background:#f3f3f3;border:none;box-shadow:0 1px 4px rgba(0,0,0,0.07);margin-right:6px;cursor:pointer;width:40px;height:40px;display:inline-flex;align-items:center;justify-content:center;">
-                    <i class="bi bi-share" style="font-size:1.3em;"></i>
+                <button class="action-btn share-btn" title="">
+                    <i class="bi bi-share"></i>
                 </button>
-                <button class="action-btn like-btn" title="Like" style="border-radius:50%;padding:8px;background:#e6f9e6;border:none;box-shadow:0 1px 4px rgba(0,0,0,0.07);margin-left:6px;cursor:pointer;width:40px;height:40px;display:inline-flex;align-items:center;justify-content:center;">
-                    <i class="bi bi-hand-thumbs-up" style="font-size:1.3em;"></i>
+                <button class="action-btn like-btn" title="Like">
+                    <i class="bi bi-hand-thumbs-up"></i>
                 </button>
-                <button class="action-btn dislike-btn" title="Dislike" style="border-radius:50%;padding:8px;background:#f9e6e6;border:none;box-shadow:0 1px 4px rgba(0,0,0,0.07);margin-left:2px;cursor:pointer;width:40px;height:40px;display:inline-flex;align-items:center;justify-content:center;">
-                    <i class="bi bi-hand-thumbs-down" style="font-size:1.3em;"></i>
+                <button class="action-btn dislike-btn" title="Dislike">
+                    <i class="bi bi-hand-thumbs-down"></i>
                 </button>
 
             </div>
@@ -207,20 +231,61 @@ function setupMessageActions(messageDiv, contentDiv) {
         });
     }
 
-    // Copy button
+    // Copy button - Copy HTML with images
     if (copyBtn) {
-        copyBtn.addEventListener('click', () => {
-            navigator.clipboard.writeText(contentDiv.textContent);
+        copyBtn.addEventListener('click', async () => {
+            try {
+                // Copy both HTML and plain text to clipboard
+                await navigator.clipboard.write([
+                    new ClipboardItem({
+                        'text/html': new Blob([contentDiv.innerHTML], { type: 'text/html' }),
+                        'text/plain': new Blob([contentDiv.textContent], { type: 'text/plain' })
+                    })
+                ]);
+            } catch (err) {
+                // Fallback to text-only if HTML copy fails
+                console.log('HTML copy failed, falling back to text:', err);
+                navigator.clipboard.writeText(contentDiv.textContent);
+            }
         });
     }
 
-    // Share button
+    // Share button - Copy HTML to clipboard for pasting in email/docs
     if (shareBtn) {
-        shareBtn.addEventListener('click', () => {
-            if (navigator.share) {
-                navigator.share({ text: contentDiv.textContent });
-            } else {
-                alert(t('messages.shareNotSupported'));
+        shareBtn.addEventListener('click', async () => {
+            try {
+                // Copy both HTML and plain text to clipboard (same as copy button)
+                await navigator.clipboard.write([
+                    new ClipboardItem({
+                        'text/html': new Blob([contentDiv.innerHTML], { type: 'text/html' }),
+                        'text/plain': new Blob([contentDiv.textContent], { type: 'text/plain' })
+                    })
+                ]);
+                
+                // Show confirmation message
+                const lang = getCurrentLanguage ? getCurrentLanguage() : 'fr';
+                const message = lang === 'fr' 
+                    ? 'Contenu copié ! Vous pouvez maintenant le coller dans Outlook, Word ou tout autre application.'
+                    : 'Content copied! You can now paste it into Outlook, Word or any other application.';
+                
+                // Temporary visual feedback
+                const originalIcon = shareBtn.innerHTML;
+                shareBtn.innerHTML = '<i class="bi bi-check2"></i>';
+                shareBtn.style.background = '#4caf50';
+                setTimeout(() => {
+                    shareBtn.innerHTML = originalIcon;
+                    shareBtn.style.background = '';
+                }, 2000);
+                
+                console.log(message);
+            } catch (err) {
+                console.log('Share copy failed:', err);
+                // Fallback to text-only if HTML copy fails
+                try {
+                    await navigator.clipboard.writeText(contentDiv.textContent);
+                } catch (e) {
+                    alert(t('messages.shareNotSupported'));
+                }
             }
         });
     }
@@ -376,19 +441,13 @@ async function handleStreamingResponse(question, contentDiv, actionsDiv) {
     let questionId = null;
     let fullText = '';
     let linksReceived = null;
-    
-    // Debouncing for rendering: wait for chunks to accumulate before displaying
-    let renderTimeout = null;
-    const RENDER_DELAY = 150; // milliseconds
-
+    let textToDisplay='';
+  
     while (true) {
         const { done, value } = await reader.read();
 
         if (done) {
-            // Clear any pending render timeout
-            if (renderTimeout) {
-                clearTimeout(renderTimeout);
-            }
+            
             actionsDiv.style.display = '';
             if (questionId) {
                 const likeBtn = actionsDiv.querySelector('.like-btn');
@@ -420,11 +479,8 @@ async function handleStreamingResponse(question, contentDiv, actionsDiv) {
                 
                 // Check for [DONE] marker
                 if (rawData === '[DONE]') {
-                    // Stream is complete, exit the loop
-                    // Clear any pending render timeout
-                    if (renderTimeout) {
-                        clearTimeout(renderTimeout);
-                    }
+
+                    
                     actionsDiv.style.display = '';
                     if (questionId) {
                         const likeBtn = actionsDiv.querySelector('.like-btn');
@@ -469,27 +525,21 @@ async function handleStreamingResponse(question, contentDiv, actionsDiv) {
                     }
 
                     if (data.chunk) {
-                        fullText += data.chunk;
+                        textToDisplay += data.chunk;
+                        fullText = textToDisplay; // Keep fullText synchronized
                         
-                        // Clear any pending render
-                        if (renderTimeout) {
-                            clearTimeout(renderTimeout);
-                        }
+                        // Remove incomplete images before displaying
+                        const cleanText = removeIncompleteImages(textToDisplay);
                         
-                        // Debounce rendering: wait for chunks to accumulate
-                        renderTimeout = setTimeout(() => {
-                            // Only parse markdown if we don't have an incomplete URL
-                            // This prevents showing broken image/link URLs during streaming
-                            if (!hasIncompleteUrl(fullText)) {
-                                if (typeof marked !== 'undefined' && typeof DOMPurify !== 'undefined') {
-                                    requestAnimationFrame(() => {
-                                        contentDiv.innerHTML = DOMPurify.sanitize(marked.parse(fullText));
-                                    });
-                                } else {
-                                    contentDiv.textContent = fullText;
-                                }
+                        // Only parse markdown if we don't have an incomplete URL
+                        // This prevents showing broken image/link URLs during streaming
+                        if (!hasIncompleteUrl(cleanText)) {
+                            if (typeof marked !== 'undefined' && typeof DOMPurify !== 'undefined') {
+                                contentDiv.innerHTML = DOMPurify.sanitize(marked.parse(cleanText));
+                            } else {
+                                contentDiv.textContent = cleanText;
                             }
-                        }, RENDER_DELAY);
+                        } 
                     }
                   
                     if (updateScrollIndicator) updateScrollIndicator();
