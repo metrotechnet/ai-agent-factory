@@ -179,10 +179,22 @@ function setupMessageActions(messageDiv, contentDiv) {
         });
     }
 
-    // Copy button
+    // Copy button - Copy HTML with images
     if (copyBtn) {
-        copyBtn.addEventListener('click', () => {
-            navigator.clipboard.writeText(contentDiv.textContent);
+        copyBtn.addEventListener('click', async () => {
+            try {
+                // Copy both HTML and plain text to clipboard
+                await navigator.clipboard.write([
+                    new ClipboardItem({
+                        'text/html': new Blob([contentDiv.innerHTML], { type: 'text/html' }),
+                        'text/plain': new Blob([contentDiv.textContent], { type: 'text/plain' })
+                    })
+                ]);
+            } catch (err) {
+                // Fallback to text-only if HTML copy fails
+                console.log('HTML copy failed, falling back to text:', err);
+                navigator.clipboard.writeText(contentDiv.textContent);
+            }
         });
     }
 
