@@ -14,7 +14,7 @@ async function warmupBackend() {
     const overlay = document.getElementById('initial-loading-overlay');
     
     const startTime = Date.now();
-    const timeout = 30000; // 30 seconds total timeout
+    const timeout = 10000; // 30 seconds total timeout
     const retryDelay = 1000; // 1 second between retries
     let connectionSucceeded = false;
     
@@ -78,15 +78,9 @@ async function warmupBackend() {
                 }
             }
             
-            // Hide input area when connection failed
-            const inputArea = document.querySelector('.input-area');
-            if (inputArea) {
-                inputArea.style.display = 'none';
-            }
         }, 600); // Wait for overlay fade out
     }
 }
-
 /**
  * Initialize all modules and event handlers
  */
@@ -103,14 +97,12 @@ document.addEventListener('DOMContentLoaded', async function() {
     const { componentRegistry } = window.ComponentsModule;
     
     // DOM elements
+    const inputArea = document.getElementById('input-area');
     const inputBox = document.getElementById('input-box');
     const sendButton = document.getElementById('send-button');
     const voiceButton = document.getElementById('voice-button');
     const languageSelector = document.getElementById('language-selector');
-    const targetLanguageSelect = document.getElementById('target-language');
-    const translationDirectionBtn = document.getElementById('translation-direction-btn');
     const chatContainer = document.getElementById('chat-container');
-    const emptyState = document.getElementById('empty-state');
     
 
     
@@ -144,7 +136,7 @@ document.addEventListener('DOMContentLoaded', async function() {
             componentRegistry.inputArea.render(langData.input);
         }
     }
-    
+
     populateSuggestionCards(getCurrentLanguage());
     
     // Initialize UI components
@@ -168,7 +160,10 @@ document.addEventListener('DOMContentLoaded', async function() {
     // ===================================
     // INPUT BOX EVENT HANDLERS
     // ===================================
-    
+    // Display input area when connection failed
+    if (inputArea) {
+        inputArea.style.display = 'block';
+    }
     if (inputBox) {
         // Auto-resize textarea
         inputBox.addEventListener('input', function() {

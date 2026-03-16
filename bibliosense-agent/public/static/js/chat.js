@@ -253,7 +253,10 @@ function positionMessageAtBottom(chatContainer, userMessageDiv, messageDiv) {
         
         // Scroll to bottom
         requestAnimationFrame(() => {
-            chatContainer.scrollTop = chatContainer.scrollHeight;
+            chatContainer.scrollTo({
+                top: chatContainer.scrollHeight,
+                behavior: 'smooth'
+            });
         });
     });
 }

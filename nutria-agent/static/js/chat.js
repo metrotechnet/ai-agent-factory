@@ -11,6 +11,8 @@
 let isLoading = false;
 let sessionId = null;
 let userMessageDiv = document.createElement('div');
+let currentAbortController = null;
+let currentReader = null;
 
 // Rate limiting - Debouncing
 let lastRequestTime = 0;
@@ -231,12 +233,29 @@ function scrollToMessageBottom(assistantMsgDiv, offset = 0) {
 function prepareUIForLoading() {
     isLoading = true;
     const sendButton = document.getElementById('send-button');
+    const stopButton = document.getElementById('stop-button');
     const inputBox = document.getElementById('input-box');
     const voiceButton = document.getElementById('voice-button');
     
-    if (sendButton) sendButton.disabled = true;
+    // Toggle send/stop buttons
+    if (sendButton) sendButton.style.display = 'none';
+    if (stopButton) stopButton.style.display = '';
     if (inputBox) inputBox.disabled = true;
     if (voiceButton) voiceButton.disabled = true;
+}
+
+/**
+ * Cancel ongoing message
+ */
+function cancelMessage() {
+    if (currentAbortController) {
+        currentAbortController.abort();
+        currentAbortController = null;
+    }
+    if (currentReader) {
+        currentReader.cancel().catch(() => {});
+        currentReader = null;
+    }
 }
 
 /**
@@ -244,11 +263,16 @@ function prepareUIForLoading() {
  */
 function cleanupAfterMessage(messageDiv) {
     isLoading = false;
+    currentAbortController = null;
+    currentReader = null;
     const sendButton = document.getElementById('send-button');
+    const stopButton = document.getElementById('stop-button');
     const inputBox = document.getElementById('input-box');
     const voiceButton = document.getElementById('voice-button');
     
-    if (sendButton) sendButton.disabled = false;
+    // Toggle stop/send buttons
+    if (stopButton) stopButton.style.display = 'none';
+    if (sendButton) sendButton.style.display = '';
     if (inputBox) inputBox.disabled = false;
     if (voiceButton) voiceButton.disabled = false;
     
@@ -289,10 +313,14 @@ async function handleStreamingResponse(question, contentDiv, actionsDiv) {
         session_id: sessionId
     };
 
+    // Create abort controller for cancellation
+    currentAbortController = new AbortController();
+
     const response = await fetch(`${BACKEND_URL}/query`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(requestData)
+        body: JSON.stringify(requestData),
+        signal: currentAbortController.signal
     });
 
     if (!response.ok) {
@@ -307,6 +335,7 @@ async function handleStreamingResponse(question, contentDiv, actionsDiv) {
     }
 
     const reader = response.body.getReader();
+    currentReader = reader;
     const decoder = new TextDecoder();
     let buffer = '';
     let questionId = null;
@@ -420,13 +449,6 @@ async function sendMessage() {
     const emptyState = document.getElementById('empty-state');
     const chatContainer = document.getElementById('chat-container');
     
-    // Check if we're in translator mode
-    if (window.AgentsModule && window.AgentsModule.getCurrentAgent() === 'translator') {
-        if (window.AgentsModule.sendTranslation) {
-            return window.AgentsModule.sendTranslation();
-        }
-    }
-    
     const question = inputBox ? inputBox.value.trim() : '';
     if (!question || isLoading) return;
     
@@ -525,6 +547,7 @@ window.ChatModule = {
     createBottomSpacer,
     scrollToMessageBottom,
     prepareUIForLoading,
+    cancelMessage,
     cleanupAfterMessage,
     handleStreamingResponse,
     isMessageLoading

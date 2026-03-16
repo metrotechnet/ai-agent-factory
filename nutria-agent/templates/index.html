@@ -29,7 +29,7 @@
     </script> 
 
 </head>
-<body style="display:none;">
+<body>
     <!-- Initial Loading Overlay -->
     <div class="initial-loading-overlay" id="initial-loading-overlay">
         <div class="initial-loading-content">
@@ -109,20 +109,6 @@
         </div>
     </div>
     <footer>
-            <!-- Translation language selector (hidden by default, shown when translator agent is active) -->
-            <div class="translate-options" id="translate-options" style="display:none;">
-                <select id="source-language" class="language-select">
-                    <!-- Populated dynamically from config.json -->
-                </select>
-                <button class="translation-direction-btn" id="translation-direction-btn" title="Inverser la direction de traduction">
-                    <svg viewBox="0 0 24 24" fill="currentColor" style="width:20px;height:20px;">
-                        <path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/>
-                    </svg>
-                </button>
-                <select id="target-language" class="language-select">
-                    <!-- Populated dynamically from config.json -->
-                </select>
-            </div>
             <div class="input-area">
                 <div class="input-wrapper">
                     <textarea 
@@ -139,11 +125,8 @@
                                 <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
                             </svg>
                         </button>
-                        <button id="send-button" class="send-button" title="" data-i18n-title="input.sendButton">
-                            <svg viewBox="0 0 24 24">
-                                <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
-                            </svg>
-                        </button>
+                        <button id="send-button" class="send-button bi bi-send" style="color: white;" title="" data-i18n-title="input.sendButton"> </button>
+                        <button id="stop-button" class="send-button bi bi-stop-fill" style="color: white; display: none;" title="Cancel" data-i18n-title="input.stopButton"> </button>
                     </div>
                 </div>
                 <div class="input-disclaimer">

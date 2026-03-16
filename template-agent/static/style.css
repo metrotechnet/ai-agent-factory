@@ -294,106 +294,6 @@ footer {
     box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
 }
 
-/* Translation Options Bar */
-.translate-options {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    padding: 8px 2rem;
-    background: #f0f0ff;
-    border-top: 1px solid #e2e8f0;
-    font-size: 0.9rem;
-}
-
-.translate-options label {
-    font-weight: 600;
-    color: #4338ca;
-    white-space: nowrap;
-}
-
-.source-language-display {
-    display: inline-flex;
-    align-items: center;
-    justify-content: left;
-    background: #ffffff;
-    padding: 8px 16px;
-    border-radius: 20px;
-    border: 2px solid #6366f1;
-    font-weight: 600;
-    min-width: 60px;
-    color: #6366f1;
-    font-size: 0.95rem;
-    letter-spacing: 0.05em;
-    min-width: 220px;
-}
-
-.translation-direction-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    background: #6366f1;
-    border: none;
-    border-radius: 50%;
-    width: 36px;
-    height: 36px;
-    margin: 0 8px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    color: white;
-    flex-shrink: 0;
-}
-
-.translation-direction-btn svg {
-    transition: transform 0.3s ease;
-}
-
-.translation-direction-btn.reversed svg {
-    transform: rotate(180deg);
-}
-
-.translation-direction-btn:hover {
-    background: #4f46e5;
-    transform: scale(1.1);
-}
-
-.translation-direction-btn:active {
-    transform: scale(0.95);
-}
-
-.language-select {
-    padding: 8px 36px 8px 14px;
-    border: 2px solid #6366f1;
-    border-radius: 20px;
-    background: #f5f3ff;
-    color: #4338ca;
-    font-size: 0.88rem;
-    font-weight: 600;
-    cursor: pointer;
-    outline: none;
-    transition: all 0.2s ease;
-    appearance: none;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236366f1' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 12px center;
-    max-width: 220px;
-    letter-spacing: 0.01em;
-    box-shadow: 0 1px 3px rgba(99, 102, 241, 0.12);
-}
-
-.language-select:hover {
-    background-color: #ede9fe;
-    border-color: #4f46e5;
-    box-shadow: 0 2px 6px rgba(99, 102, 241, 0.2);
-}
-
-.language-select:focus {
-    border-color: #4f46e5;
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
-}
-
 /* Translation result styling */
 .translation-result {
     background: #f0fdf4;
@@ -435,54 +335,11 @@ footer {
         gap: 6px;
         padding: 0.75rem 1rem;
     }
-
-    .translate-options {
-        padding: 6px 1rem;
-        flex-wrap: wrap;
-        gap: 6px;
-    }
-
-    .translate-options label {
-        font-size: 0.82rem;
-    }
-
-    .source-language-display {
-        padding: 6px 12px;
-        min-width: 50px;
-        font-size: 0.82rem;
-        max-width: 160px;
-
-    }
-
-    .translation-direction-btn {
-        width: 30px;
-        height: 30px;
-        margin: 0 4px;
-    }
-
-    .translation-direction-btn svg {
-        width: 16px;
-        height: 16px;
-    }
-
-    .language-select {
-        font-size: 0.78rem;
-        padding: 5px 26px 5px 10px;
-        border-radius: 16px;
-        border-width: 1.5px;
-        max-width: 160px;
-    }
 }
 
 @media (max-width: 380px) {
     header h2 {
         display: none;
-    }
-
-    .language-select {
-        font-size: 0.75rem;
-        padding: 5px 24px 5px 8px;
-        max-width: 140px;
     }
 }
 

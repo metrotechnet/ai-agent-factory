@@ -171,6 +171,7 @@ footer {
 
 .input-area {
     padding: 1rem 2rem;
+    display: none;
 }
 
 /* Disabled input-area style */

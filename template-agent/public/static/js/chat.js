@@ -11,6 +11,12 @@
 let isLoading = false;
 let sessionId = null;
 let userMessageDiv = document.createElement('div');
+let currentAbortController = null;
+let currentReader = null;
+
+// Rate limiting - Debouncing
+let lastRequestTime = 0;
+const MIN_REQUEST_INTERVAL = 2000; // 2 seconds minimum between requests
 
 /**
  * Escape HTML to prevent XSS
@@ -210,11 +216,16 @@ function createBottomSpacer(userMsgDiv, assistantMsgDiv, offset = 10) {
 }
 
 /**
- * Scroll to message bottom (disabled - no auto-scroll)
+ * Scroll to message bottom
  */
 function scrollToMessageBottom(assistantMsgDiv, offset = 0) {
-    // Auto-scroll disabled
-    return;
+    const chatContainer = document.getElementById('chat-container');
+    if (!chatContainer) return;
+    
+    const targetTop = assistantMsgDiv.offsetTop + assistantMsgDiv.offsetHeight - chatContainer.clientHeight + offset;
+    if (targetTop > 0) {
+        chatContainer.scrollTop = targetTop;
+    }
 }
 
 /**
@@ -223,12 +234,29 @@ function scrollToMessageBottom(assistantMsgDiv, offset = 0) {
 function prepareUIForLoading() {
     isLoading = true;
     const sendButton = document.getElementById('send-button');
+    const stopButton = document.getElementById('stop-button');
     const inputBox = document.getElementById('input-box');
     const voiceButton = document.getElementById('voice-button');
     
-    if (sendButton) sendButton.disabled = true;
+    // Toggle send/stop buttons
+    if (sendButton) sendButton.style.display = 'none';
+    if (stopButton) stopButton.style.display = '';
     if (inputBox) inputBox.disabled = true;
     if (voiceButton) voiceButton.disabled = true;
+}
+
+/**
+ * Cancel ongoing message
+ */
+function cancelMessage() {
+    if (currentAbortController) {
+        currentAbortController.abort();
+        currentAbortController = null;
+    }
+    if (currentReader) {
+        currentReader.cancel().catch(() => {});
+        currentReader = null;
+    }
 }
 
 /**
@@ -236,11 +264,16 @@ function prepareUIForLoading() {
  */
 function cleanupAfterMessage(messageDiv) {
     isLoading = false;
+    currentAbortController = null;
+    currentReader = null;
     const sendButton = document.getElementById('send-button');
+    const stopButton = document.getElementById('stop-button');
     const inputBox = document.getElementById('input-box');
     const voiceButton = document.getElementById('voice-button');
     
-    if (sendButton) sendButton.disabled = false;
+    // Toggle stop/send buttons
+    if (stopButton) stopButton.style.display = 'none';
+    if (sendButton) sendButton.style.display = '';
     if (inputBox) inputBox.disabled = false;
     if (voiceButton) voiceButton.disabled = false;
     
@@ -281,17 +314,29 @@ async function handleStreamingResponse(question, contentDiv, actionsDiv) {
         session_id: sessionId
     };
 
+    // Create abort controller for cancellation
+    currentAbortController = new AbortController();
+
     const response = await fetch(`${BACKEND_URL}/query`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(requestData)
+        body: JSON.stringify(requestData),
+        signal: currentAbortController.signal
     });
 
     if (!response.ok) {
+        if (response.status === 429) {
+            const lang = getCurrentLanguage();
+            const rateLimitMsg = lang === 'fr' 
+                ? 'Limite de requêtes atteinte. Vous avez dépassé le nombre maximum de questions autorisées (10 par heure). Veuillez réessayer plus tard.'
+                : 'Rate limit reached. You have exceeded the maximum number of allowed questions (10 per hour). Please try again later.';
+            throw new Error(rateLimitMsg);
+        }
         throw new Error(`HTTP error! status: ${response.status}`);
     }
 
     const reader = response.body.getReader();
+    currentReader = reader;
     const decoder = new TextDecoder();
     let buffer = '';
     let questionId = null;
@@ -405,15 +450,23 @@ async function sendMessage() {
     const emptyState = document.getElementById('empty-state');
     const chatContainer = document.getElementById('chat-container');
     
-    // Check if we're in translator mode
-    if (window.AgentsModule && window.AgentsModule.getCurrentAgent() === 'translator') {
-        if (window.AgentsModule.sendTranslation) {
-            return window.AgentsModule.sendTranslation();
-        }
-    }
-    
     const question = inputBox ? inputBox.value.trim() : '';
     if (!question || isLoading) return;
+    
+    // Rate limiting - Check minimum interval between requests
+    const now = Date.now();
+    if (now - lastRequestTime < MIN_REQUEST_INTERVAL) {
+        console.log('Please wait before sending another message');
+        // Optional: Show a brief visual feedback
+        if (inputBox) {
+            inputBox.style.borderColor = '#ff9800';
+            setTimeout(() => {
+                inputBox.style.borderColor = '';
+            }, 500);
+        }
+        return;
+    }
+    lastRequestTime = now;
     
     // Stop voice recording
     if (window.VoiceRecognitionModule && window.VoiceRecognitionModule.stopRecording) {
@@ -438,7 +491,10 @@ async function sendMessage() {
     if (chatContainer) {
         chatContainer.appendChild(spacerDiv);
         
+        // Set spacer height to push content up (viewport height - small offset)
         spacerDiv.style.height = (chatContainer.clientHeight - 100) + 'px';
+        
+        // Scroll to show user message at the top (with header offset)
         requestAnimationFrame(() => {
             requestAnimationFrame(() => {
                 chatContainer.scrollTop = userMessageDiv.offsetTop - 80;
@@ -457,8 +513,16 @@ async function sendMessage() {
         await handleStreamingResponse(question, contentDiv, actionsDiv);
     } catch (error) {
         console.error('Message sending error:', error);
-        const { t } = window.ConfigModule;
-        contentDiv.textContent = t('messages.error');
+        const { t, getCurrentLanguage } = window.ConfigModule;
+        
+        // Check if it's a rate limit error
+        if (error.message && (error.message.includes('Limite de requêtes') || error.message.includes('Rate limit'))) {
+            contentDiv.innerHTML = `<div style="color: #d32f2f; padding: 10px; background: #ffebee; border-radius: 4px; border-left: 4px solid #d32f2f;">
+                <strong>⚠️ ${error.message}</strong>
+            </div>`;
+        } else {
+            contentDiv.textContent = t('messages.error');
+        }
     } finally {
         cleanupAfterMessage(messageDiv);
         const { handleFocus } = window.UIUtilsModule || {};
@@ -484,6 +548,7 @@ window.ChatModule = {
     createBottomSpacer,
     scrollToMessageBottom,
     prepareUIForLoading,
+    cancelMessage,
     cleanupAfterMessage,
     handleStreamingResponse,
     isMessageLoading
