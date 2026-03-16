@@ -242,11 +242,37 @@ function setupMessageActions(messageDiv, contentDiv) {
                         'text/plain': new Blob([contentDiv.textContent], { type: 'text/plain' })
                     })
                 ]);
+                
+                // Show confirmation feedback
+                const originalIcon = copyBtn.innerHTML;
+                copyBtn.innerHTML = '<i class="bi bi-check2"></i>';
+                copyBtn.style.background = '#4caf50';
+                
+                setTimeout(() => {
+                    copyBtn.innerHTML = originalIcon;
+                    copyBtn.style.background = '';
+                }, 2000);
+                
             } catch (err) {
                 // Fallback to text-only if HTML copy fails
                 console.log('HTML copy failed, falling back to text:', err);
-                navigator.clipboard.writeText(contentDiv.textContent);
+                try {
+                    await navigator.clipboard.writeText(contentDiv.textContent);
+                    
+                    // Show confirmation feedback for fallback too
+                    const originalIcon = copyBtn.innerHTML;
+                    copyBtn.innerHTML = '<i class="bi bi-check2"></i>';
+                    copyBtn.style.background = '#4caf50';
+                    
+                    setTimeout(() => {
+                        copyBtn.innerHTML = originalIcon;
+                        copyBtn.style.background = '';
+                    }, 2000);
+                } catch (fallbackErr) {
+                    console.error('Copy failed:', fallbackErr);
+                }
             }
+
         });
     }
 

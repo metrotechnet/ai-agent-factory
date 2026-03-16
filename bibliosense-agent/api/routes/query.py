@@ -62,7 +62,8 @@ async def query_agent(request: Request, query_request: QueryRequest):
                 session=session,
                 question_id=question_id,
                 agent=query_request.agent,
-                bibliotheque=query_request.bibliotheque
+                bibliotheque=query_request.bibliotheque,
+                distance_threshold=1.05
             ):
                 assistant_response += chunk
                 yield f"data: {json.dumps({'chunk': chunk})}\n\n"

@@ -286,8 +286,13 @@ def get_links_from_contexts(contexts, metadatas=None, agent=None):
     
     return list(links)
 
-def ask_question_stream(question, language="fr", timezone="UTC", locale="fr-FR", top_k=25, conversation_history=None, session=None, question_id=None, agent=None, bibliotheque="all"):
-    """Streaming version of ask_question with language support and conversation history"""
+def ask_question_stream(question, language="fr", timezone="UTC", locale="fr-FR", top_k=100, conversation_history=None, session=None, question_id=None, agent=None, bibliotheque="all", distance_threshold=None):
+    """Streaming version of ask_question with language support and conversation history
+    
+    Args:
+        distance_threshold: Optional float. If provided, only return results with distance < threshold.
+                          Lower distance = higher similarity. Typical values: 0.3-0.5
+    """
     # Use conversation_history if provided, otherwise empty list
     if conversation_history is None:
         conversation_history = []
@@ -332,10 +337,11 @@ def ask_question_stream(question, language="fr", timezone="UTC", locale="fr-FR",
         if bibliotheque and bibliotheque != "all":
             where_filter = {"bibliotheque": bibliotheque}
 
+        collectio_size = col.count()
         # Query ChromaDB with optional library filter
         query_params = {
             "query_embeddings": [query_emb],
-            "n_results": top_k,
+            "n_results": collectio_size,
             "include": ['documents', 'metadatas']
         }
         if where_filter:
@@ -347,22 +353,32 @@ def ask_question_stream(question, language="fr", timezone="UTC", locale="fr-FR",
             yield "No relevant information found. Please make sure you have indexed some transcripts."
             return
 
-        # Randomize the order of results to vary recommendations
-        documents = results['documents'][0]
-        metadatas_list = results.get('metadatas', [[]])[0]
-        if documents and metadatas_list:
-            doc_meta_pairs = list(zip(documents, metadatas_list))
-            random.shuffle(doc_meta_pairs)
-            documents, metadatas_list = zip(*doc_meta_pairs)
-            results['documents'][0] = list(documents)
-            results['metadatas'][0] = list(metadatas_list)
+        # Option 1: Garder les N meilleurs, puis mélanger seulement ceux-là
+        top_relevant = 50  # Garde les 50 meilleurs
+        documents = results['documents'][0][:top_relevant]
+        metadatas_list = results.get('metadatas', [[]])[0][:top_relevant]
+
+        #Print title of first 10 books for debugging
+        print(f"[Query] Top {len(documents)} results (before filtering):", flush=True)
+        for i, meta in enumerate(metadatas_list[:10]):
+            title = meta.get('titre') or meta.get('title') or 'Unknown Title'
+            auteur = meta.get('auteur') or meta.get('author') or 'Unknown Author'
+            print(f"  {i+1}. {title} by {auteur}", flush=True)
+            
+        # Option 2: Filtrer par distance (si fourni), puis mélanger les résultats restants
+        # Mélanger seulement dans ce sous-ensemble pertinent
+        # if documents and metadatas_list:
+        #     doc_meta_pairs = list(zip(documents, metadatas_list))
+        #     random.shuffle(doc_meta_pairs)
+        #     documents, metadatas_list = zip(*doc_meta_pairs)
+
+        # print(f"[Query] Final number of results after filtering and shuffling: {len(documents)}", flush=True)                                                         
 
         # Build context from results with metadata
         contexts = []
-        metadatas = results.get('metadatas', [[]])[0]
-        for i, doc in enumerate(results['documents'][0]):
+        for i, doc in enumerate(documents):
             # Include metadata with each document
-            metadata = metadatas[i] if i < len(metadatas) else {}
+            metadata = metadatas_list[i] if i < len(metadatas_list) else {}
             context_entry = f"Document {i+1}:\n{doc}"
             
             # Add relevant metadata fields
@@ -382,8 +398,7 @@ def ask_question_stream(question, language="fr", timezone="UTC", locale="fr-FR",
         # Only extract links for substantial questions (not for generic/short questions)
         links = []
         if is_substantial_question(question):
-            metadatas = results.get('metadatas', [[]])[0]
-            links = get_links_from_contexts(contexts, metadatas=metadatas, agent=agent)
+            links = get_links_from_contexts(contexts, metadatas=metadatas_list, agent=agent)
         
         # Save links in session if provided
         if session is not None and question_id is not None:
@@ -451,9 +466,13 @@ def ask_question_stream(question, language="fr", timezone="UTC", locale="fr-FR",
         yield f"Error processing your question: {str(e)}"
 
 
-def ask_question_stream_gemini(question, language="fr", timezone="UTC", locale="fr-FR", top_k=15, conversation_history=None, session=None, question_id=None, model_name="gemini-2.0-flash-exp", agent=None, bibliotheque="all"):
+def ask_question_stream_gemini(question, language="fr", timezone="UTC", locale="fr-FR", top_k=15, conversation_history=None, session=None, question_id=None, model_name="gemini-2.0-flash-exp", agent=None, bibliotheque="all", distance_threshold=None):
     """Streaming answer using Gemini with new template system. 
     This function now uses build_prompt_from_template for consistency.
+    
+    Args:
+        distance_threshold: Optional float. If provided, only return results with distance < threshold.
+                          Lower distance = higher similarity. Typical values: 0.3-0.5
     """
     # Use conversation_history if provided, otherwise empty list
     if conversation_history is None:
@@ -503,7 +522,7 @@ def ask_question_stream_gemini(question, language="fr", timezone="UTC", locale="
         query_params = {
             "query_embeddings": [query_emb],
             "n_results": top_k,
-            "include": ['documents', 'metadatas']
+            "include": ['documents', 'metadatas', 'distances']
         }
         if where_filter:
             query_params["where"] = where_filter
@@ -514,9 +533,36 @@ def ask_question_stream_gemini(question, language="fr", timezone="UTC", locale="
             yield "No relevant information found. Please make sure you have indexed some transcripts."
             return
 
-        # Randomize the order of results to vary recommendations
+        # Apply distance threshold filtering if specified
         documents = results['documents'][0]
         metadatas_list = results.get('metadatas', [[]])[0]
+        distances = results.get('distances', [[]])[0]
+        
+        # Log distances for monitoring
+        if distances:
+            print(f"[Query Gemini] Found {len(distances)} results. Distance range: {min(distances):.3f} - {max(distances):.3f}")
+        
+        # Filter by distance threshold
+        if distance_threshold is not None and distances:
+            filtered_data = []
+            for i, dist in enumerate(distances):
+                if dist < distance_threshold:
+                    filtered_data.append((documents[i], metadatas_list[i], dist))
+            
+            if filtered_data:
+                documents, metadatas_list, distances = zip(*filtered_data)
+                documents = list(documents)
+                metadatas_list = list(metadatas_list)
+                distances = list(distances)
+                print(f"[Query Gemini] After threshold {distance_threshold}: {len(documents)} results kept")
+            else:
+                print(f"[Query Gemini] Warning: No results pass threshold {distance_threshold}. Using top 3 results anyway.")
+                # Keep at least top 3 results even if they don't pass threshold
+                documents = documents[:3]
+                metadatas_list = metadatas_list[:3]
+                distances = distances[:3]
+        
+        # Randomize the order of results to vary recommendations
         if documents and metadatas_list:
             doc_meta_pairs = list(zip(documents, metadatas_list))
             random.shuffle(doc_meta_pairs)
