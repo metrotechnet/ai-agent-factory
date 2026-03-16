@@ -286,6 +286,65 @@ def get_links_from_contexts(contexts, metadatas=None, agent=None):
     
     return list(links)
 
+def detect_vague_question(question, language="fr"):
+    """
+    Détecte si une question est trop vague et nécessite des clarifications.
+    
+    Args:
+        question: Question de l'utilisateur
+        language: Langue de la question
+        
+    Returns:
+        tuple (is_vague: bool, clarification_message: str or None)
+    """
+    question_lower = question.lower().strip()
+    
+    # Questions très courtes (moins de 3 mots non-vides)
+    words = [w for w in question_lower.split() if len(w) > 2]
+    if len(words) < 3:
+        # Vérifier si c'est juste des termes génériques
+        generic_terms_fr = ['livre', 'livres', 'roman', 'romans', 'auteur', 'auteurs', 'lecture', 'lire']
+        generic_terms_en = ['book', 'books', 'novel', 'novels', 'author', 'authors', 'read', 'reading']
+        generic_terms = generic_terms_fr if language == 'fr' else generic_terms_en
+        
+        if any(term in question_lower for term in generic_terms) and len(words) <= 2:
+            if language == 'fr':
+                return True, "Pouvez-vous préciser ce que vous recherchez? Par exemple:\n- Un genre spécifique (roman policier, science-fiction, romance, etc.)?\n- Un auteur en particulier?\n- Un thème ou sujet qui vous intéresse?\n- Un type de lecture (facile, complexe, court, série, etc.)?"
+            else:
+                return True, "Could you be more specific about what you're looking for? For example:\n- A specific genre (mystery, sci-fi, romance, etc.)?\n- A particular author?\n- A theme or topic of interest?\n- A type of reading (easy, complex, short, series, etc.)?"
+    
+    # Termes très vagues sans qualificatifs
+    vague_patterns_fr = [
+        (r'^(un|une|des)\s+(bon|bonne|bons|bonnes)\s+(livre|livres|roman|romans)[\s?!.]*$', 
+         "Qu'est-ce qui rend un livre 'bon' pour vous? Pourriez-vous préciser:\n- Le genre que vous préférez?\n- Les thèmes qui vous intéressent?\n- Le style d'écriture que vous aimez?\n- Des auteurs que vous avez appréciés?"),
+        (r'^(quelque chose|qqch)\s+(d[\'e])?intéressant', 
+         "Qu'est-ce qui vous intéresse en particulier? Un genre, un auteur, un thème spécifique?"),
+        (r'^(un|une)\s+(livre|roman)\s*[\s?!.]*$',
+         "Quel type de livre recherchez-vous? (genre, auteur, thème, style...)"),
+        (r'^\s*(livre|livres|roman|romans)\s*[\s?!.]*$',
+         "Pouvez-vous préciser quel type de livre vous intéresse? (genre, auteur, thème...)"),
+    ]
+    
+    vague_patterns_en = [
+        (r'^(a|an|some)\s+good\s+(book|books|novel|novels)[\s?!.]*$',
+         "What makes a book 'good' for you? Could you specify:\n- Your preferred genre?\n- Topics of interest?\n- Writing style you enjoy?\n- Authors you've liked?"),
+        (r'^something\s+interesting',
+         "What interests you in particular? A genre, author, or specific theme?"),
+        (r'^(a|an)\s+(book|novel)\s*[\s?!.]*$',
+         "What type of book are you looking for? (genre, author, theme, style...)"),
+        (r'^\s*(book|books|novel|novels)\s*[\s?!.]*$',
+         "Could you specify what type of book interests you? (genre, author, theme...)"),
+    ]
+    
+    patterns = vague_patterns_fr if language == 'fr' else vague_patterns_en
+    
+    for pattern, message in patterns:
+        if re.match(pattern, question_lower):
+            return True, message
+    
+    return False, None
+
+
 def reformulate_question_with_context(question, conversation_history, language="fr"):
     """
     Reformule la question en tenant compte du contexte conversationnel.
@@ -398,6 +457,15 @@ def ask_question_stream(question, language="fr", timezone="UTC", locale="fr-FR",
         return
 
     try:
+        # Détecter si la question est trop vague et nécessite clarification
+        is_vague, clarification_msg = detect_vague_question(question, language)
+        if is_vague and not conversation_history:
+            # Seulement demander clarification si pas d'historique (première question)
+            # Si historique existe, la reformulation pourrait aider
+            print(f"[Vague Question Detected] Question: '{question}'")
+            yield clarification_msg
+            return
+        
         # Reformuler la question en tenant compte du contexte si nécessaire
         # Cela permet de gérer des questions comme "du même auteur", "similaire", etc.
         search_question = reformulate_question_with_context(question, conversation_history, language)
@@ -414,13 +482,12 @@ def ask_question_stream(question, language="fr", timezone="UTC", locale="fr-FR",
         if bibliotheque and bibliotheque != "all":
             where_filter = {"bibliotheque": bibliotheque}
 
-        # Limit n_results to avoid SQLite "too many SQL variables" error
-        # We only need top 500 for diversity filtering (we use top 150)
-        max_results = 500
+        # We only need top 150 for diversity filtering before shuffling and taking top 50
+        top_relevant = 150  # Garde les 150 meilleurs pour augmenter la diversité
         # Query ChromaDB with optional library filter
         query_params = {
             "query_embeddings": [query_emb],
-            "n_results": max_results,
+            "n_results": top_relevant,
             "include": ['documents', 'metadatas']
         }
         if where_filter:
@@ -433,7 +500,6 @@ def ask_question_stream(question, language="fr", timezone="UTC", locale="fr-FR",
             return
 
         # Option 1: Garder les N meilleurs, puis mélanger seulement ceux-là
-        top_relevant = 150  # Garde les 150 meilleurs pour augmenter la diversité
         documents = results['documents'][0][:top_relevant]
         metadatas_list = results.get('metadatas', [[]])[0][:top_relevant]
 
@@ -575,171 +641,3 @@ def ask_question_stream(question, language="fr", timezone="UTC", locale="fr-FR",
     except Exception as e:
         yield f"Error processing your question: {str(e)}"
 
-
-def ask_question_stream_gemini(question, language="fr", timezone="UTC", locale="fr-FR", top_k=15, conversation_history=None, session=None, question_id=None, model_name="gemini-2.0-flash-exp", agent=None, bibliotheque="all", distance_threshold=None):
-    """Streaming answer using Gemini with new template system. 
-    This function now uses build_prompt_from_template for consistency.
-    
-    Args:
-        distance_threshold: Optional float. If provided, only return results with distance < threshold.
-                          Lower distance = higher similarity. Typical values: 0.3-0.5
-    """
-    # Use conversation_history if provided, otherwise empty list
-    if conversation_history is None:
-        conversation_history = []
-
-    # Build history_text for prompt template
-    history_text = ""
-    # Extract previously recommended books from history to avoid repetition
-    previously_recommended = set()
-    
-    if conversation_history and len(conversation_history) > 1:
-        history_text = "\n\nHISTORIQUE DE LA CONVERSATION:\n"
-        recent_history = conversation_history[-7:-1] if len(conversation_history) > 1 else []
-        for msg in recent_history:
-            role_label = "Utilisateur" if msg['role'] == 'user' else "Assistant"
-            history_text += f"{role_label}: {msg['content']}\n"
-            
-            # Extract book titles from assistant responses (look for ### **Title** pattern)
-            if msg['role'] == 'assistant':
-                titles = re.findall(r'###\s*\*\*(.+?)\*\*', msg['content'])
-                previously_recommended.update(titles)
-    
-    # Add note about previously recommended books
-    if previously_recommended:
-        history_text += f"\n\nLIVRES DÉJÀ RECOMMANDÉS (à éviter pour varier les recommandations):\n"
-        for title in previously_recommended:
-            history_text += f"- {title}\n"
-
-    col = get_collection(kb_name=agent)
-    if col is None:
-        yield "Error: ChromaDB collection is not available. Please run 'python index_chromadb.py' first to index your documents."
-        return
-
-    try:
-        # Reformuler la question en tenant compte du contexte si nécessaire
-        search_question = reformulate_question_with_context(question, conversation_history, language)
-        
-        # Get embedding for the reformulated question using OpenAI (keeps Chroma flow unchanged)
-        query_emb = client.embeddings.create(
-            model="text-embedding-3-large",
-            input=search_question
-        ).data[0].embedding
-
-        # Build where filter for library selection
-        where_filter = None
-        if bibliotheque and bibliotheque != "all":
-            where_filter = {"bibliotheque": bibliotheque}
-
-        # Query ChromaDB with optional library filter
-        query_params = {
-            "query_embeddings": [query_emb],
-            "n_results": top_k,
-            "include": ['documents', 'metadatas', 'distances']
-        }
-        if where_filter:
-            query_params["where"] = where_filter
-        
-        results = col.query(**query_params)
-
-        if not results['documents'] or not results['documents'][0]:
-            yield "No relevant information found. Please make sure you have indexed some transcripts."
-            return
-
-        # Apply distance threshold filtering if specified
-        documents = results['documents'][0]
-        metadatas_list = results.get('metadatas', [[]])[0]
-        distances = results.get('distances', [[]])[0]
-        
-        # Log distances for monitoring
-        if distances:
-            print(f"[Query Gemini] Found {len(distances)} results. Distance range: {min(distances):.3f} - {max(distances):.3f}")
-        
-        # Filter by distance threshold
-        if distance_threshold is not None and distances:
-            filtered_data = []
-            for i, dist in enumerate(distances):
-                if dist < distance_threshold:
-                    filtered_data.append((documents[i], metadatas_list[i], dist))
-            
-            if filtered_data:
-                documents, metadatas_list, distances = zip(*filtered_data)
-                documents = list(documents)
-                metadatas_list = list(metadatas_list)
-                distances = list(distances)
-                print(f"[Query Gemini] After threshold {distance_threshold}: {len(documents)} results kept")
-            else:
-                print(f"[Query Gemini] Warning: No results pass threshold {distance_threshold}. Using top 3 results anyway.")
-                # Keep at least top 3 results even if they don't pass threshold
-                documents = documents[:3]
-                metadatas_list = metadatas_list[:3]
-                distances = distances[:3]
-        
-        # Randomize the order of results to vary recommendations
-        if documents and metadatas_list:
-            doc_meta_pairs = list(zip(documents, metadatas_list))
-            random.shuffle(doc_meta_pairs)
-            documents, metadatas_list = zip(*doc_meta_pairs)
-            results['documents'][0] = list(documents)
-            results['metadatas'][0] = list(metadatas_list)
-
-        # Build context from results with metadata
-        contexts = []
-        metadatas = results.get('metadatas', [[]])[0]
-        for i, doc in enumerate(results['documents'][0]):
-            # Include metadata with each document
-            metadata = metadatas[i] if i < len(metadatas) else {}
-            context_entry = f"Document {i+1}:\n{doc}"
-            
-            # Add relevant metadata fields
-            if metadata:
-                metadata_str = "\nMétadonnées:"
-                for key, value in metadata.items():
-                    if key in ['image', 'couverture', 'cover', 'image_url', 'cover_url', 'titre', 'title', 
-                               'auteur', 'author', 'lien', 'resume', 'summary', 'categorie', 'category',
-                               'editeur', 'publisher', 'parution', 'publication', 'pages', 'langue', 'language', 'bibliotheque']:
-                        metadata_str += f"\n- {key}: {value}"
-                context_entry += metadata_str
-            
-            contexts.append(context_entry)
-        context = "\n\n".join(contexts)
-
-        # Extract links from context
-        links = []
-        if is_substantial_question(question):
-            metadatas = results.get('metadatas', [[]])[0]
-            links = get_links_from_contexts(contexts, metadatas=metadatas, agent=agent)
-        
-        # Save links in session if provided
-        if session is not None and question_id is not None:
-            if 'links' not in session:
-                session['links'] = {}
-            session['links'][question_id] = links
-
-        # Build prompt using template from JSON (same as OpenAI version)
-        prompt, model_config = build_prompt_from_template(language, context, question, history_text, agent=agent)
-        
-        if not prompt:
-            yield "Error: Unable to load prompt template."
-            return
-
-        # Configure Gemini model
-        model = genai.GenerativeModel(model_name, generation_config={
-            "temperature": 1.0
-        })
-
-        # Stream tokens
-        response = model.generate_content(prompt, stream=True)
-
-        first_chunk = True
-        for chunk in response:
-            text = getattr(chunk, "text", None)
-            if text:
-                if first_chunk:
-                    text = text.lstrip()
-                    first_chunk = False
-                if text:
-                    yield text
-
-    except Exception as e:
-        yield f"Error processing your question (Gemini): {str(e)}"

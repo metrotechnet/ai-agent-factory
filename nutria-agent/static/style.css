@@ -635,6 +635,36 @@ footer {
     margin-bottom: 0.5rem;
 }
 
+.message-text img {
+    max-width: 200px;
+    width: 200px;
+    height: auto;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    object-fit: cover;
+    display: block;
+    margin-bottom: 0.75rem;
+}
+
+/* Placeholder for broken images */
+.broken-image-placeholder {
+    max-width: 200px;
+    width: 200px;
+    height: 280px;
+    background: #e2e8f0;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.75rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.broken-image-placeholder i {
+    font-size: 48px;
+    color: #94a3b8;
+}
+
 .message-disclaimer {
     font-size: 0.75rem;
     font-style: italic;
