@@ -25,6 +25,8 @@ for /f "usebackq eol=# tokens=1* delims==" %%a in (.env) do (
     if "%%a"=="GCP_IMAGE_NAME" set "GCP_IMAGE_NAME=%%b"
     if "%%a"=="CLOUD_RUN_MEMORY" set "CLOUD_RUN_MEMORY=%%b"
     if "%%a"=="CLOUD_RUN_TIMEOUT" set "CLOUD_RUN_TIMEOUT=%%b"
+    if "%%a"=="CLOUD_RUN_MIN_INSTANCES" set "CLOUD_RUN_MIN_INSTANCES=%%b"
+    if "%%a"=="CLOUD_RUN_MAX_INSTANCES" set "CLOUD_RUN_MAX_INSTANCES=%%b"
     if "%%a"=="FIREBASE_PROJECT_ID" set "FIREBASE_PROJECT_ID=%%b"
     if "%%a"=="ADDITIONAL_CORS_ORIGINS" set "ADDITIONAL_CORS_ORIGINS=%%b"
     if "%%a"=="KNOWLEDGE_BASE" set "KNOWLEDGE_BASE=%%b"
@@ -38,6 +40,8 @@ echo   Service: %GCP_SERVICE_NAME%
 echo   Image: %GCP_IMAGE_NAME%
 echo   Memory: %CLOUD_RUN_MEMORY%
 echo   Timeout: %CLOUD_RUN_TIMEOUT%s
+echo   Min Instances: %CLOUD_RUN_MIN_INSTANCES%
+echo   Max Instances: %CLOUD_RUN_MAX_INSTANCES%
 echo   Firebase Project: %FIREBASE_PROJECT_ID%
 echo   Knowledge Base: %KNOWLEDGE_BASE%
 echo.
@@ -71,6 +75,8 @@ if "%GCP_IMAGE_NAME%"=="" (
 REM Set defaults for optional parameters
 if "%CLOUD_RUN_MEMORY%"=="" set CLOUD_RUN_MEMORY=1Gi
 if "%CLOUD_RUN_TIMEOUT%"=="" set CLOUD_RUN_TIMEOUT=300
+if "%CLOUD_RUN_MIN_INSTANCES%"=="" set CLOUD_RUN_MIN_INSTANCES=0
+if "%CLOUD_RUN_MAX_INSTANCES%"=="" set CLOUD_RUN_MAX_INSTANCES=10
 
 REM Use API keys from configuration file
 set OPENAI_API_KEY=%CONFIG_OPENAI_KEY%
@@ -90,8 +96,8 @@ call gcloud run deploy %GCP_SERVICE_NAME% ^
   --update-secrets /secrets/gdrive/credentials.json=gdrive-credentials:latest ^
   --memory %CLOUD_RUN_MEMORY% ^
   --timeout %CLOUD_RUN_TIMEOUT%s ^
-  --min-instances 1 ^
-  --max-instances 10 ^
+  --min-instances %CLOUD_RUN_MIN_INSTANCES% ^
+  --max-instances %CLOUD_RUN_MAX_INSTANCES% ^
   --cpu 2 ^
   --concurrency 80
 

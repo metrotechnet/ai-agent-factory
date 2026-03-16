@@ -286,6 +286,78 @@ def get_links_from_contexts(contexts, metadatas=None, agent=None):
     
     return list(links)
 
+def reformulate_question_with_context(question, conversation_history, language="fr"):
+    """
+    Reformule la question en tenant compte du contexte conversationnel.
+    Utile pour des questions comme "du même auteur", "un autre livre similaire", etc.
+    
+    Args:
+        question: Question actuelle de l'utilisateur
+        conversation_history: Historique des messages
+        language: Langue de la conversation
+        
+    Returns:
+        Question reformulée de manière standalone
+    """
+    # Si pas d'historique ou historique trop court, retourner la question telle quelle
+    if not conversation_history or len(conversation_history) < 2:
+        return question
+    
+    # Construire le contexte des derniers échanges (exclure le message actuel)
+    recent_messages = conversation_history[-6:] if len(conversation_history) > 6 else conversation_history[:-1]
+    context = ""
+    for msg in recent_messages:
+        role_label = "Utilisateur" if msg['role'] == 'user' else "Assistant"
+        context += f"{role_label}: {msg['content'][:200]}...\n\n"
+    
+    # Prompt de reformulation
+    if language == 'fr':
+        reformulation_prompt = f"""Contexte de la conversation précédente:
+{context}
+
+Question actuelle de l'utilisateur: "{question}"
+
+Si cette question fait référence au contexte précédent (par exemple: "du même auteur", "similaire", "autres livres", "encore", etc.), reformule-la de manière standalone en incluant toutes les informations nécessaires (nom d'auteur, genre, etc.).
+
+Si la question est déjà standalone et claire, retourne-la telle quelle.
+
+Retourne UNIQUEMENT la question reformulée, sans explication."""
+    else:
+        reformulation_prompt = f"""Previous conversation context:
+{context}
+
+Current user question: "{question}"
+
+If this question references the previous context (e.g., "by the same author", "similar", "other books", "more", etc.), reformulate it as a standalone question including all necessary information (author name, genre, etc.).
+
+If the question is already standalone and clear, return it as is.
+
+Return ONLY the reformulated question, without explanation."""
+    
+    try:
+        # Utiliser GPT pour la reformulation (rapide avec gpt-4o-mini)
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {"role": "user", "content": reformulation_prompt}
+            ],
+            temperature=0.3,
+            max_tokens=150
+        )
+        
+        reformulated = response.choices[0].message.content.strip()
+        
+        # Log pour débug
+        if reformulated.lower() != question.lower():
+            print(f"[Reformulation] Original: '{question}'")
+            print(f"[Reformulation] Reformulée: '{reformulated}'")
+        
+        return reformulated
+        
+    except Exception as e:
+        print(f"[Reformulation] Error: {e}, using original question")
+        return question
+
 def ask_question_stream(question, language="fr", timezone="UTC", locale="fr-FR", top_k=100, conversation_history=None, session=None, question_id=None, agent=None, bibliotheque="all", distance_threshold=None):
     """Streaming version of ask_question with language support and conversation history
     
@@ -326,10 +398,15 @@ def ask_question_stream(question, language="fr", timezone="UTC", locale="fr-FR",
         return
 
     try:
-        # Get embedding for the question
+        # Reformuler la question en tenant compte du contexte si nécessaire
+        # Cela permet de gérer des questions comme "du même auteur", "similaire", etc.
+        search_question = reformulate_question_with_context(question, conversation_history, language)
+        print(f"[ask_question_stream] Search question after reformulation: '{search_question}'", flush=True)
+
+        # Get embedding for the reformulated question
         query_emb = client.embeddings.create(
             model="text-embedding-3-large", 
-            input=question
+            input=search_question
         ).data[0].embedding
 
         # Build where filter for library selection
@@ -337,11 +414,13 @@ def ask_question_stream(question, language="fr", timezone="UTC", locale="fr-FR",
         if bibliotheque and bibliotheque != "all":
             where_filter = {"bibliotheque": bibliotheque}
 
-        collectio_size = col.count()
+        # Limit n_results to avoid SQLite "too many SQL variables" error
+        # We only need top 500 for diversity filtering (we use top 150)
+        max_results = 500
         # Query ChromaDB with optional library filter
         query_params = {
             "query_embeddings": [query_emb],
-            "n_results": collectio_size,
+            "n_results": max_results,
             "include": ['documents', 'metadatas']
         }
         if where_filter:
@@ -354,25 +433,56 @@ def ask_question_stream(question, language="fr", timezone="UTC", locale="fr-FR",
             return
 
         # Option 1: Garder les N meilleurs, puis mélanger seulement ceux-là
-        top_relevant = 50  # Garde les 50 meilleurs
+        top_relevant = 150  # Garde les 150 meilleurs pour augmenter la diversité
         documents = results['documents'][0][:top_relevant]
         metadatas_list = results.get('metadatas', [[]])[0][:top_relevant]
 
+        # Extraire les auteurs déjà recommandés de l'historique
+        previously_recommended_authors = set()
+        if conversation_history:
+            for msg in conversation_history:
+                if msg['role'] == 'assistant':
+                    # Extraire les auteurs avec regex: *par Auteur*
+                    authors = re.findall(r'\*par\s+([^*]+)\*', msg['content'])
+                    previously_recommended_authors.update(authors)
+        
+        # Filtrer pour limiter le nombre de livres par auteur (max 2)
+        author_count = {}
+        filtered_results = []
+        for doc, meta in zip(documents, metadatas_list):
+            author = meta.get('auteur') or meta.get('author') or 'Unknown'
+            
+            # Pénaliser les auteurs déjà recommandés dans l'historique
+            if author in previously_recommended_authors:
+                # Garder seulement si on a très peu de résultats
+                if len(filtered_results) < 20:
+                    continue
+            
+            # Limiter à 2 livres par auteur pour plus de diversité
+            if author_count.get(author, 0) < 2:
+                filtered_results.append((doc, meta))
+                author_count[author] = author_count.get(author, 0) + 1
+        
+        # Si on a trop filtré, garder quand même des résultats
+        if len(filtered_results) < 20:
+            filtered_results = list(zip(documents, metadatas_list))[:50]
+        
+        # Mélanger pour varier les recommandations
+        random.shuffle(filtered_results)
+        
+        # Prendre les 50 premiers après shuffle
+        filtered_results = filtered_results[:50]
+        documents, metadatas_list = zip(*filtered_results) if filtered_results else ([], [])
+        documents = list(documents)
+        metadatas_list = list(metadatas_list)
+
         #Print title of first 10 books for debugging
-        print(f"[Query] Top {len(documents)} results (before filtering):", flush=True)
+        print(f"[Query] Top {len(documents)} results (after filtering & shuffle):", flush=True)
+        print(f"[Query] Previously recommended authors: {previously_recommended_authors}", flush=True)
         for i, meta in enumerate(metadatas_list[:10]):
             title = meta.get('titre') or meta.get('title') or 'Unknown Title'
             auteur = meta.get('auteur') or meta.get('author') or 'Unknown Author'
-            print(f"  {i+1}. {title} by {auteur}", flush=True)
-            
-        # Option 2: Filtrer par distance (si fourni), puis mélanger les résultats restants
-        # Mélanger seulement dans ce sous-ensemble pertinent
-        # if documents and metadatas_list:
-        #     doc_meta_pairs = list(zip(documents, metadatas_list))
-        #     random.shuffle(doc_meta_pairs)
-        #     documents, metadatas_list = zip(*doc_meta_pairs)
-
-        # print(f"[Query] Final number of results after filtering and shuffling: {len(documents)}", flush=True)                                                         
+            print(f"  {i+1}. {title} by {auteur}", flush=True)                                                         
 
         # Build context from results with metadata
         contexts = []
@@ -507,10 +617,13 @@ def ask_question_stream_gemini(question, language="fr", timezone="UTC", locale="
         return
 
     try:
-        # Get embedding for the question using OpenAI (keeps Chroma flow unchanged)
+        # Reformuler la question en tenant compte du contexte si nécessaire
+        search_question = reformulate_question_with_context(question, conversation_history, language)
+        
+        # Get embedding for the reformulated question using OpenAI (keeps Chroma flow unchanged)
         query_emb = client.embeddings.create(
             model="text-embedding-3-large",
-            input=question
+            input=search_question
         ).data[0].embedding
 
         # Build where filter for library selection
