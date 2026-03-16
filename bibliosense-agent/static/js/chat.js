@@ -11,14 +11,15 @@
 let isLoading = false;
 let sessionId = null;
 let userMessageDiv = document.createElement('div');
+let endPadding = 0;
+let currentAbortController = null;
+let currentReader = null;
 
 // Rate limiting - Debouncing
 let lastRequestTime = 0;
 const MIN_REQUEST_INTERVAL = 2000; // 2 seconds minimum between requests
 
-// Auto-scroll control
-let autoScrollEnabled = true;
-let isScrollingProgrammatically = false;
+
 
 // Configure marked.js to open links in new tab
 if (typeof marked !== 'undefined') {
@@ -226,32 +227,38 @@ function setupMessageActions(messageDiv, contentDiv) {
 }
 
 /**
- * Remove previous bottom spacer
+ * Position message at bottom of viewport
  */
-function removePreviousSpacer() {
-    const previousSpacer = document.getElementById('chat-bottom-spacer');
-    if (previousSpacer && previousSpacer.parentNode) {
-        previousSpacer.remove();
-    }
-}
+function positionMessageAtBottom(chatContainer, userMessageDiv, messageDiv) {
+    if (!chatContainer || !userMessageDiv || !messageDiv) return;
+    
+    // Calculate needed padding to position message at bottom
+    requestAnimationFrame(() => {
+        
+        const userMessageHeight = userMessageDiv.offsetHeight;      
+        const messageDivHeight = messageDiv.offsetHeight;
+        const containerHeight = chatContainer.clientHeight;
+        
+        // Calculate padding needed to push content to bottom
+        const endPadding = containerHeight - userMessageHeight - messageDivHeight - 50;
+        console.log('Needed padding to position message at bottom:', endPadding);
 
-/**
- * Create bottom spacer
- */
-function createBottomSpacer(userMsgDiv, assistantMsgDiv, offset = 10) {
-    const bottomSpacer = document.createElement('div');
-    bottomSpacer.id = 'chat-bottom-spacer';
-    bottomSpacer.style.height = offset + 'px';
-    bottomSpacer.style.flexShrink = '0';
-    return bottomSpacer;
-}
-
-/**
- * Scroll to message bottom (disabled - no auto-scroll)
- */
-function scrollToMessageBottom(assistantMsgDiv, offset = 0) {
-    // Auto-scroll disabled
-    return;
+        if (endPadding > 0) {
+            const messageContent = messageDiv.querySelector('.message-content');
+            if (messageContent) {
+                const currentHeight = messageContent.offsetHeight;
+                messageContent.style.minHeight = (currentHeight + endPadding) + 'px';
+            }
+        }
+        
+        // Scroll to bottom
+        requestAnimationFrame(() => {
+            chatContainer.scrollTo({
+                top: chatContainer.scrollHeight,
+                behavior: 'smooth'
+            });
+        });
+    });
 }
 
 /**
@@ -260,12 +267,29 @@ function scrollToMessageBottom(assistantMsgDiv, offset = 0) {
 function prepareUIForLoading() {
     isLoading = true;
     const sendButton = document.getElementById('send-button');
+    const stopButton = document.getElementById('stop-button');
     const inputBox = document.getElementById('input-box');
     const voiceButton = document.getElementById('voice-button');
     
-    if (sendButton) sendButton.disabled = true;
+    // Toggle send/stop buttons
+    if (sendButton) sendButton.style.display = 'none';
+    if (stopButton) stopButton.style.display = '';
     if (inputBox) inputBox.disabled = true;
     if (voiceButton) voiceButton.disabled = true;
+}
+
+/**
+ * Cancel ongoing message
+ */
+function cancelMessage() {
+    if (currentAbortController) {
+        currentAbortController.abort();
+        currentAbortController = null;
+    }
+    if (currentReader) {
+        currentReader.cancel().catch(() => {});
+        currentReader = null;
+    }
 }
 
 /**
@@ -273,11 +297,16 @@ function prepareUIForLoading() {
  */
 function cleanupAfterMessage(messageDiv) {
     isLoading = false;
+    currentAbortController = null;
+    currentReader = null;
     const sendButton = document.getElementById('send-button');
+    const stopButton = document.getElementById('stop-button');
     const inputBox = document.getElementById('input-box');
     const voiceButton = document.getElementById('voice-button');
     
-    if (sendButton) sendButton.disabled = false;
+    // Toggle stop/send buttons
+    if (stopButton) stopButton.style.display = 'none';
+    if (sendButton) sendButton.style.display = '';
     if (inputBox) inputBox.disabled = false;
     if (voiceButton) voiceButton.disabled = false;
     
@@ -319,10 +348,14 @@ async function handleStreamingResponse(question, contentDiv, actionsDiv) {
         bibliotheque: getSelectedLibrary()
     };
 
+    // Create abort controller for cancellation
+    currentAbortController = new AbortController();
+
     const response = await fetch(`${BACKEND_URL}/query`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(requestData)
+        body: JSON.stringify(requestData),
+        signal: currentAbortController.signal
     });
 
     if (!response.ok) {
@@ -337,6 +370,7 @@ async function handleStreamingResponse(question, contentDiv, actionsDiv) {
     }
 
     const reader = response.body.getReader();
+    currentReader = reader;
     const decoder = new TextDecoder();
     let buffer = '';
     let questionId = null;
@@ -434,7 +468,6 @@ async function handleStreamingResponse(question, contentDiv, actionsDiv) {
                                 contentDiv.textContent = fullText;
                             }
                         } 
-                        scrollToMessageBottom(contentDiv.closest('.message'));
                     }
                   
                     if (updateScrollIndicator) updateScrollIndicator();
@@ -454,13 +487,6 @@ async function sendMessage() {
     const inputBox = document.getElementById('input-box');
     const emptyState = document.getElementById('empty-state');
     const chatContainer = document.getElementById('chat-container');
-    
-    // Check if we're in translator mode
-    if (window.AgentsModule && window.AgentsModule.getCurrentAgent() === 'translator') {
-        if (window.AgentsModule.sendTranslation) {
-            return window.AgentsModule.sendTranslation();
-        }
-    }
     
     const question = inputBox ? inputBox.value.trim() : '';
     if (!question || isLoading) return;
@@ -489,41 +515,32 @@ async function sendMessage() {
         emptyState.style.display = 'none';
     }
     
-    removePreviousSpacer();
-    
     userMessageDiv = addMessage(question, 'user');
     const messageDiv = createAssistantMessage();
     
-    if (chatContainer) {
-        chatContainer.appendChild(userMessageDiv);
-        chatContainer.appendChild(messageDiv);
-    }
-    
-    const spacerDiv = createBottomSpacer(userMessageDiv, messageDiv);
-    if (chatContainer) {
-        chatContainer.appendChild(spacerDiv);
-        
-        // Set spacer height to push content up (viewport height - small offset)
-        spacerDiv.style.height = (chatContainer.clientHeight - 100) + 'px';
-        
-        // Scroll to show user message at the top (with header offset)
-        requestAnimationFrame(() => {
-            requestAnimationFrame(() => {
-                chatContainer.scrollTop = userMessageDiv.offsetTop - 80;
-            });
-        });
-    }
+    chatContainer.appendChild(userMessageDiv);
+    chatContainer.appendChild(messageDiv);
 
     const contentDiv = messageDiv.querySelector('.message-text');
     const actionsDiv = messageDiv.querySelector('.message-actions');
     
     setupMessageActions(messageDiv, contentDiv);
     prepareUIForLoading();
-    scrollToMessageBottom(contentDiv.closest('.message'));
+
+    setTimeout(() => {
+        positionMessageAtBottom(chatContainer, userMessageDiv, messageDiv);
+    }, 100);
 
     try {
         await handleStreamingResponse(question, contentDiv, actionsDiv);
     } catch (error) {
+        // Check if request was cancelled
+        if (error.name === 'AbortError') {
+            // console.log('Request cancelled by user');
+            // contentDiv.innerHTML = '<em style="color: #666;">Request cancelled</em>';
+            return;
+        }
+        
         console.error('Message sending error:', error);
         const { t, getCurrentLanguage } = window.ConfigModule;
         
@@ -539,7 +556,6 @@ async function sendMessage() {
         cleanupAfterMessage(messageDiv);
         const { handleFocus } = window.UIUtilsModule || {};
         if (handleFocus) handleFocus();
-        scrollToMessageBottom(contentDiv.closest('.message'));
     }
 }
 
@@ -556,11 +572,10 @@ window.ChatModule = {
     createAssistantMessage,
     setupMessageActions,
     addMessage,
-    removePreviousSpacer,
-    createBottomSpacer,
-    scrollToMessageBottom,
+    positionMessageAtBottom,
     prepareUIForLoading,
     cleanupAfterMessage,
+    cancelMessage,
     handleStreamingResponse,
     isMessageLoading
 };

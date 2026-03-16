@@ -441,6 +441,60 @@ function initLegalLinks() {
     }
 }
 
+// ===================================
+// TESTING UTILITIES
+// ===================================
+
+/**
+ * Simulate keyboard appearance (for testing in desktop browser)
+ * Usage in console: window.UIUtilsModule.simulateKeyboard()
+ */
+function simulateKeyboard() {
+    console.log('🧪 Simulating keyboard appearance...');
+    
+    // Force mobile mode
+    const originalWidth = window.innerWidth;
+    Object.defineProperty(window, 'innerWidth', {
+        writable: true,
+        configurable: true,
+        value: 400
+    });
+    
+    // Trigger keyboard show
+    isKeyboardVisible = true;
+    onKeyboardShow();
+    
+    console.log('✅ Keyboard simulated (mobile mode active)');
+    console.log('💡 To hide: window.UIUtilsModule.hideSimulatedKeyboard()');
+    
+    // Restore original width after testing
+    window._originalWidth = originalWidth;
+}
+
+/**
+ * Hide simulated keyboard
+ * Usage in console: window.UIUtilsModule.hideSimulatedKeyboard()
+ */
+function hideSimulatedKeyboard() {
+    console.log('🧪 Hiding simulated keyboard...');
+    
+    // Trigger keyboard hide
+    isKeyboardVisible = false;
+    onKeyboardHide();
+    
+    // Restore original width
+    if (window._originalWidth) {
+        Object.defineProperty(window, 'innerWidth', {
+            writable: true,
+            configurable: true,
+            value: window._originalWidth
+        });
+        delete window._originalWidth;
+    }
+    
+    console.log('✅ Keyboard hidden (mobile mode deactivated)');
+}
+
 // Export for use in other modules
 window.UIUtilsModule = {
     isMobileDevice,
@@ -455,5 +509,8 @@ window.UIUtilsModule = {
     showLegalNotice,
     showPrivacyPolicy,
     showAbout,
-    initLegalLinks
+    initLegalLinks,
+    // Testing utilities
+    simulateKeyboard,
+    hideSimulatedKeyboard
 };
