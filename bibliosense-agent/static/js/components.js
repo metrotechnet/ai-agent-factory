@@ -1,12 +1,15 @@
+
 // ===================================
 // COMPONENT REGISTRY SYSTEM
 // ===================================
 
 /**
- * Component Registry - manages UI components for different agents
+ * Component Registry - manages UI components for different agents.
+ * Provides rendering, hiding, and state management for language selector and input area.
  */
 
-// Translation state
+
+// Translation state (tracks if source/target are reversed)
 let translationReversed = false;
 
 /**
@@ -15,7 +18,8 @@ let translationReversed = false;
 const componentRegistry = {
     /**
      * Language Selector Component
-     * Supports single, pair (source/target), or multi-select modes
+     * Supports single, pair (source/target), or multi-select modes.
+     * Handles rendering, swapping, and resetting language selections.
      */
     languageSelector: {
         render(config) {
@@ -100,7 +104,7 @@ const componentRegistry = {
     
     /**
      * Input Area Component
-     * Manages input area visibility and configuration
+     * Manages input area visibility, placeholder, and disclaimer configuration.
      */
     inputArea: {
         render(config) {
@@ -137,13 +141,19 @@ const componentRegistry = {
     }
 };
 
+
 /**
- * Get/set translation reversed state
+ * Returns true if translation direction is reversed.
+ * @returns {boolean}
  */
 function isTranslationReversed() {
     return translationReversed;
 }
 
+/**
+ * Sets the translation reversed state.
+ * @param {boolean} value
+ */
 function setTranslationReversed(value) {
     translationReversed = value;
 }

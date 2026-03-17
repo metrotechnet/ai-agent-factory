@@ -1,11 +1,14 @@
+
 // ===================================
 // CHAT MESSAGING FUNCTIONALITY
 // ===================================
 
 /**
  * Chat module
- * Handles message sending, streaming responses, and message UI
+ * Handles message sending, streaming responses, and message UI.
+ * All logic is organized in clear sections for maintainability.
  */
+
 
 // Global state
 let isLoading = false;
@@ -18,6 +21,7 @@ let currentReader = null;
 // Rate limiting - Debouncing
 let lastRequestTime = 0;
 const MIN_REQUEST_INTERVAL = 2000; // 2 seconds minimum between requests
+
 
 
 
@@ -36,7 +40,8 @@ if (typeof marked !== 'undefined') {
 const brokenImageUrls = new Set();
 
 /**
- * Replace broken image with gray placeholder
+ * Replace broken image with gray placeholder.
+ * @param {HTMLImageElement} img - The broken image element
  */
 function handleBrokenImage(img) {
     // Track the broken URL
@@ -54,7 +59,8 @@ function handleBrokenImage(img) {
 }
 
 /**
- * Add error handlers to all images in content
+ * Add error handlers to all images in content.
+ * @param {HTMLElement} container - The container with images
  */
 function setupImageErrorHandlers(container) {
     const images = container.querySelectorAll('img');
@@ -82,7 +88,9 @@ function setupImageErrorHandlers(container) {
 }
 
 /**
- * Check if text ends with incomplete markdown URL syntax
+ * Check if text ends with incomplete markdown URL syntax.
+ * @param {string} text
+ * @returns {boolean}
  */
 function hasIncompleteUrl(text) {
     // Check for incomplete markdown image: ![text](incomplete_url
@@ -94,8 +102,10 @@ function hasIncompleteUrl(text) {
 }
 
 /**
- * Remove incomplete markdown URLs from text
+ * Remove incomplete markdown URLs from text.
  * Removes everything from the last occurrence of [text](incomplete_url
+ * @param {string} text
+ * @returns {string}
  */
 function removeIncompleteUrls(text) {
     // Find the last occurrence of an incomplete markdown image or link
@@ -126,7 +136,8 @@ function removeIncompleteUrls(text) {
 }
 
 /**
- * Get selected library from selector
+ * Get selected library from selector.
+ * @returns {string}
  */
 function getSelectedLibrary() {
     const selector = document.getElementById('library-selector');
@@ -134,7 +145,9 @@ function getSelectedLibrary() {
 }
 
 /**
- * Escape HTML to prevent XSS
+ * Escape HTML to prevent XSS.
+ * @param {string} text
+ * @returns {string}
  */
 function escapeHtml(text) {
     const div = document.createElement('div');
@@ -143,7 +156,10 @@ function escapeHtml(text) {
 }
 
 /**
- * Add message to chat
+ * Add message to chat.
+ * @param {string} text - Message text
+ * @param {string} role - 'user' or 'assistant'
+ * @returns {HTMLElement} The message div
  */
 function addMessage(text, role) {
     const messageDiv = document.createElement('div');
@@ -163,7 +179,8 @@ function addMessage(text, role) {
 }
 
 /**
- * Create assistant message with loading state
+ * Create assistant message with loading state.
+ * @returns {HTMLElement} The message div
  */
 function createAssistantMessage() {
     const messageDiv = document.createElement('div');
@@ -197,7 +214,9 @@ function createAssistantMessage() {
 }
 
 /**
- * Setup message action buttons
+ * Setup message action buttons (copy, like, dislike, TTS).
+ * @param {HTMLElement} messageDiv
+ * @param {HTMLElement} contentDiv
  */
 function setupMessageActions(messageDiv, contentDiv) {
     const { t, BACKEND_URL } = window.ConfigModule;
@@ -331,7 +350,10 @@ function setupMessageActions(messageDiv, contentDiv) {
 }
 
 /**
- * Position message at bottom of viewport
+ * Position message at bottom of viewport.
+ * @param {HTMLElement} chatContainer
+ * @param {HTMLElement} userMessageDiv
+ * @param {HTMLElement} messageDiv
  */
 function positionMessageAtBottom(chatContainer, userMessageDiv, messageDiv) {
     if (!chatContainer || !userMessageDiv || !messageDiv) return;
@@ -366,7 +388,7 @@ function positionMessageAtBottom(chatContainer, userMessageDiv, messageDiv) {
 }
 
 /**
- * Prepare UI for loading
+ * Prepare UI for loading (disable input, show stop button).
  */
 function prepareUIForLoading() {
     isLoading = true;
@@ -383,7 +405,7 @@ function prepareUIForLoading() {
 }
 
 /**
- * Cancel ongoing message
+ * Cancel ongoing message (abort fetch/stream).
  */
 function cancelMessage() {
     if (currentAbortController) {
@@ -397,7 +419,8 @@ function cancelMessage() {
 }
 
 /**
- * Cleanup after message
+ * Cleanup after message (reenable input, hide stop button).
+ * @param {HTMLElement} messageDiv
  */
 function cleanupAfterMessage(messageDiv) {
     isLoading = false;
@@ -419,7 +442,9 @@ function cleanupAfterMessage(messageDiv) {
 }
 
 /**
- * Display links/PMIDs
+ * Display links/PMIDs as clickable references.
+ * @param {HTMLElement} container
+ * @param {string[]} links
  */
 function displayLinks(container, links) {
     if (!links || links.length === 0) return;
@@ -435,7 +460,11 @@ function displayLinks(container, links) {
 }
 
 /**
- * Handle streaming response
+ * Handle streaming response from backend and update UI.
+ * @param {string} question
+ * @param {HTMLElement} contentDiv
+ * @param {HTMLElement} actionsDiv
+ * @returns {Promise<object>} The full text and links
  */
 async function handleStreamingResponse(question, contentDiv, actionsDiv) {
     const { BACKEND_URL, getCurrentLanguage } = window.ConfigModule;
@@ -594,7 +623,8 @@ async function handleStreamingResponse(question, contentDiv, actionsDiv) {
 }
 
 /**
- * Main send message function
+ * Main send message function. Handles input, rate limiting, and UI updates.
+ * @returns {Promise<void>}
  */
 async function sendMessage() {
     const inputBox = document.getElementById('input-box');
@@ -673,7 +703,8 @@ async function sendMessage() {
 }
 
 /**
- * Get loading state
+ * Get loading state (true if a message is being processed).
+ * @returns {boolean}
  */
 function isMessageLoading() {
     return isLoading;

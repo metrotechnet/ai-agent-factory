@@ -1,14 +1,17 @@
+
 // ===================================
 // FIREBASE APP CHECK CONFIGURATION
 // ===================================
 
 /**
  * Firebase App Check initialization
- * Protects API endpoints from unauthorized access
- * 
+ * Protects API endpoints from unauthorized access using reCAPTCHA v3.
+ *
  * Configuration via environment variables:
  * - FIREBASE_PROJECT_ID: Your Firebase project ID
  * - RECAPTCHA_SITE_KEY: reCAPTCHA v3 site key for App Check
+ *
+ * All logic is organized in clear sections for maintainability.
  */
 
 // Firebase configuration (must match your Firebase project)
@@ -38,7 +41,9 @@ let appCheck = null;
 let appCheckInitialized = false;
 
 /**
- * Initialize Firebase and App Check
+ * Initialize Firebase and App Check.
+ * Sets up App Check with reCAPTCHA v3 and handles debug mode for localhost.
+ * @returns {Promise<object|null>} The App Check instance or null
  */
 async function initializeFirebaseAppCheck() {
     if (!APP_CHECK_ENABLED) {
@@ -101,7 +106,8 @@ async function initializeFirebaseAppCheck() {
 }
 
 /**
- * Get App Check token
+ * Get App Check token for secure API requests.
+ * @returns {Promise<string|null>} The App Check token or null
  */
 async function getAppCheckToken() {
     if (!APP_CHECK_ENABLED) {
@@ -173,8 +179,11 @@ async function getAppCheckToken() {
 }
 
 /**
- * Enhanced fetch with App Check token
- * Use this instead of native fetch for API calls
+ * Enhanced fetch with App Check token.
+ * Use this instead of native fetch for API calls to ensure App Check protection.
+ * @param {string} url - The request URL
+ * @param {object} options - Fetch options
+ * @returns {Promise<Response>} The fetch response
  */
 async function secureFetch(url, options = {}) {
     // Initialize App Check if not already done

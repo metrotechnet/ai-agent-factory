@@ -4,19 +4,23 @@
 
 /**
  * Configuration and internationalization module
- * Handles config loading, language switching, and translations
+ * Handles config loading, language switching, and translations.
+ * All logic is organized in clear sections for maintainability.
  */
+
 
 // Backend URL - can be overridden by window.BACKEND_URL from config.js
 const BACKEND_URL = window.BACKEND_URL || '';
 console.log('Using BACKEND_URL:', BACKEND_URL);
 
-// Global state
+// Global state for config and language
 let mainConfig = {};
 let currentLanguage = 'fr';
 
 /**
  * Get URL parameter by name
+ * @param {string} name - The parameter name
+ * @returns {string|null} The parameter value or null
  */
 function getUrlParameter(name) {
     const urlParams = new URLSearchParams(window.location.search);
@@ -24,7 +28,8 @@ function getUrlParameter(name) {
 }
 
 /**
- * Load agent configuration 
+ * Load agent configuration from backend and apply language settings.
+ * @param {string} agent - (optional) agent name for multi-agent setups
  */
 async function loadConfig(agent) {
     try {
@@ -67,7 +72,8 @@ async function loadConfig(agent) {
 }
 
 /**
- * Apply translations to all elements with data-i18n attributes
+ * Apply translations to all elements with data-i18n attributes.
+ * @param {string} lang - Language code to apply
  */
 function applyConfig(lang) {
     const langData = mainConfig[lang] || mainConfig['fr'];
@@ -143,7 +149,8 @@ function applyConfig(lang) {
 }
 
 /**
- * Populate suggestion cards dynamically from config
+ * Populate suggestion cards dynamically from config.
+ * @param {string} lang - Language code
  */
 function populateSuggestionCards(lang) {
     const suggestionsContainer = document.querySelector('.suggestions');
@@ -213,7 +220,10 @@ function populateSuggestionCards(lang) {
 }
 
 /**
- * Get nested value from object using dot notation
+ * Get nested value from object using dot notation.
+ * @param {object} obj - The object to search
+ * @param {string} path - Dot notation path
+ * @returns {*} The value or null
  */
 function getNestedValue(obj, path) {
     return path.split('.').reduce((current, key) => {
@@ -222,7 +232,8 @@ function getNestedValue(obj, path) {
 }
 
 /**
- * Switch language
+ * Switch language and update UI.
+ * @param {string} lang - Language code
  */
 function switchLanguage(lang) {
     currentLanguage = lang;
@@ -243,7 +254,9 @@ function switchLanguage(lang) {
 }
 
 /**
- * Get translation for a key
+ * Get translation for a key.
+ * @param {string} key - Translation key
+ * @returns {string} The translation or key
  */
 function t(key) {
     const langData = mainConfig[currentLanguage] || mainConfig['fr'];
@@ -251,14 +264,16 @@ function t(key) {
 }
 
 /**
- * Get current language
+ * Get current language code.
+ * @returns {string}
  */
 function getCurrentLanguage() {
     return currentLanguage;
 }
 
 /**
- * Get main config
+ * Get main config object.
+ * @returns {object}
  */
 function getMainConfig() {
     return mainConfig;
