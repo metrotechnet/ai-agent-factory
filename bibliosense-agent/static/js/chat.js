@@ -85,24 +85,32 @@ function hasIncompleteUrl(text) {
 }
 
 /**
- * Remove incomplete markdown images from text
- * Removes everything from the last occurrence of ![
+ * Remove incomplete markdown URLs from text
+ * Removes everything from the last occurrence of [text](incomplete_url
  */
-function removeIncompleteImages(text) {
-    // Find the last occurrence of ![
+function removeIncompleteUrls(text) {
+    // Find the last occurrence of an incomplete markdown image or link
     const lastImageStart = text.lastIndexOf('![');
-    if (lastImageStart === -1) {
-        return text; // No image markdown found
+    const lastLinkStart = text.lastIndexOf('[');
+    let lastUrlStart = Math.max(lastImageStart, lastLinkStart);
+    
+    if (lastUrlStart === -1) {
+        return text; // No URL markdown found
     }
+
+    // If this [ is part of an image ![, include the ! in the cut
+    if (lastUrlStart > 0 && text[lastUrlStart - 1] === '!') {
+        lastUrlStart -= 1;
+    }
+
+    // Check if there's a complete URL after this point
+    const afterUrl = text.substring(lastUrlStart);
+    // Complete URL patterns: ![text](url) or [text](url)
+    const completeUrlPattern = /^!?\[[^\]]*\]\([^)]+\)/;
     
-    // Check if there's a complete image after this point
-    const afterImage = text.substring(lastImageStart);
-    // Complete image pattern: ![alt text](url)
-    const completeImagePattern = /^!\[([^\]]*)\]\(([^)]+)\)/;
-    
-    if (!completeImagePattern.test(afterImage)) {
-        // Incomplete image, remove from this point
-        return text.substring(0, lastImageStart);
+    if (!completeUrlPattern.test(afterUrl)) {
+        // Incomplete URL, remove from this point
+        return text.substring(0, lastUrlStart);
     }
     
     return text;
@@ -493,7 +501,7 @@ async function handleStreamingResponse(question, contentDiv, actionsDiv) {
                 if (dislikeBtn) dislikeBtn.dataset.questionId = questionId;
             }
             if (typeof marked !== 'undefined' && typeof DOMPurify !== 'undefined') {
-                contentDiv.innerHTML = DOMPurify.sanitize(marked.parse(fullText));
+                contentDiv.innerHTML = DOMPurify.sanitize(marked.parse(fullText), { ADD_ATTR: ['target'] });
                 setupImageErrorHandlers(contentDiv);
             } else {
                 contentDiv.textContent = fullText;
@@ -518,7 +526,6 @@ async function handleStreamingResponse(question, contentDiv, actionsDiv) {
                 // Check for [DONE] marker
                 if (rawData === '[DONE]') {
 
-                    
                     actionsDiv.style.display = '';
                     if (questionId) {
                         const likeBtn = actionsDiv.querySelector('.like-btn');
@@ -527,7 +534,7 @@ async function handleStreamingResponse(question, contentDiv, actionsDiv) {
                         if (dislikeBtn) dislikeBtn.dataset.questionId = questionId;
                     }
                     if (typeof marked !== 'undefined' && typeof DOMPurify !== 'undefined') {
-                        contentDiv.innerHTML = DOMPurify.sanitize(marked.parse(fullText));
+                        contentDiv.innerHTML = DOMPurify.sanitize(marked.parse(fullText), { ADD_ATTR: ['target'] });
                         setupImageErrorHandlers(contentDiv);
                     } else {
                         contentDiv.textContent = fullText;
@@ -567,14 +574,13 @@ async function handleStreamingResponse(question, contentDiv, actionsDiv) {
                         textToDisplay += data.chunk;
                         fullText = textToDisplay; // Keep fullText synchronized
                         
-                        // Remove incomplete images before displaying
-                        const cleanText = removeIncompleteImages(textToDisplay);
-                        
+                        // Remove incomplete URLs before displaying
+                        const cleanText = removeIncompleteUrls(textToDisplay);
                         // Only parse markdown if we don't have an incomplete URL
                         // This prevents showing broken image/link URLs during streaming
                         if (!hasIncompleteUrl(cleanText)) {
                             if (typeof marked !== 'undefined' && typeof DOMPurify !== 'undefined') {
-                                contentDiv.innerHTML = DOMPurify.sanitize(marked.parse(cleanText));
+                                contentDiv.innerHTML = DOMPurify.sanitize(marked.parse(cleanText), { ADD_ATTR: ['target'] });
                                 // Setup error handlers for images after rendering
                                 setupImageErrorHandlers(contentDiv);
                             } else {

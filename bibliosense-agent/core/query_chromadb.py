@@ -7,7 +7,6 @@ from dotenv import load_dotenv
 from openai import OpenAI
 import chromadb
 from chromadb.config import Settings
-import google.generativeai as genai
 
 # Get project root directory
 PROJECT_ROOT = Path(__file__).parent.parent
@@ -16,8 +15,13 @@ load_dotenv(dotenv_path=PROJECT_ROOT / '.env')
 # Initialize ChromaDB client (local storage)
 chroma_client = None
 collection = None
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+
+# Initialize Vercel AI Gateway client (OpenAI-compatible)
+# See https://vercel.com/docs/ai-gateway/sdks-and-apis/openai-chat-completions
+client = OpenAI(
+    api_key=os.getenv("AI_GATEWAY_API_KEY"),
+    base_url="https://ai-gateway.vercel.sh/v1"
+)
 
 
 
@@ -77,8 +81,7 @@ def build_prompt_from_template(language, context, question, history_text="", age
     
     # Extract model configuration
     model_config = {
-        "supplier": prompts_data.get("model_supplier", "openai"),
-        "name": prompts_data.get("model_name", "gpt-4o-mini")
+        "name": prompts_data.get("model_name", "openai/gpt-4o-mini")
     }
     
     if not lang_data:
@@ -347,8 +350,8 @@ def detect_vague_question(question, language="fr"):
 
 def reformulate_question_with_context(question, conversation_history, language="fr"):
     """
-    Reformule la question en tenant compte du contexte conversationnel.
-    Utile pour des questions comme "du même auteur", "un autre livre similaire", etc.
+    Reformule la question en tenant compte du contexte conversationnel et
+    qualifie la question comme 'general' ou 'specific'.
     
     Args:
         question: Question actuelle de l'utilisateur
@@ -356,66 +359,80 @@ def reformulate_question_with_context(question, conversation_history, language="
         language: Langue de la conversation
         
     Returns:
-        Question reformulée de manière standalone
+        tuple (reformulated_question: str, question_type: str)
+            question_type is 'general' (e.g. genre, broad theme) or 'specific' (e.g. specific author, title)
     """
-    # Si pas d'historique ou historique trop court, retourner la question telle quelle
-    if not conversation_history or len(conversation_history) < 2:
-        return question
-    
     # Construire le contexte des derniers échanges (exclure le message actuel)
-    recent_messages = conversation_history[-6:] if len(conversation_history) > 6 else conversation_history[:-1]
     context = ""
-    for msg in recent_messages:
-        role_label = "Utilisateur" if msg['role'] == 'user' else "Assistant"
-        context += f"{role_label}: {msg['content'][:200]}...\n\n"
+    if conversation_history and len(conversation_history) >= 2:
+        recent_messages = conversation_history[-6:] if len(conversation_history) > 6 else conversation_history[:-1]
+        for msg in recent_messages:
+            role_label = "Utilisateur" if msg['role'] == 'user' else "Assistant"
+            context += f"{role_label}: {msg['content'][:200]}...\n\n"
     
-    # Prompt de reformulation
+    # Prompt de reformulation + qualification
     if language == 'fr':
-        reformulation_prompt = f"""Contexte de la conversation précédente:
-{context}
+        reformulation_prompt = f"""{"Contexte de la conversation précédente:" + chr(10) + context + chr(10) if context else ""}Question actuelle de l'utilisateur: "{question}"
 
-Question actuelle de l'utilisateur: "{question}"
+Effectue deux tâches:
+1. REFORMULATION: Si la question fait référence au contexte précédent (ex: "du même auteur", "similaire", "autres livres"), reformule-la de manière standalone. Sinon, retourne-la telle quelle.
+2. QUALIFICATION: Qualifie la question comme "general" ou "specific".
+   - "general": demande large (un genre, un thème, un type de livre, ex: "roman policier", "science-fiction", "livre pour enfants")
+   - "specific": demande précise (un auteur spécifique, un titre, un sujet pointu, ex: "livres de Victor Hugo", "Le Petit Prince")
 
-Si cette question fait référence au contexte précédent (par exemple: "du même auteur", "similaire", "autres livres", "encore", etc.), reformule-la de manière standalone en incluant toutes les informations nécessaires (nom d'auteur, genre, etc.).
-
-Si la question est déjà standalone et claire, retourne-la telle quelle.
-
-Retourne UNIQUEMENT la question reformulée, sans explication."""
+Réponds UNIQUEMENT en JSON, sans explication:
+{{"question": "la question reformulée", "type": "general ou specific"}}"""
     else:
-        reformulation_prompt = f"""Previous conversation context:
-{context}
+        reformulation_prompt = f"""{"Previous conversation context:" + chr(10) + context + chr(10) if context else ""}Current user question: "{question}"
 
-Current user question: "{question}"
+Perform two tasks:
+1. REFORMULATION: If the question references previous context (e.g., "by the same author", "similar", "other books"), reformulate it as standalone. Otherwise, return it as is.
+2. QUALIFICATION: Qualify the question as "general" or "specific".
+   - "general": broad request (a genre, theme, type of book, e.g., "mystery novels", "sci-fi", "children's books")
+   - "specific": precise request (a specific author, title, narrow topic, e.g., "books by Victor Hugo", "The Little Prince")
 
-If this question references the previous context (e.g., "by the same author", "similar", "other books", "more", etc.), reformulate it as a standalone question including all necessary information (author name, genre, etc.).
-
-If the question is already standalone and clear, return it as is.
-
-Return ONLY the reformulated question, without explanation."""
+Respond ONLY in JSON, no explanation:
+{{"question": "the reformulated question", "type": "general or specific"}}"""
     
     try:
-        # Utiliser GPT pour la reformulation (rapide avec gpt-4o-mini)
+        # Utiliser Vercel AI Gateway pour la reformulation
+        prompts_data = load_prompts()
+        reformulation_model = prompts_data.get("model_name", "openai/gpt-4o-mini")
         response = client.chat.completions.create(
-            model="gpt-4o-mini",
+            model=reformulation_model,
             messages=[
                 {"role": "user", "content": reformulation_prompt}
             ],
             temperature=0.3,
-            max_tokens=150
+            max_tokens=200
         )
         
-        reformulated = response.choices[0].message.content.strip()
+        raw = response.choices[0].message.content.strip()
+        
+        # Parse JSON response
+        result = json.loads(raw)
+        reformulated = result.get("question", question).strip()
+        question_type = result.get("type", "specific").strip().lower()
+        
+        # Validate question_type
+        if question_type not in ("general", "specific"):
+            question_type = "specific"
         
         # Log pour débug
+        print(f"[Reformulation] Original: '{question}'")
         if reformulated.lower() != question.lower():
-            print(f"[Reformulation] Original: '{question}'")
             print(f"[Reformulation] Reformulée: '{reformulated}'")
+        print(f"[Reformulation] Type: {question_type}")
         
-        return reformulated
+        return reformulated, question_type
         
+    except json.JSONDecodeError:
+        # If JSON parsing fails, try to extract the text anyway
+        print(f"[Reformulation] JSON parse error, raw: {raw}")
+        return raw if raw else question, "specific"
     except Exception as e:
         print(f"[Reformulation] Error: {e}, using original question")
-        return question
+        return question, "specific"
 
 def ask_question_stream(question, language="fr", timezone="UTC", locale="fr-FR", top_k=100, conversation_history=None, session=None, question_id=None, agent=None, bibliotheque="all", distance_threshold=None):
     """Streaming version of ask_question with language support and conversation history
@@ -445,11 +462,6 @@ def ask_question_stream(question, language="fr", timezone="UTC", locale="fr-FR",
                 titles = re.findall(r'###\s*\*\*(.+?)\*\*', msg['content'])
                 previously_recommended.update(titles)
     
-    # Add note about previously recommended books
-    if previously_recommended:
-        history_text += f"\n\nLIVRES DÉJÀ RECOMMANDÉS (à éviter pour varier les recommandations):\n"
-        for title in previously_recommended:
-            history_text += f"- {title}\n"
 
     col = get_collection()
     if col is None:
@@ -468,12 +480,12 @@ def ask_question_stream(question, language="fr", timezone="UTC", locale="fr-FR",
         
         # Reformuler la question en tenant compte du contexte si nécessaire
         # Cela permet de gérer des questions comme "du même auteur", "similaire", etc.
-        search_question = reformulate_question_with_context(question, conversation_history, language)
-        print(f"[ask_question_stream] Search question after reformulation: '{search_question}'", flush=True)
+        search_question, question_type = reformulate_question_with_context(question, conversation_history, language)
+        print(f"[ask_question_stream] Search question after reformulation: '{search_question}' (type: {question_type})", flush=True)
 
         # Get embedding for the reformulated question
         query_emb = client.embeddings.create(
-            model="text-embedding-3-large", 
+            model="openai/text-embedding-3-large", 
             input=search_question
         ).data[0].embedding
 
@@ -483,60 +495,45 @@ def ask_question_stream(question, language="fr", timezone="UTC", locale="fr-FR",
             where_filter = {"bibliotheque": bibliotheque}
 
         # We only need top 150 for diversity filtering before shuffling and taking top 50
-        top_relevant = 150  # Garde les 150 meilleurs pour augmenter la diversité
         # Query ChromaDB with optional library filter
+        nbr_results = 500
         query_params = {
             "query_embeddings": [query_emb],
-            "n_results": top_relevant,
+            "n_results": nbr_results,
             "include": ['documents', 'metadatas']
         }
         if where_filter:
             query_params["where"] = where_filter
         
         results = col.query(**query_params)
-
+         
         if not results['documents'] or not results['documents'][0]:
             yield "No relevant information found. Please make sure you have indexed some transcripts."
             return
-
-        # Option 1: Garder les N meilleurs, puis mélanger seulement ceux-là
-        documents = results['documents'][0][:top_relevant]
-        metadatas_list = results.get('metadatas', [[]])[0][:top_relevant]
-
-        # Extraire les auteurs déjà recommandés de l'historique
-        previously_recommended_authors = set()
-        if conversation_history:
-            for msg in conversation_history:
-                if msg['role'] == 'assistant':
-                    # Extraire les auteurs avec regex: *par Auteur*
-                    authors = re.findall(r'\*par\s+([^*]+)\*', msg['content'])
-                    previously_recommended_authors.update(authors)
         
+        documents = results['documents'][0]
+        metadatas_list = results.get('metadatas', [[]])[0]
+
         # Filtrer pour limiter le nombre de livres par auteur (max 2)
-        author_count = {}
         filtered_results = []
         for doc, meta in zip(documents, metadatas_list):
-            author = meta.get('auteur') or meta.get('author') or 'Unknown'
+            title = meta.get('titre') or meta.get('title') or ''
             
-            # Pénaliser les auteurs déjà recommandés dans l'historique
-            if author in previously_recommended_authors:
-                # Garder seulement si on a très peu de résultats
-                if len(filtered_results) < 20:
-                    continue
-            
-            # Limiter à 2 livres par auteur pour plus de diversité
-            if author_count.get(author, 0) < 2:
+            # Inclure les livres non recommandés dans l'historique
+            if title and title not in previously_recommended:
                 filtered_results.append((doc, meta))
-                author_count[author] = author_count.get(author, 0) + 1
+
         
         # Si on a trop filtré, garder quand même des résultats
         if len(filtered_results) < 20:
             filtered_results = list(zip(documents, metadatas_list))[:50]
         
-        # Mélanger pour varier les recommandations
-        random.shuffle(filtered_results)
-        
-        # Prendre les 50 premiers après shuffle
+        # Shuffle les résultats si la question est générale pour plus de diversité
+        if question_type == 'general':
+            random.shuffle(filtered_results)
+            print(f"[Query] Shuffled results (general question)", flush=True)
+
+        # Prendre les 50 premiers
         filtered_results = filtered_results[:50]
         documents, metadatas_list = zip(*filtered_results) if filtered_results else ([], [])
         documents = list(documents)
@@ -544,7 +541,6 @@ def ask_question_stream(question, language="fr", timezone="UTC", locale="fr-FR",
 
         #Print title of first 10 books for debugging
         print(f"[Query] Top {len(documents)} results (after filtering & shuffle):", flush=True)
-        print(f"[Query] Previously recommended authors: {previously_recommended_authors}", flush=True)
         for i, meta in enumerate(metadatas_list[:10]):
             title = meta.get('titre') or meta.get('title') or 'Unknown Title'
             auteur = meta.get('auteur') or meta.get('author') or 'Unknown Author'
@@ -589,54 +585,30 @@ def ask_question_stream(question, language="fr", timezone="UTC", locale="fr-FR",
             yield "Error: Unable to load prompt template."
             return
 
-        # Get streaming response from configured LLM
-        model_name = model_config.get('name', 'gpt-4o-mini')
-        model_supplier = model_config.get('supplier', 'openai')
+        # Get streaming response from Vercel AI Gateway
+        model_name = model_config.get('name', 'openai/gpt-4o-mini')
         
-        if model_supplier == 'openai':
-            # OpenAI streaming
-            stream = client.chat.completions.create(
-                model=model_name,
-                messages=[
-                    {"role": "user", "content": prompt}
-                ],
-                temperature=1.0,
-                stream=True
-            )
+        stream = client.chat.completions.create(
+            model=model_name,
+            messages=[
+                {"role": "user", "content": prompt}
+            ],
+            temperature=1.0,
+            stream=True
+        )
 
-            first_chunk = True
-            answer = ""
-            for chunk in stream:
-                if chunk.choices[0].delta.content is not None:
-                    content = chunk.choices[0].delta.content
-                    # Strip leading whitespace from first chunk only
-                    if first_chunk:
-                        content = content.lstrip()
-                        first_chunk = False
-                    if content:
-                        answer += content
-                        yield content
-                        
-        elif model_supplier == 'gemini':
-            # Gemini streaming
-            model = genai.GenerativeModel(model_name, generation_config={
-                "temperature": 1.0
-            })
-            
-            response = model.generate_content(prompt, stream=True)
-            
-            first_chunk = True
-            for chunk in response:
-                text = getattr(chunk, "text", None)
-                if text:
-                    if first_chunk:
-                        text = text.lstrip()
-                        first_chunk = False
-                    if text:
-                        yield text
-        else:
-            yield f"Error: Model supplier '{model_supplier}' not supported. Use 'openai' or 'gemini'."
-            return
+        first_chunk = True
+        answer = ""
+        for chunk in stream:
+            if chunk.choices[0].delta.content is not None:
+                content = chunk.choices[0].delta.content
+                # Strip leading whitespace from first chunk only
+                if first_chunk:
+                    content = content.lstrip()
+                    first_chunk = False
+                if content:
+                    answer += content
+                    yield content
 
     except Exception as e:
         yield f"Error processing your question: {str(e)}"
