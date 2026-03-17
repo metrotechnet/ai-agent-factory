@@ -39,7 +39,14 @@
     border-radius: 50%;
     animation: spin 1s linear infinite;
 }
-
+/* App Name in Initial Loading Overlay */
+.app-name {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 18px;
+    padding-bottom: 12px;
+    letter-spacing: 1px;
+}
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
@@ -74,7 +81,7 @@ html {
 } 
 
 header {
-    padding: 2rem;
+    padding: 0.5rem;
     border-bottom: 1px solid #e2e8f0;
     background: #ffffff;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);

@@ -32,7 +32,15 @@
 
 
 </head>
-<body style="display:none;">
+<body>
+    <!-- Initial Loading Overlay -->
+    <div class="initial-loading-overlay" id="initial-loading-overlay">
+        <div class="initial-loading-content">
+            <h2 class="app-name">IMX - Translator</h2>
+            <div class="initial-spinner"></div>
+            <p class="initial-loading-text" data-i18n="messages.warmup">Démarrage de l'application...</p>
+        </div>
+    </div>
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <h2 data-i18n="sidebar.title">IMX Agent</h2>
@@ -78,6 +86,8 @@
             <span></span>
             <span></span>
         </button>
+        <h1 class="header-title" data-i18n="header.title">IMX - Translator</h1>
+
     </header>
 
     <div class="content" id="chat-container">

@@ -51,7 +51,14 @@
     margin: 0;
     animation: pulse 1.5s ease-in-out infinite;
 }
-
+/* App Name in Initial Loading Overlay */
+.app-name {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 18px;
+    padding-bottom: 12px;
+    letter-spacing: 1px;
+}
 @keyframes pulse {
     0%, 100% { opacity: 1; }
     50% { opacity: 0.6; }
