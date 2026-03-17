@@ -31,8 +31,11 @@ while not (MAIN_ROOT / '.env').exists() and MAIN_ROOT.parent != MAIN_ROOT:
 env_path = MAIN_ROOT / '.env'
 load_dotenv(dotenv_path=env_path, override=True)
 
-# Initialize OpenAI client
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+# Initialize Vercel AI Gateway client (OpenAI-compatible)
+client = OpenAI(
+    api_key=os.getenv("AI_GATEWAY_API_KEY"),
+    base_url="https://ai-gateway.vercel.sh/v1"
+)
 
 
 def get_embeddings(texts):
