@@ -1,4 +1,7 @@
+# Template Agent – Documentation
 # Firebase App Check Setup Guide
+
+Ce guide explique la configuration de Firebase App Check pour le projet **Template Agent**. Il détaille les étapes pour sécuriser les endpoints API contre les accès non autorisés.
 
 ## Overview
 Firebase App Check protects your API endpoints from unauthorized access by verifying that requests come from legitimate app instances.

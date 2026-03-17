@@ -1,6 +1,7 @@
-# IMX Agent Factory 🧠
 
-An AI assistant platform template. Features a **Document Assistant** powered by RAG (Retrieval-Augmented Generation) over your documents, and a **Translation Agent** with speech-to-text via OpenAI Whisper. Built with FastAPI, ChromaDB, and OpenAI GPT-4o-mini.
+# Bibliosense Agent (IMX Agent Factory)
+
+This repository provides a modular AI assistant platform, including a **Document Assistant** (RAG over your documents) and a **Translation Agent** (text/audio, OpenAI Whisper). Built with FastAPI, ChromaDB, and OpenAI GPT-4o-mini.
 
 ## ✨ Features
 

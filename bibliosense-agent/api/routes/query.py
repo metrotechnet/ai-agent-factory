@@ -1,5 +1,7 @@
 """
-Query Routes - Main query endpoint for streaming responses
+query.py
+Main query endpoint for streaming responses in the Bibliosense agent API.
+Handles question submission, rate limiting, and streaming assistant responses.
 """
 from fastapi import APIRouter, Request
 from fastapi.responses import StreamingResponse, JSONResponse

@@ -1,5 +1,7 @@
 """
-Session Management - Conversation session handling
+sessions.py
+Session management utilities for conversation handling in the Bibliosense agent API.
+Provides in-memory session storage, cleanup, and session lifecycle helpers.
 """
 from datetime import datetime, timedelta
 from typing import Dict

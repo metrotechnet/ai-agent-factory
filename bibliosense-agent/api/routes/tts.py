@@ -1,5 +1,7 @@
 """
-TTS Routes - Text-to-Speech endpoint
+tts.py
+Text-to-Speech endpoint for the Bibliosense agent API.
+Converts text to speech using OpenAI TTS API and streams audio responses.
 """
 from fastapi import APIRouter, Body, Request
 from fastapi.responses import Response, JSONResponse

@@ -1,4 +1,7 @@
+# Translator Agent – Documentation
 # Knowledge Bases
+
+This directory contains all knowledge bases for the **Dok2u Multi-Agent** system. Each knowledge base is a separate folder containing documents, transcripts, and the corresponding ChromaDB vector database for the Translator Agent and related agents.
 
 This directory contains all knowledge bases for the Dok2u Multi-Agent system. Each knowledge base is a separate folder containing documents, transcripts, and the corresponding ChromaDB vector database.
 

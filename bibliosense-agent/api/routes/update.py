@@ -1,5 +1,7 @@
 """
-Update Routes - Google Drive document indexing endpoint
+update.py
+Google Drive document indexing endpoint for the Bibliosense agent API.
+Triggers the indexing pipeline, typically called by Cloud Scheduler.
 """
 from fastapi import APIRouter, Request, Query
 from datetime import datetime

@@ -1,5 +1,6 @@
 """
-Data Models - Pydantic models for API requests
+models.py
+Pydantic data models for API requests and payload validation in the Bibliosense agent API.
 """
 from pydantic import BaseModel
 from typing import Optional

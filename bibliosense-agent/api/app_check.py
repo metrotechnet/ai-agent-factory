@@ -1,11 +1,14 @@
+
+"""
+app_check.py
+Firebase App Check middleware for the Bibliosense agent API.
+Verifies App Check tokens to ensure requests come from legitimate app instances.
+Can be enabled/disabled via environment variables.
+"""
+
 from fastapi import APIRouter
 
 router = APIRouter()
-
-"""
-Firebase App Check Middleware
-Verifies App Check tokens to ensure requests come from legitimate app instances
-"""
 
 from fastapi import Request
 from fastapi.responses import JSONResponse

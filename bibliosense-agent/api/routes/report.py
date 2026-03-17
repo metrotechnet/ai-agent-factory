@@ -1,5 +1,7 @@
 """
-Report Routes - Endpoints for logging and reports
+report.py
+Endpoints for logging, comments, likes, and report downloads in the Bibliosense agent API.
+Handles question log access and HTML report rendering.
 """
 from fastapi import APIRouter, Body, Query, Request
 from fastapi.responses import FileResponse, HTMLResponse

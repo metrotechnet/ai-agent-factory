@@ -1,4 +1,7 @@
-# 🔧 Guide: Tester avec un Debug Token Firebase
+# Translator Agent – Documentation
+# 🛷 Guide: Tester avec un Debug Token Firebase
+
+Ce guide explique comment utiliser un debug token Firebase App Check pour le projet **Translator Agent**. Il est destiné au développement local, aux tests automatisés et au débogage.
 
 ## Qu'est-ce qu'un Debug Token?
 

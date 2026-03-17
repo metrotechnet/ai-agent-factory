@@ -1,5 +1,7 @@
 """
-Configuration Management - Configuration loading and merging
+config.py
+Configuration management utilities for loading and merging agent configs in the Bibliosense agent API.
+Handles deep merging of base and override configs.
 """
 from pathlib import Path
 import json

@@ -1,4 +1,7 @@
+# Agent Factory – Documentation
 # Shared Google Drive Setup Guide
+
+This guide is part of the **Agent Factory** documentation. It explains how to set up a shared Google Drive folder to automatically sync and index documents for your agent application.
 
 ## Overview
 This guide walks you through setting up a shared Google Drive folder to automatically sync and index documents for your agent application.

@@ -1,4 +1,7 @@
+# Translator Agent – Documentation
 # Google Drive Pipeline Configuration
+
+Ce guide explique la configuration du pipeline Google Drive pour le projet **Translator Agent**. Il détaille comment indexer automatiquement des documents depuis un dossier Google Drive partagé dans ChromaDB pour l'agent conversationnel.
 
 ## Overview
 Ce pipeline permet d'indexer automatiquement des documents depuis un dossier Google Drive partagé dans ChromaDB pour être utilisés par l'agent conversationnel.

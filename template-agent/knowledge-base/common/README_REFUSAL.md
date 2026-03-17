@@ -1,4 +1,7 @@
+# Template Agent – Documentation
 # Configuration des Réponses de Refus
+
+Ce dossier fait partie de la documentation du **Template Agent**. Il contient les fichiers de configuration pour le système de refus du chatbot, permettant de personnaliser les réponses selon les cas d'usage.
 
 Ce dossier contient les fichiers de configuration pour le système de refus du chatbot.
 

@@ -1,5 +1,7 @@
 """
-Translation Routes - Translation and audio transcription endpoints
+translation.py
+Translation and audio transcription endpoints for the Bibliosense agent API.
+Handles text translation, audio transcription, and supported languages.
 """
 from fastapi import APIRouter, UploadFile, File, Form
 from fastapi.responses import StreamingResponse, JSONResponse

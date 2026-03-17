@@ -1,5 +1,7 @@
 """
-Agent Routes - Agent configuration endpoints
+config.py
+Agent configuration endpoints for the Bibliosense agent API.
+Provides access to agent config for single-agent deployment.
 """
 from fastapi import APIRouter, Query
 from typing import Optional

@@ -1,5 +1,7 @@
 """
-Logging - Question and response logging with comments and likes
+logging.py
+Logging utilities for question/response logging, comments, and likes in the Bibliosense agent API.
+Thread-safe file operations and disclaimer detection helpers.
 """
 from pathlib import Path
 from datetime import datetime

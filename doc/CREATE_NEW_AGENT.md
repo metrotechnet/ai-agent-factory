@@ -1,4 +1,7 @@
+# Agent Factory – Documentation
 # Creating a New Agent from Template 🚀
+
+This guide is part of the **Agent Factory** documentation. It explains how to create a new custom AI agent using the IMX Agent Factory template, including setup, configuration, and deployment steps.
 
 This guide walks you through creating your own custom AI agent using the IMX Agent Factory template.
 

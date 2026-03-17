@@ -1,3 +1,4 @@
 """
-API Module - FastAPI backend
+__init__.py
+Initializes the API module for the Bibliosense agent FastAPI backend.
 """

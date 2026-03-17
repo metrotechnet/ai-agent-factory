@@ -1,4 +1,9 @@
+
 # Rate Limiting Configuration 🛡️
+
+This document explains the rate limiting configuration for the Bibliosense Agent (IMX Agent) application. It describes the multi-layered approach to protect the backend from abuse and API overuse.
+
+---
 
 Ce document explique la configuration de rate limiting (limitation de débit) mise en place pour protéger l'application contre les abus et les attaques.
 

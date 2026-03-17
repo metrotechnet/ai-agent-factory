@@ -1,6 +1,8 @@
-# API Module Structure
 
-This directory contains the modularized backend API for the IMX Agent application.
+# Bibliosense Agent API Module
+
+This directory contains the modularized backend API for the Bibliosense Agent application (IMX Agent).
+It provides all FastAPI endpoints, data models, session management, logging, and configuration utilities for the agent backend.
 
 ## Directory Structure
 

@@ -1,4 +1,7 @@
+# Template Agent – Documentation
 # API Module Structure
+
+This directory contains the modularized backend API for the **Template Agent** application. It describes the structure and purpose of each module for maintainability and clarity.
 
 This directory contains the modularized backend API for the IMX Agent application.
 

@@ -1,5 +1,7 @@
 """
-Session Routes - Session management endpoints
+sessions.py
+Session management endpoints for the Bibliosense agent API.
+Provides reset and info endpoints for conversation sessions.
 """
 from fastapi import APIRouter
 
