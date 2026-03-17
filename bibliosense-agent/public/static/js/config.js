@@ -72,7 +72,6 @@ async function loadConfig(agent) {
 function applyConfig(lang) {
     const langData = mainConfig[lang] || mainConfig['fr'];
     
-    // Update text content
     document.querySelectorAll('[data-i18n]').forEach(element => {
         const key = element.getAttribute('data-i18n');
         const translation = getNestedValue(langData, key);
@@ -98,6 +97,12 @@ function applyConfig(lang) {
             element.title = translation;
         }
     });
+    // Update input disclaimer if present
+    // Update input disclaimer if present
+    const inputDisclaimer = document.querySelector('.input-disclaimer');
+    if (inputDisclaimer && langData.components && langData.components.inputArea && langData.components.inputArea.disclaimer) {
+        inputDisclaimer.textContent = langData.components.inputArea.disclaimer;
+    }
     
     // Update alt attributes
     document.querySelectorAll('[data-i18n-alt]').forEach(element => {
