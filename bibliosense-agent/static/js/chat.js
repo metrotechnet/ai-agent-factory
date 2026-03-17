@@ -174,9 +174,6 @@ function createAssistantMessage() {
                 <button class="action-btn copy-btn" title="">
                     <i class="bi bi-clipboard"></i>
                 </button>
-                <button class="action-btn share-btn" title="">
-                    <i class="bi bi-share"></i>
-                </button>
                 <button class="action-btn like-btn" title="Like">
                     <i class="bi bi-hand-thumbs-up"></i>
                 </button>
@@ -198,7 +195,6 @@ function setupMessageActions(messageDiv, contentDiv) {
     const { speakText, stopTTS, getActiveTtsButton } = window.TTSModule || {};
     
     const copyBtn = messageDiv.querySelector('.copy-btn');
-    const shareBtn = messageDiv.querySelector('.share-btn');
     const likeBtn = messageDiv.querySelector('.like-btn');
     const dislikeBtn = messageDiv.querySelector('.dislike-btn');
     const ttsBtn = messageDiv.querySelector('.tts-btn');
@@ -206,7 +202,6 @@ function setupMessageActions(messageDiv, contentDiv) {
     // Set translated titles
     if (ttsBtn) ttsBtn.title = t('messages.listen') || 'Listen';
     if (copyBtn) copyBtn.title = t('messages.copy');
-    if (shareBtn) shareBtn.title = t('messages.share');
 
     // TTS button
     if (ttsBtn && speakText && stopTTS && getActiveTtsButton) {
@@ -324,16 +319,6 @@ function setupMessageActions(messageDiv, contentDiv) {
         });
     }
 
-    // Share button
-    if (shareBtn) {
-        shareBtn.addEventListener('click', () => {
-            if (navigator.share) {
-                navigator.share({ text: contentDiv.textContent });
-            } else {
-                alert(t('messages.shareNotSupported'));
-            }
-        });
-    }
 }
 
 /**
