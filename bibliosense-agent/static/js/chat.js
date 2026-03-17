@@ -32,19 +32,22 @@ if (typeof marked !== 'undefined') {
     marked.setOptions({ renderer: renderer });
 }
 
+// Track known broken image URLs to avoid flicker during streaming
+const brokenImageUrls = new Set();
+
 /**
  * Replace broken image with gray placeholder
  */
 function handleBrokenImage(img) {
+    // Track the broken URL
+    if (img.src) brokenImageUrls.add(img.src);
+    
     // Create a gray box with exclamation mark
     const placeholder = document.createElement('div');
     placeholder.className = 'broken-image-placeholder';
     placeholder.innerHTML = '<i class="bi bi-exclamation-circle"></i>';
     placeholder.title = 'Image non disponible';
     
-    // Copy image dimensions if available
-    if (img.width) placeholder.style.width = img.width + 'px';
-    if (img.height) placeholder.style.height = img.height + 'px';
     
     // Replace image with placeholder
     img.parentNode.replaceChild(placeholder, img);
@@ -56,6 +59,12 @@ function handleBrokenImage(img) {
 function setupImageErrorHandlers(container) {
     const images = container.querySelectorAll('img');
     images.forEach(img => {
+        // Immediately replace images with known broken URLs (prevents flicker during streaming)
+        if (img.src && brokenImageUrls.has(img.src)) {
+            handleBrokenImage(img);
+            return;
+        }
+        
         // Remove any existing error handler to avoid duplicates
         img.onerror = null;
         

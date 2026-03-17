@@ -86,7 +86,16 @@ header {
     gap: 0.75rem;
     flex-shrink: 0;
 }
-
+.header-title {
+    font-size: 1.75rem;
+    font-weight: 600;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin: 0;
+    letter-spacing: -0.5px;
+}
 
 .content {
     flex: 1;
@@ -146,13 +155,14 @@ footer {
         overflow-y: auto;
         -webkit-overflow-scrolling: touch;
     }
-  
+    
+
     
     .library-label {
         font-size: 0.85rem;
     }
     
-  
+
 }
 
 .menu-toggle {
@@ -579,6 +589,36 @@ footer {
 
 .message-text {
     margin-bottom: 0.5rem;
+}
+
+.message-text img {
+    max-width: 200px;
+    width: 200px;
+    height: auto;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    object-fit: cover;
+    display: block;
+    margin-bottom: 0.75rem;
+}
+
+/* Placeholder for broken images */
+.broken-image-placeholder {
+    max-width: 200px;
+    width: 200px;
+    height: 280px;
+    background: #e2e8f0;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.75rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.broken-image-placeholder i {
+    font-size: 48px;
+    color: #94a3b8;
 }
 
 .message-disclaimer {
@@ -1132,4 +1172,45 @@ body.keyboard-visible .input-area {
         padding: 1rem;
         padding-bottom: 0;
     }
+}
+
+/* ===================================
+   MESSAGE ACTION BUTTONS
+   =================================== */
+
+.action-btn {
+    border-radius: 50%;
+    padding: 8px;
+    border: none;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.07);
+    cursor: pointer;
+    width: 40px;
+    height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.action-btn i {
+    font-size: 1.3em;
+}
+
+.action-btn.copy-btn {
+    background: #f3f3f3;
+    margin-left: 6px;
+}
+
+.action-btn.like-btn {
+    background: #e6f9e6;
+    margin-left: 6px;
+}
+
+.action-btn.dislike-btn {
+    background: #f9e6e6;
+    margin-left: 2px;
+}
+
+.action-btn.tts-btn {
+    background: #c1ddf1;
+    margin-left: 2px;
 }

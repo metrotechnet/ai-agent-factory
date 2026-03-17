@@ -293,6 +293,7 @@ function getCurrentAgent() {
 
 // Export for use in other modules
 window.AgentsModule = {
+    displayAgentIntro,
     sendTranslation,
     isTranslationReversed,
     updateAgentSelectorLabels,

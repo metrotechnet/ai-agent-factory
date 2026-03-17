@@ -25,8 +25,7 @@ async def text_to_speech(
     """
     try:
         client_openai = openai.OpenAI(
-            api_key=os.getenv("AI_GATEWAY_API_KEY"),
-            base_url="https://ai-gateway.vercel.sh/v1"
+            api_key=os.getenv("OPENAI_API_KEY")
         )
         # Choose voice based on language
         voice = "nova" if language in ["fr", "es", "it", "pt", "ro"] else "alloy"

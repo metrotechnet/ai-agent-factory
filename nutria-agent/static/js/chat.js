@@ -32,45 +32,7 @@ if (typeof marked !== 'undefined') {
     marked.setOptions({ renderer: renderer });
 }
 
-/**
- * Replace broken image with gray placeholder
- */
-function handleBrokenImage(img) {
-    // Create a gray box with exclamation mark
-    const placeholder = document.createElement('div');
-    placeholder.className = 'broken-image-placeholder';
-    placeholder.innerHTML = '<i class="bi bi-exclamation-circle"></i>';
-    placeholder.title = 'Image non disponible';
-    
-    // Copy image dimensions if available
-    if (img.width) placeholder.style.width = img.width + 'px';
-    if (img.height) placeholder.style.height = img.height + 'px';
-    
-    // Replace image with placeholder
-    img.parentNode.replaceChild(placeholder, img);
-}
 
-/**
- * Add error handlers to all images in content
- */
-function setupImageErrorHandlers(container) {
-    const images = container.querySelectorAll('img');
-    images.forEach(img => {
-        // Remove any existing error handler to avoid duplicates
-        img.onerror = null;
-        
-        // Add error handler
-        img.onerror = function() {
-            console.log('Image failed to load:', this.src);
-            handleBrokenImage(this);
-        };
-        
-        // Check if image is already broken (cached failure)
-        if (img.complete && img.naturalHeight === 0) {
-            handleBrokenImage(img);
-        }
-    });
-}
 
 /**
  * Check if text ends with incomplete markdown URL syntax
@@ -487,7 +449,6 @@ async function handleStreamingResponse(question, contentDiv, actionsDiv) {
             }
             if (typeof marked !== 'undefined' && typeof DOMPurify !== 'undefined') {
                 contentDiv.innerHTML = DOMPurify.sanitize(marked.parse(fullText), { ADD_ATTR: ['target'] });
-                setupImageErrorHandlers(contentDiv);
             } else {
                 contentDiv.textContent = fullText;
             }
@@ -520,7 +481,6 @@ async function handleStreamingResponse(question, contentDiv, actionsDiv) {
                     }
                     if (typeof marked !== 'undefined' && typeof DOMPurify !== 'undefined') {
                         contentDiv.innerHTML = DOMPurify.sanitize(marked.parse(fullText), { ADD_ATTR: ['target'] });
-                        setupImageErrorHandlers(contentDiv);
                     } else {
                         contentDiv.textContent = fullText;
                     }
@@ -566,8 +526,6 @@ async function handleStreamingResponse(question, contentDiv, actionsDiv) {
                         if (!hasIncompleteUrl(cleanText)) {
                             if (typeof marked !== 'undefined' && typeof DOMPurify !== 'undefined') {
                                 contentDiv.innerHTML = DOMPurify.sanitize(marked.parse(cleanText), { ADD_ATTR: ['target'] });
-                                // Setup error handlers for images after rendering
-                                setupImageErrorHandlers(contentDiv);
                             } else {
                                 contentDiv.textContent = cleanText;
                             }

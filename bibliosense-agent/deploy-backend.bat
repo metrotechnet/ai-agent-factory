@@ -17,6 +17,7 @@ if not exist ".env" (
 REM Load all configuration from .env file (skip comment lines and empty lines)
 for /f "usebackq eol=# tokens=1* delims==" %%a in (.env) do (
     if "%%a"=="AI_GATEWAY_API_KEY" set "CONFIG_AI_GATEWAY_KEY=%%b"
+    if "%%a"=="OPENAI_API_KEY" set "CONFIG_OPENAI_KEY=%%b"
     if "%%a"=="GDRIVE_FOLDER_ID" set "GDRIVE_FOLDER_ID=%%b"
     if "%%a"=="GCP_PROJECT_ID" set "GCP_PROJECT=%%b"
     if "%%a"=="GCP_REGION" set "GCP_REGION=%%b"
@@ -73,8 +74,9 @@ if "%CLOUD_RUN_TIMEOUT%"=="" set CLOUD_RUN_TIMEOUT=300
 if "%CLOUD_RUN_MIN_INSTANCES%"=="" set CLOUD_RUN_MIN_INSTANCES=0
 if "%CLOUD_RUN_MAX_INSTANCES%"=="" set CLOUD_RUN_MAX_INSTANCES=10
 
-REM Use API key from configuration file
+REM Use API keys from configuration file
 set AI_GATEWAY_API_KEY=%CONFIG_AI_GATEWAY_KEY%
+set OPENAI_API_KEY=%CONFIG_OPENAI_KEY%
 
 echo.
 echo Starting deployment to Cloud Run...
@@ -86,7 +88,7 @@ call gcloud run deploy %GCP_SERVICE_NAME% ^
   --platform managed ^
   --region %GCP_REGION% ^
   --allow-unauthenticated ^
-  --set-env-vars AI_GATEWAY_API_KEY=%AI_GATEWAY_API_KEY%,GCP_PROJECT_ID=%GCP_PROJECT%,GCP_REGION=%GCP_REGION%,GDRIVE_FOLDER_ID=%GDRIVE_FOLDER_ID%,FIREBASE_PROJECT_ID=%FIREBASE_PROJECT_ID%,ADDITIONAL_CORS_ORIGINS=%ADDITIONAL_CORS_ORIGINS%,KNOWLEDGE_BASE=%KNOWLEDGE_BASE% ^
+  --set-env-vars AI_GATEWAY_API_KEY=%AI_GATEWAY_API_KEY%,OPENAI_API_KEY=%OPENAI_API_KEY%,GCP_PROJECT_ID=%GCP_PROJECT%,GCP_REGION=%GCP_REGION%,GDRIVE_FOLDER_ID=%GDRIVE_FOLDER_ID%,FIREBASE_PROJECT_ID=%FIREBASE_PROJECT_ID%,ADDITIONAL_CORS_ORIGINS=%ADDITIONAL_CORS_ORIGINS%,KNOWLEDGE_BASE=%KNOWLEDGE_BASE% ^
   --update-secrets /secrets/gdrive/credentials.json=gdrive-credentials:latest ^
   --memory %CLOUD_RUN_MEMORY% ^
   --timeout %CLOUD_RUN_TIMEOUT%s ^

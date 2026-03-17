@@ -13,10 +13,15 @@ from dotenv import load_dotenv
 PROJECT_ROOT = Path(__file__).parent.parent
 load_dotenv(dotenv_path=PROJECT_ROOT / '.env')
 
-# Initialize Vercel AI Gateway client (OpenAI-compatible)
+# Initialize Vercel AI Gateway client (OpenAI-compatible) for chat/text
 client = OpenAI(
     api_key=os.getenv("AI_GATEWAY_API_KEY"),
     base_url="https://ai-gateway.vercel.sh/v1"
+)
+
+# Direct OpenAI client for audio APIs (Whisper, TTS) - not supported by Vercel AI Gateway
+client_audio = OpenAI(
+    api_key=os.getenv("OPENAI_API_KEY")
 )
 
 # Supported translation languages
@@ -165,7 +170,7 @@ def transcribe_audio_whisper(audio_bytes: bytes, filename: str = "audio.webm", l
                 params["language"] = language
                 print(f"Transcribing with language hint: {SUPPORTED_LANGUAGES.get(language, language)}")
             
-            transcript = client.audio.transcriptions.create(**params)
+            transcript = client_audio.audio.transcriptions.create(**params)
         return transcript.strip()
     finally:
         os.unlink(tmp_path)
@@ -190,7 +195,7 @@ def translate_audio_whisper(audio_bytes: bytes, filename: str = "audio.webm") ->
 
     try:
         with open(tmp_path, "rb") as audio_file:
-            translation = client.audio.translations.create(
+            translation = client_audio.audio.translations.create(
                 model="whisper-1",
                 file=audio_file,
                 response_format="text"
