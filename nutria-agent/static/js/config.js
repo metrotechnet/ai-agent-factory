@@ -226,6 +226,7 @@ function switchLanguage(lang) {
     window.history.replaceState({}, '', url);
     
     applyConfig(lang);
+    populateSuggestionCards(lang);
     
     // Update language selector value
     const langSelector = document.getElementById('language-selector');

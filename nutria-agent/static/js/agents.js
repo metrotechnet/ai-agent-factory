@@ -41,41 +41,7 @@ function displayAgentIntro(agent) {
         descEl.textContent = intro.description;
     }
     
-    // Insert library selector between description and disclaimer
     const disclaimerEl = emptyState.querySelector('strong[data-i18n="intro.disclaimer"]');
-    if (disclaimerEl && !emptyState.querySelector('.library-selector-container')) {
-        const libSelectorContainer = document.createElement('div');
-        libSelectorContainer.className = 'library-selector-container';
-        libSelectorContainer.innerHTML = `
-            <label for="library-selector" class="library-label">
-                <svg viewBox="0 0 24 24" fill="currentColor" style="width:18px;height:18px;margin-right:4px;">
-                    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
-                </svg>
-                <span data-i18n="components.librarySelector.label">Bibliothèque:</span>
-            </label>
-            <select id="library-selector" class="library-selector">
-                <option value="quebec" data-i18n="components.librarySelector.quebec">Ville de Québec</option>
-                <option value="montreal" data-i18n="components.librarySelector.montreal">Ville de Montréal</option>
-            </select>
-        `;
-        
-        // Insert before disclaimer parent paragraph
-        disclaimerEl.parentElement.insertAdjacentElement('beforebegin', libSelectorContainer);
-        
-        // Apply translations to the dynamically inserted elements
-        const { t } = window.ConfigModule;
-        if (t) {
-            const label = libSelectorContainer.querySelector('[data-i18n="components.librarySelector.label"]');
-            if (label) label.textContent = t('components.librarySelector.label');
-            
-            const quebecOption = libSelectorContainer.querySelector('[data-i18n="components.librarySelector.quebec"]');
-            if (quebecOption) quebecOption.textContent = t('components.librarySelector.quebec');
-            
-            const montrealOption = libSelectorContainer.querySelector('[data-i18n="components.librarySelector.montreal"]');
-            if (montrealOption) montrealOption.textContent = t('components.librarySelector.montreal');
-        }
-    }
-    
     if (disclaimerEl && intro.disclaimer) {
         disclaimerEl.textContent = intro.disclaimer;
     }

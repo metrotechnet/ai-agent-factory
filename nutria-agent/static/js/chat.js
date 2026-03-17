@@ -11,6 +11,7 @@
 let isLoading = false;
 let sessionId = null;
 let userMessageDiv = document.createElement('div');
+let endPadding = 0;
 let currentAbortController = null;
 let currentReader = null;
 
@@ -18,17 +19,17 @@ let currentReader = null;
 let lastRequestTime = 0;
 const MIN_REQUEST_INTERVAL = 2000; // 2 seconds minimum between requests
 
-// Auto-scroll control
-let autoScrollEnabled = true;
-let isScrollingProgrammatically = false;
 
-/**
- * Escape HTML to prevent XSS
- */
-function escapeHtml(text) {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
+
+// Configure marked.js to open links in new tab
+if (typeof marked !== 'undefined') {
+    const renderer = new marked.Renderer();
+    const linkRenderer = renderer.link;
+    renderer.link = (href, title, text) => {
+        const html = linkRenderer.call(renderer, href, title, text);
+        return html.replace(/^<a /, '<a target="_blank" rel="noopener noreferrer" ');
+    };
+    marked.setOptions({ renderer: renderer });
 }
 
 /**
@@ -72,6 +73,67 @@ function setupImageErrorHandlers(container) {
 }
 
 /**
+ * Check if text ends with incomplete markdown URL syntax
+ */
+function hasIncompleteUrl(text) {
+    // Check for incomplete markdown image: ![text](incomplete_url
+    // or incomplete markdown link: [text](incomplete_url
+    const imagePattern = /!\[[^\]]*\]\([^)]*$/;
+    const linkPattern = /\[[^\]]*\]\([^)]*$/;
+    
+    return imagePattern.test(text) || linkPattern.test(text);
+}
+
+/**
+ * Remove incomplete markdown URLs from text
+ * Removes everything from the last occurrence of [text](incomplete_url
+ */
+function removeIncompleteUrls(text) {
+    // Find the last occurrence of an incomplete markdown image or link
+    const lastImageStart = text.lastIndexOf('![');
+    const lastLinkStart = text.lastIndexOf('[');
+    let lastUrlStart = Math.max(lastImageStart, lastLinkStart);
+    
+    if (lastUrlStart === -1) {
+        return text; // No URL markdown found
+    }
+
+    // If this [ is part of an image ![, include the ! in the cut
+    if (lastUrlStart > 0 && text[lastUrlStart - 1] === '!') {
+        lastUrlStart -= 1;
+    }
+
+    // Check if there's a complete URL after this point
+    const afterUrl = text.substring(lastUrlStart);
+    // Complete URL patterns: ![text](url) or [text](url)
+    const completeUrlPattern = /^!?\[[^\]]*\]\([^)]+\)/;
+    
+    if (!completeUrlPattern.test(afterUrl)) {
+        // Incomplete URL, remove from this point
+        return text.substring(0, lastUrlStart);
+    }
+    
+    return text;
+}
+
+/**
+ * Get selected library from selector
+ */
+function getSelectedLibrary() {
+    const selector = document.getElementById('library-selector');
+    return selector ? selector.value : 'all';
+}
+
+/**
+ * Escape HTML to prevent XSS
+ */
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+/**
  * Add message to chat
  */
 function addMessage(text, role) {
@@ -109,21 +171,16 @@ function createAssistantMessage() {
                 </div>
             </div>
             <div class="message-actions" style="display:none">
-                <button class="action-btn copy-btn" title="" style="border-radius:50%;padding:8px;background:#f3f3f3;border:none;box-shadow:0 1px 4px rgba(0,0,0,0.07);margin-right:6px;cursor:pointer;width:40px;height:40px;display:inline-flex;align-items:center;justify-content:center;">
-                    <i class="bi bi-clipboard" style="font-size:1.3em;"></i>
+                <button class="action-btn copy-btn" title="">
+                    <i class="bi bi-clipboard"></i>
                 </button>
-                <button class="action-btn share-btn" title="" style="border-radius:50%;padding:8px;background:#f3f3f3;border:none;box-shadow:0 1px 4px rgba(0,0,0,0.07);margin-right:6px;cursor:pointer;width:40px;height:40px;display:inline-flex;align-items:center;justify-content:center;">
-                    <i class="bi bi-share" style="font-size:1.3em;"></i>
+                <button class="action-btn like-btn" title="Like">
+                    <i class="bi bi-hand-thumbs-up"></i>
                 </button>
-                <button class="action-btn like-btn" title="Like" style="border-radius:50%;padding:8px;background:#e6f9e6;border:none;box-shadow:0 1px 4px rgba(0,0,0,0.07);margin-left:6px;cursor:pointer;width:40px;height:40px;display:inline-flex;align-items:center;justify-content:center;">
-                    <i class="bi bi-hand-thumbs-up" style="font-size:1.3em;"></i>
+                <button class="action-btn dislike-btn" title="Dislike">
+                    <i class="bi bi-hand-thumbs-down"></i>
                 </button>
-                <button class="action-btn dislike-btn" title="Dislike" style="border-radius:50%;padding:8px;background:#f9e6e6;border:none;box-shadow:0 1px 4px rgba(0,0,0,0.07);margin-left:2px;cursor:pointer;width:40px;height:40px;display:inline-flex;align-items:center;justify-content:center;">
-                    <i class="bi bi-hand-thumbs-down" style="font-size:1.3em;"></i>
-                </button>
-                <button class="action-btn tts-btn" title="" style="border-radius:50%;padding:8px;background:#c1ddf1;border:none;box-shadow:0 1px 4px rgba(0,0,0,0.07);margin-left:2px;cursor:pointer;width:40px;height:40px;display:inline-flex;align-items:center;justify-content:center;">
-                    <i class="bi bi-volume-up" style="font-size:1.3em;"></i>
-                </button>
+
             </div>
         </div>
     `;
@@ -138,7 +195,6 @@ function setupMessageActions(messageDiv, contentDiv) {
     const { speakText, stopTTS, getActiveTtsButton } = window.TTSModule || {};
     
     const copyBtn = messageDiv.querySelector('.copy-btn');
-    const shareBtn = messageDiv.querySelector('.share-btn');
     const likeBtn = messageDiv.querySelector('.like-btn');
     const dislikeBtn = messageDiv.querySelector('.dislike-btn');
     const ttsBtn = messageDiv.querySelector('.tts-btn');
@@ -146,7 +202,6 @@ function setupMessageActions(messageDiv, contentDiv) {
     // Set translated titles
     if (ttsBtn) ttsBtn.title = t('messages.listen') || 'Listen';
     if (copyBtn) copyBtn.title = t('messages.copy');
-    if (shareBtn) shareBtn.title = t('messages.share');
 
     // TTS button
     if (ttsBtn && speakText && stopTTS && getActiveTtsButton) {
@@ -260,48 +315,45 @@ function setupMessageActions(messageDiv, contentDiv) {
                     console.error('Copy failed:', fallbackErr);
                 }
             }
+
         });
     }
 
-    // Share button
-    if (shareBtn) {
-        shareBtn.addEventListener('click', () => {
-            if (navigator.share) {
-                navigator.share({ text: contentDiv.textContent });
-            } else {
-                alert(t('messages.shareNotSupported'));
+}
+
+/**
+ * Position message at bottom of viewport
+ */
+function positionMessageAtBottom(chatContainer, userMessageDiv, messageDiv) {
+    if (!chatContainer || !userMessageDiv || !messageDiv) return;
+    
+    // Calculate needed padding to position message at bottom
+    requestAnimationFrame(() => {
+        
+        const userMessageHeight = userMessageDiv.offsetHeight;      
+        const messageDivHeight = messageDiv.offsetHeight;
+        const containerHeight = chatContainer.clientHeight;
+        
+        // Calculate padding needed to push content to bottom
+        const endPadding = containerHeight - userMessageHeight - messageDivHeight - 50;
+        console.log('Needed padding to position message at bottom:', endPadding);
+
+        if (endPadding > 0) {
+            const messageContent = messageDiv.querySelector('.message-content');
+            if (messageContent) {
+                const currentHeight = messageContent.offsetHeight;
+                messageContent.style.minHeight = (currentHeight + endPadding) + 'px';
             }
+        }
+        
+        // Scroll to bottom
+        requestAnimationFrame(() => {
+            chatContainer.scrollTo({
+                top: chatContainer.scrollHeight,
+                behavior: 'smooth'
+            });
         });
-    }
-}
-
-/**
- * Remove previous bottom spacer
- */
-function removePreviousSpacer() {
-    const previousSpacer = document.getElementById('chat-bottom-spacer');
-    if (previousSpacer && previousSpacer.parentNode) {
-        previousSpacer.remove();
-    }
-}
-
-/**
- * Create bottom spacer
- */
-function createBottomSpacer(userMsgDiv, assistantMsgDiv, offset = 10) {
-    const bottomSpacer = document.createElement('div');
-    bottomSpacer.id = 'chat-bottom-spacer';
-    bottomSpacer.style.height = offset + 'px';
-    bottomSpacer.style.flexShrink = '0';
-    return bottomSpacer;
-}
-
-/**
- * Scroll to message bottom (disabled - no auto-scroll)
- */
-function scrollToMessageBottom(assistantMsgDiv, offset = 0) {
-    // Auto-scroll disabled
-    return;
+    });
 }
 
 /**
@@ -387,7 +439,8 @@ async function handleStreamingResponse(question, contentDiv, actionsDiv) {
         language: getCurrentLanguage(),
         timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC",
         locale: navigator.language || (getCurrentLanguage() === 'en' ? 'en-US' : 'fr-FR'),
-        session_id: sessionId
+        session_id: sessionId,
+        bibliotheque: getSelectedLibrary()
     };
 
     // Create abort controller for cancellation
@@ -418,11 +471,13 @@ async function handleStreamingResponse(question, contentDiv, actionsDiv) {
     let questionId = null;
     let fullText = '';
     let linksReceived = null;
-
+    let textToDisplay='';
+  
     while (true) {
         const { done, value } = await reader.read();
 
         if (done) {
+            
             actionsDiv.style.display = '';
             if (questionId) {
                 const likeBtn = actionsDiv.querySelector('.like-btn');
@@ -431,7 +486,7 @@ async function handleStreamingResponse(question, contentDiv, actionsDiv) {
                 if (dislikeBtn) dislikeBtn.dataset.questionId = questionId;
             }
             if (typeof marked !== 'undefined' && typeof DOMPurify !== 'undefined') {
-                contentDiv.innerHTML = DOMPurify.sanitize(marked.parse(fullText));
+                contentDiv.innerHTML = DOMPurify.sanitize(marked.parse(fullText), { ADD_ATTR: ['target'] });
                 setupImageErrorHandlers(contentDiv);
             } else {
                 contentDiv.textContent = fullText;
@@ -455,7 +510,7 @@ async function handleStreamingResponse(question, contentDiv, actionsDiv) {
                 
                 // Check for [DONE] marker
                 if (rawData === '[DONE]') {
-                    // Stream is complete, exit the loop
+
                     actionsDiv.style.display = '';
                     if (questionId) {
                         const likeBtn = actionsDiv.querySelector('.like-btn');
@@ -464,7 +519,7 @@ async function handleStreamingResponse(question, contentDiv, actionsDiv) {
                         if (dislikeBtn) dislikeBtn.dataset.questionId = questionId;
                     }
                     if (typeof marked !== 'undefined' && typeof DOMPurify !== 'undefined') {
-                        contentDiv.innerHTML = DOMPurify.sanitize(marked.parse(fullText));
+                        contentDiv.innerHTML = DOMPurify.sanitize(marked.parse(fullText), { ADD_ATTR: ['target'] });
                         setupImageErrorHandlers(contentDiv);
                     } else {
                         contentDiv.textContent = fullText;
@@ -501,14 +556,22 @@ async function handleStreamingResponse(question, contentDiv, actionsDiv) {
                     }
 
                     if (data.chunk) {
-                        fullText += data.chunk;
-                        if (typeof marked !== 'undefined' && typeof DOMPurify !== 'undefined') {
-                            contentDiv.innerHTML = DOMPurify.sanitize(marked.parse(fullText));
-                            setupImageErrorHandlers(contentDiv);
-                        } else {
-                            contentDiv.textContent = fullText;
-                        }
-                        scrollToMessageBottom(contentDiv.closest('.message'));
+                        textToDisplay += data.chunk;
+                        fullText = textToDisplay; // Keep fullText synchronized
+                        
+                        // Remove incomplete URLs before displaying
+                        const cleanText = removeIncompleteUrls(textToDisplay);
+                        // Only parse markdown if we don't have an incomplete URL
+                        // This prevents showing broken image/link URLs during streaming
+                        if (!hasIncompleteUrl(cleanText)) {
+                            if (typeof marked !== 'undefined' && typeof DOMPurify !== 'undefined') {
+                                contentDiv.innerHTML = DOMPurify.sanitize(marked.parse(cleanText), { ADD_ATTR: ['target'] });
+                                // Setup error handlers for images after rendering
+                                setupImageErrorHandlers(contentDiv);
+                            } else {
+                                contentDiv.textContent = cleanText;
+                            }
+                        } 
                     }
                   
                     if (updateScrollIndicator) updateScrollIndicator();
@@ -556,41 +619,32 @@ async function sendMessage() {
         emptyState.style.display = 'none';
     }
     
-    removePreviousSpacer();
-    
     userMessageDiv = addMessage(question, 'user');
     const messageDiv = createAssistantMessage();
     
-    if (chatContainer) {
-        chatContainer.appendChild(userMessageDiv);
-        chatContainer.appendChild(messageDiv);
-    }
-    
-    const spacerDiv = createBottomSpacer(userMessageDiv, messageDiv);
-    if (chatContainer) {
-        chatContainer.appendChild(spacerDiv);
-        
-        // Set spacer height to push content up (viewport height - small offset)
-        spacerDiv.style.height = (chatContainer.clientHeight - 100) + 'px';
-        
-        // Scroll to show user message at the top (with header offset)
-        requestAnimationFrame(() => {
-            requestAnimationFrame(() => {
-                chatContainer.scrollTop = userMessageDiv.offsetTop - 80;
-            });
-        });
-    }
+    chatContainer.appendChild(userMessageDiv);
+    chatContainer.appendChild(messageDiv);
 
     const contentDiv = messageDiv.querySelector('.message-text');
     const actionsDiv = messageDiv.querySelector('.message-actions');
     
     setupMessageActions(messageDiv, contentDiv);
     prepareUIForLoading();
-    scrollToMessageBottom(contentDiv.closest('.message'));
+
+    setTimeout(() => {
+        positionMessageAtBottom(chatContainer, userMessageDiv, messageDiv);
+    }, 100);
 
     try {
         await handleStreamingResponse(question, contentDiv, actionsDiv);
     } catch (error) {
+        // Check if request was cancelled
+        if (error.name === 'AbortError') {
+            // console.log('Request cancelled by user');
+            // contentDiv.innerHTML = '<em style="color: #666;">Request cancelled</em>';
+            return;
+        }
+        
         console.error('Message sending error:', error);
         const { t, getCurrentLanguage } = window.ConfigModule;
         
@@ -606,7 +660,6 @@ async function sendMessage() {
         cleanupAfterMessage(messageDiv);
         const { handleFocus } = window.UIUtilsModule || {};
         if (handleFocus) handleFocus();
-        scrollToMessageBottom(contentDiv.closest('.message'));
     }
 }
 
@@ -623,12 +676,10 @@ window.ChatModule = {
     createAssistantMessage,
     setupMessageActions,
     addMessage,
-    removePreviousSpacer,
-    createBottomSpacer,
-    scrollToMessageBottom,
+    positionMessageAtBottom,
     prepareUIForLoading,
-    cancelMessage,
     cleanupAfterMessage,
+    cancelMessage,
     handleStreamingResponse,
     isMessageLoading
 };
