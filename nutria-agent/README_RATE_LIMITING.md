@@ -1,4 +1,7 @@
+# Nutria Agent – Documentation
 # Rate Limiting Configuration 🛡️
+
+Ce document décrit la configuration de la limitation de débit (rate limiting) pour le projet **Nutria Agent**. Il explique comment protéger l'application contre les abus et les attaques, et détaille les paramètres utilisés dans ce projet.
 
 Ce document explique la configuration de rate limiting (limitation de débit) mise en place pour protéger l'application contre les abus et les attaques.
 

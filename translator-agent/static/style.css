@@ -43,6 +43,17 @@
 /* App Name in Initial Loading Overlay */
 .app-name {
     font-size: 2rem;
+    /* =====================================================================
+        Translator Agent - Main Stylesheet
+        ---------------------------------------------------------------------
+        This file contains all global and component-level CSS for the Translator Agent web UI.
+        - Layout, typography, and color themes
+        - Loading overlays, chat UI, agent selector, translation controls
+        - Responsive and mobile adjustments
+        - Utility classes and animations
+        ---------------------------------------------------------------------
+        Last updated: 2026-03-17
+        ===================================================================== */
     font-weight: 700;
     margin-bottom: 18px;
     padding-bottom: 12px;
@@ -87,12 +98,348 @@ header {
     background: #ffffff;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
     text-align: center;
+}
+.header .app-name {
+    /* App Name in Initial Loading Overlay */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    flex-shrink: 0;
+}
+/* Spinner Animation for Loading Overlay */
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+/* Loading Text Animation */
+.initial-loading-text {
+    font-size: 1.1rem;
+    font-weight: 500;
+    margin: 0;
+    animation: pulse 1.5s ease-in-out infinite;
+}
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+}
+/* =============================
+   Base Layout & Typography
+   ============================= */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+    background: #f7f7f8;
+    color: #2d3748;
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overscroll-behavior: contain;
+}
+html {
+    height: -webkit-fill-available;
+} 
+
+/* =============================
+   Header Styles
+   ============================= */
+header {
+    padding: 0.5rem;
+    border-bottom: 1px solid #e2e8f0;
+    background: #ffffff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    text-align: center;
     position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 0.75rem;
     flex-shrink: 0;
+}
+/* Gradient Title in Header */
+.header-title {
+    font-size: 1.75rem;
+    font-weight: 600;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin: 0;
+    letter-spacing: -0.5px;
+}
+/* =============================
+   Main Content Area
+   ============================= */
+.content {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+#chat-container {
+    flex: 1;
+    padding: 2rem;
+    padding-bottom: calc(2rem - 50px);
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    overflow-y: auto;
+    width: 1000px;
+    margin: 0 auto;
+}
+#chat-top-spacer {
+    display: none;
+}
+
+/* =============================
+   Footer Styles
+   ============================= */
+footer {
+    background: #ffffff;
+    border-top: 1px solid #e2e8f0;
+    flex-shrink: 0;
+}
+@media (max-width: 1000px) {
+    #chat-container {
+        width: 100%;
+        padding: 1rem;
+    }
+}
+/* =============================
+   Input Area Styles
+   ============================= */
+.input-area {
+    padding: 1rem 2rem;
+}
+/* Disabled input-area style */
+.input-area.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+    filter: grayscale(0.7);
+}
+@media (max-width: 768px) {
+    body {
+        overscroll-behavior: auto;
+        position: fixed;
+        width: 100%;
+    }
+    
+    .content {
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+}
+/* =============================
+   Menu Toggle (Sidebar)
+   ============================= */
+.menu-toggle {
+    position: absolute;
+    top: 50%;
+    left: 1rem;
+    transform: translateY(-50%);
+    z-index: 1001;
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 0;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+/* =============================
+   Menu Toggle Hover Effect
+   ============================= */
+.menu-toggle:hover {
+    background: rgba(99, 102, 241, 0.1);
+    transform: translateY(-50%) scale(1.05);
+}
+.menu-toggle span {
+    display: block;
+    width: 22px;
+    height: 2px;
+    background: #6366f1;
+    border-radius: 2px;
+    transition: all 0.3s ease;
+}
+/* =============================
+   Agent Selector (Sidebar)
+   ============================= */
+.agent-selector-container {
+    padding: 1rem 1.5rem;
+    margin-top: 0.5rem;
+    border-top: 1px solid #e2e8f0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+/* =============================
+   Translation Options Bar
+   ============================= */
+.translate-options {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 8px 2rem;
+    background: #f0f0ff;
+    border-top: 1px solid #e2e8f0;
+    font-size: 0.9rem;
+}
+/* =============================
+   Translation Result Styling
+   ============================= */
+.translation-result {
+    background: #f0fdf4;
+    border-left: 3px solid #22c55e;
+    padding: 12px 16px;
+    border-radius: 0 8px 8px 0;
+    margin-top: 8px;
+}
+@media (max-width: 768px) {
+    header {
+        flex-wrap: nowrap;
+        gap: 6px;
+        padding: 0.75rem 1rem;
+    }
+
+    .translate-options {
+        padding: 6px 0.5rem;
+        flex-wrap: nowrap;
+        gap: 4px;
+    }
+
+    .translate-options label {
+        font-size: 0.82rem;
+    }
+
+    .source-language-display {
+        padding: 6px 12px;
+        min-width: 50px;
+        font-size: 0.82rem;
+        max-width: 160px;
+
+    }
+
+    .translation-direction-btn {
+        width: 32px;
+        height: 32px;
+        margin: 0;
+        box-shadow: 0 2px 6px rgba(99, 102, 241, 0.3), 
+                    0 1px 2px rgba(0, 0, 0, 0.1);
+    }
+
+    .translation-direction-btn:active {
+        transform: scale(0.90);
+        box-shadow: 0 1px 3px rgba(99, 102, 241, 0.3);
+    }
+
+    .translation-direction-btn svg {
+        width: 16px;
+        height: 16px;
+    }
+
+    .swap-button-container {
+        margin: 0 4px;
+        gap: 2px;
+    }
+
+    .swap-wrapper {
+        margin: 0 4px;
+    }
+
+    .swap-hint {
+        font-size: 0.65rem;
+        padding: 2px 0;
+    }
+
+    .swap-hint-source {
+        padding-right: 30px;
+    }
+
+    .swap-hint-target {
+        padding-left: 30px;
+    }
+
+
+
+    .language-select {
+        font-size: 0.78rem;
+        padding: 5px 26px 5px 10px;
+        border-radius: 16px;
+        border-width: 1.5px;
+        max-width: 140px;
+        min-width: 90px;
+        flex: 1;
+    }
+}
+/* =============================
+   Sidebar Navigation
+   ============================= */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: -300px;
+    width: 300px;
+    height: 100vh;
+    background: #ffffff;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+    z-index: 1002;
+    transition: left 0.3s ease;
+    display: flex;
+    flex-direction: column;
+}
+/* =============================
+   Cookie Banner
+   ============================= */
+.cookie-banner {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #ffffff;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+    z-index: 2000;
+    padding: 1.5rem;
+    transform: translateY(100%);
+    transition: transform 0.3s ease-out;
+}
+/* ===================================
+   MOBILE KEYBOARD STATE
+   ===================================
+   Styles when mobile keyboard is visible
+*/
+body.keyboard-visible {
+    /* Prevent body scroll when keyboard is shown */
+    overflow: hidden;
+}
+body.keyboard-visible #chat-container {
+    /* Adjust chat container when keyboard appears */
+    padding-bottom: 0;
+}
+body.keyboard-visible .input-area {
+    /* Ensure input stays visible above keyboard */
+    position: sticky;
+    bottom: 0;
+    z-index: 100;
+}
+@media (max-width: 768px) {
+    body.keyboard-visible .content {
+        /* Adjust content height for mobile keyboard */
+        max-height: calc(100vh - env(safe-area-inset-bottom));
+    }
+    
+    body.keyboard-visible #chat-container {
+        /* Reduce padding when keyboard is visible */
+        padding: 1rem;
+        padding-bottom: 0;
+    }
 }
 .header-title {
     font-size: 1.75rem;

@@ -1,5 +1,7 @@
 """
-TTS Routes - Text-to-Speech endpoint
+Text-to-Speech (TTS) API Routes
+
+This module defines endpoints for converting text to speech using the OpenAI TTS API in the Nutria Agent backend.
 """
 from fastapi import APIRouter, Body, Request
 from fastapi.responses import Response, JSONResponse
@@ -12,6 +14,7 @@ router = APIRouter()
 limiter = Limiter(key_func=get_remote_address)
 
 
+
 @router.post("/api/tts")
 @limiter.limit("10/hour")  # Max 10 TTS requests per hour per IP (TTS is expensive)
 async def text_to_speech(
@@ -20,8 +23,15 @@ async def text_to_speech(
     language: str = Body("fr", embed=True)
 ):
     """
-    Convert text to speech using OpenAI TTS API.
-    Returns audio/mpeg stream.
+    Convert text to speech using the OpenAI TTS API.
+
+    Args:
+        request (Request): FastAPI request object.
+        text (str): The text to convert to speech.
+        language (str): Target language for voice selection (default: 'fr').
+
+    Returns:
+        Response: Audio/mpeg stream or error message.
     """
     try:
         client_openai = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
@@ -33,12 +43,10 @@ async def text_to_speech(
             input=text[:4096],  # TTS API limit
             response_format="mp3"
         )
-        
         # Read full audio content
         audio_bytes = b""
         for chunk in response.iter_bytes(chunk_size=4096):
             audio_bytes += chunk
-        
         return Response(
             content=audio_bytes,
             media_type="audio/mpeg",

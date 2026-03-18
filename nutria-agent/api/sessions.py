@@ -1,5 +1,7 @@
 """
-Session Management - Conversation session handling
+Session Management Utilities
+
+This module provides functions for managing conversation sessions in the Nutria Agent backend.
 """
 from datetime import datetime, timedelta
 from typing import Dict
@@ -12,7 +14,7 @@ SESSION_TIMEOUT = timedelta(hours=2)
 
 def clean_old_sessions():
     """
-    Delete expired conversation sessions.
+    Delete expired conversation sessions from the in-memory session store.
     """
     now = datetime.now()
     expired_sessions = [
@@ -25,13 +27,13 @@ def clean_old_sessions():
 
 def get_or_create_session(session_id: str = None) -> tuple[str, dict]:
     """
-    Get existing session or create new one.
-    
+    Retrieve an existing session or create a new one if not found.
+
     Args:
-        session_id: Optional session ID
-        
+        session_id (str, optional): The session ID to retrieve or create. If None, a new session is created.
+
     Returns:
-        Tuple of (session_id, session_dict)
+        tuple: (session_id, session_dict)
     """
     if not session_id:
         session_id = str(uuid.uuid4())
@@ -63,7 +65,15 @@ def get_or_create_session(session_id: str = None) -> tuple[str, dict]:
 
 
 def reset_session(session_id: str = None):
-    """Reset a conversation session"""
+    """
+    Reset a conversation session by session ID.
+
+    Args:
+        session_id (str, optional): The session ID to reset.
+
+    Returns:
+        dict: Status and message about the reset operation.
+    """
     if session_id and session_id in conversation_sessions:
         del conversation_sessions[session_id]
         return {"status": "success", "message": "Session reset"}
@@ -71,7 +81,15 @@ def reset_session(session_id: str = None):
 
 
 def get_session_info(session_id: str):
-    """Get information about a session"""
+    """
+    Get information about a conversation session.
+
+    Args:
+        session_id (str): The session ID to retrieve info for.
+
+    Returns:
+        dict: Session information (exists, message count, timestamps, etc.).
+    """
     if session_id in conversation_sessions:
         session = conversation_sessions[session_id]
         return {

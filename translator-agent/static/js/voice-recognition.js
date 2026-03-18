@@ -1,3 +1,12 @@
+/*
+====================================================
+ voice-recognition.js – Voice Recognition Module
+----------------------------------------------------
+ Handles both Web Speech API and Whisper transcription for the Translator Agent UI.
+ Provides voice input, recording, and transcription utilities for multilingual support.
+====================================================
+*/
+
 // ===================================
 // VOICE RECOGNITION MODULE
 // ===================================
@@ -5,6 +14,14 @@
 /**
  * Voice recognition module
  * Supports both Web Speech API and Whisper transcription
+ *
+ * Exports:
+ *   - initSpeechRecognition: Initialize browser speech recognition
+ *   - toggleRecording: Start/stop voice input (Web Speech or Whisper)
+ *   - stopRecording: Stop Web Speech API recording
+ *   - toggleRecognitionMethod: Switch between Whisper and Web Speech
+ *   - isRecording: Get current recording state
+ *   - useWhisper: Get current recognition method
  */
 
 // State

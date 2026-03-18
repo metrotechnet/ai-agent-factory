@@ -1,3 +1,12 @@
+/*
+====================================================
+ tts.js – Text-to-Speech Module
+----------------------------------------------------
+ Handles TTS via OpenAI API for the Translator Agent UI.
+ Provides functions to speak, stop, and manage TTS playback for chat and translation results.
+====================================================
+*/
+
 // ===================================
 // TEXT-TO-SPEECH MODULE
 // ===================================
@@ -5,6 +14,11 @@
 /**
  * Text-to-speech module
  * Handles TTS via OpenAI API
+ *
+ * Exports:
+ *   - speakText: Speak text using OpenAI TTS
+ *   - stopTTS: Stop TTS playback
+ *   - getActiveTtsButton: Get currently active TTS button
  */
 
 // State

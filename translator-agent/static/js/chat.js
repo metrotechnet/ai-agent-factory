@@ -1,3 +1,12 @@
+/*
+====================================================
+ chat.js – Chat Messaging Functionality
+----------------------------------------------------
+ Handles chat message sending, streaming responses, and message UI for the Translator Agent.
+ Provides utilities for message actions, rate limiting, and chat state management.
+====================================================
+*/
+
 // ===================================
 // CHAT MESSAGING FUNCTIONALITY
 // ===================================
@@ -5,6 +14,17 @@
 /**
  * Chat module
  * Handles message sending, streaming responses, and message UI
+ *
+ * Exports:
+ *   - sendMessage: Main send message function
+ *   - createAssistantMessage: Create assistant message with loading state
+ *   - setupMessageActions: Setup copy/share/like/TTS buttons
+ *   - addMessage: Add message to chat
+ *   - removePreviousSpacer, createBottomSpacer: Chat layout helpers
+ *   - scrollToMessageBottom: Scroll management
+ *   - prepareUIForLoading, cleanupAfterMessage: UI state helpers
+ *   - handleStreamingResponse: SSE streaming handler
+ *   - isMessageLoading: Get loading state
  */
 
 // Global state

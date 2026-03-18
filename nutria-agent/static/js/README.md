@@ -1,4 +1,7 @@
+# Nutria Agent – Documentation
 # JavaScript Modular Structure
+
+This document describes the modular JavaScript frontend structure for the **Nutria Agent** project. It explains the purpose of each module and the rationale for the architecture.
 
 ## Overview
 The frontend JavaScript code has been refactored from a single monolithic `script.js` file into a modular architecture with clear separation of concerns.

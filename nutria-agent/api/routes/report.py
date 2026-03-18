@@ -1,5 +1,7 @@
 """
-Report Routes - Endpoints for logging and reports
+Report API Routes
+
+This module defines endpoints for logging user feedback (comments, likes) and serving log files in the Nutria Agent backend.
 """
 from fastapi import APIRouter, Body, Query, Request
 from fastapi.responses import FileResponse, HTMLResponse
@@ -15,12 +17,22 @@ PROJECT_ROOT = Path(__file__).parent.parent.parent
 templates = Jinja2Templates(directory=str(PROJECT_ROOT / "templates"))
 
 
+
 @router.post("/api/add_comment")
 def add_comment_api(
     question_id: str = Body(...),
     comment: str = Body(...)
 ):
-    """Endpoint to add a comment to a question"""
+    """
+    Add a user comment to a specific question in the log.
+
+    Args:
+        question_id (str): The ID of the question to comment on.
+        comment (str): The comment text.
+
+    Returns:
+        dict: Status and message indicating success or error.
+    """
     success = add_comment_to_question(question_id, comment)
     if success:
         return {"status": "success", "message": "Comment added"}
@@ -28,18 +40,38 @@ def add_comment_api(
         return {"status": "error", "message": "Question ID not found"}
 
 
+
 @router.post("/api/like_answer")
 def like_answer(
     question_id: str = Body(...),
     like: bool = Body(...)
 ):
-    """Add or update a like/dislike vote for a question. Replaces any previous vote."""
+    """
+    Add or update a like/dislike vote for a question. Replaces any previous vote.
+
+    Args:
+        question_id (str): The ID of the question to like/dislike.
+        like (bool): True for like, False for dislike.
+
+    Returns:
+        dict: Updated like/dislike status for the question.
+    """
     return add_like_to_question(question_id, like)
 
 
 @router.get("/api/download_log")
+
+@router.get("/api/download_log")
 def download_question_log(key: str = Query(...)):
-    """Endpoint to download the questions log"""
+    """
+    Download the full questions log as a JSON file (admin access).
+
+    Args:
+        key (str): Admin key for authorization.
+
+    Returns:
+        FileResponse or dict: The log file or error message.
+    """
     if key != "dboubou363":
         return {"status": "error", "message": "Unauthorized"}
     if not QUESTION_LOG_PATH.exists():
@@ -51,9 +83,19 @@ def download_question_log(key: str = Query(...)):
     )
 
 
+
 @router.get("/log_report", response_class=HTMLResponse)
 def serve_log_report(request: Request, key: str = Query(...)):
-    """Endpoint to display the log report"""
+    """
+    Serve the HTML log report page (admin access).
+
+    Args:
+        request (Request): FastAPI request object.
+        key (str): Admin key for authorization.
+
+    Returns:
+        HTMLResponse: The rendered log report page or unauthorized message.
+    """
     # Only allow access if key is correct
     if key != "dboubou363":
         return HTMLResponse(
