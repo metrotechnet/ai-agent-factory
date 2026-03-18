@@ -22,13 +22,11 @@ load_dotenv(dotenv_path=PROJECT_ROOT / '.env')
 # Extract config values from environment variables
 GDRIVE_FOLDER_ID = os.getenv("GDRIVE_FOLDER_ID", "")
 GDRIVE_CREDENTIALS_PATH = os.getenv("GDRIVE_CREDENTIALS_PATH", "")
-AI_GATEWAY_API_KEY = os.getenv("AI_GATEWAY_API_KEY")
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+KNOWLEDGE_BASE = os.getenv("KNOWLEDGE_BASE")
 
 # Clients (initialized globally, paths determined per agent)
-client_openai = OpenAI(
-    api_key=AI_GATEWAY_API_KEY,
-    base_url="https://ai-gateway.vercel.sh/v1"
-)
+client_openai = OpenAI(api_key=OPENAI_API_KEY)
 
 def get_agent_paths(agent=None):
     """Get knowledge base paths for specific agent"""
@@ -52,7 +50,7 @@ def get_chroma_collection(agent=None):
     os.makedirs(paths['chroma_db_dir'], exist_ok=True)
     
     ef = embedding_functions.OpenAIEmbeddingFunction(
-        api_key=AI_GATEWAY_API_KEY, model_name="text-embedding-3-large"
+        api_key=OPENAI_API_KEY, model_name="text-embedding-3-large"
     )
     chroma_client = chromadb.PersistentClient(
         path=paths['chroma_db_dir'],

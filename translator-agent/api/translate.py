@@ -137,22 +137,8 @@ def translate_text_stream(text: str, target_language: str, source_language: str 
             if chunk.choices[0].delta.content:
                 yield chunk.choices[0].delta.content
                 
-    elif model_supplier == 'gemini':
-        # Gemini streaming
-        model = genai.GenerativeModel(model_name, generation_config={
-            "temperature": 0.3
-        })
-        
-        # Combine system prompt and user text for Gemini
-        combined_prompt = f"{system_prompt}\n\n{text}"
-        response = model.generate_content(combined_prompt, stream=True)
-        
-        for chunk in response:
-            text_chunk = getattr(chunk, "text", None)
-            if text_chunk:
-                yield text_chunk
     else:
-        yield f"Error: Model supplier '{model_supplier}' not supported. Use 'openai' or 'gemini'."
+        yield f"Error: Model supplier '{model_supplier}' not supported. Use 'openai'."
 
 
 def transcribe_audio_whisper(audio_bytes: bytes, filename: str = "audio.webm", language: str = None) -> str:

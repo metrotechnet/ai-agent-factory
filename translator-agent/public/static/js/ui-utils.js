@@ -1,3 +1,12 @@
+/*
+====================================================
+ ui-utils.js – UI Utilities & Interactions
+----------------------------------------------------
+ Provides UI helpers for sidebar, keyboard detection, scroll indicator,
+ mobile handling, cookie consent, and legal/privacy popups in the Translator Agent UI.
+====================================================
+*/
+
 // ===================================
 // UI UTILITIES & INTERACTIONS
 // ===================================
@@ -5,6 +14,16 @@
 /**
  * UI utilities module
  * Handles sidebar, keyboard detection, scroll indicator, mobile handling, and popups
+ *
+ * Exports:
+ *   - isMobileDevice: Detect mobile device
+ *   - handleFocus: Focus input on desktop
+ *   - initKeyboardDetection: Mobile keyboard detection
+ *   - createScrollIndicator, updateScrollIndicator: Scroll indicator helpers
+ *   - initSidebar, closeSidebarMenu: Sidebar navigation
+ *   - initCookieConsent, checkCookieConsent: Cookie consent banner
+ *   - showLegalNotice, showPrivacyPolicy, showAbout: Popups
+ *   - initLegalLinks: Legal/privacy/about link handlers
  */
 
 // State variables

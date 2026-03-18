@@ -1,3 +1,12 @@
+/*
+====================================================
+ voice-recognition.js – Voice Recognition Module
+----------------------------------------------------
+ Handles both Web Speech API and Whisper transcription for the Translator Agent UI.
+ Provides voice input, recording, and transcription utilities for multilingual support.
+====================================================
+*/
+
 // ===================================
 // VOICE RECOGNITION MODULE
 // ===================================
@@ -5,6 +14,14 @@
 /**
  * Voice recognition module
  * Supports both Web Speech API and Whisper transcription
+ *
+ * Exports:
+ *   - initSpeechRecognition: Initialize browser speech recognition
+ *   - toggleRecording: Start/stop voice input (Web Speech or Whisper)
+ *   - stopRecording: Stop Web Speech API recording
+ *   - toggleRecognitionMethod: Switch between Whisper and Web Speech
+ *   - isRecording: Get current recording state
+ *   - useWhisper: Get current recognition method
  */
 
 // State
@@ -57,7 +74,7 @@ function initSpeechRecognition() {
     
     recognition.onstart = function() {
         isRecording = true;
-        const voiceButton = document.getElementById('voice-button');
+        const voiceButton = document.getElementById('n');
         if (voiceButton) voiceButton.classList.add('recording');
         finalTranscript = '';
         console.log('Voice recording onstart');
@@ -139,7 +156,10 @@ function stopRecording() {
     if (recognition && isRecording) {
         isRecording = false;
         const voiceButton = document.getElementById('voice-button');
-        if (voiceButton) voiceButton.classList.remove('recording');
+        if (voiceButton) {
+            voiceButton.classList.remove('recording');
+            voiceButton.disabled = false;
+        }
         recognition.stop();
         console.log('Voice recording stopped');
     }
@@ -159,6 +179,8 @@ async function initWhisperRecording() {
             inputBox.disabled = true;
         }
         if (sendButton) sendButton.disabled = true;
+
+
         
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
         whisperStream = stream;
@@ -184,6 +206,8 @@ async function initWhisperRecording() {
                 console.warn('No audio data recorded');
                 if (inputBox) inputBox.disabled = false;
                 if (sendButton) sendButton.disabled = false;
+                const voiceButton = document.getElementById('voice-button');
+                if (voiceButton) voiceButton.disabled = false;
                 return;
             }
             
@@ -195,6 +219,8 @@ async function initWhisperRecording() {
                 console.log('Audio too small, likely no speech detected');
                 if (inputBox) inputBox.disabled = false;
                 if (sendButton) sendButton.disabled = false;
+                const voiceButton = document.getElementById('voice-button');
+                if (voiceButton) voiceButton.disabled = false;
                 restorePlaceholder();
                 return;
             }
@@ -212,6 +238,8 @@ async function initWhisperRecording() {
             }
             
             await transcribeWithWhisper(audioBlob);
+            const voiceButton = document.getElementById('voice-button');
+            if (voiceButton) voiceButton.disabled = false;
             restorePlaceholder();
         };
         
@@ -269,6 +297,7 @@ async function initWhisperRecording() {
         isRecording = false;
         const voiceButton = document.getElementById('voice-button');
         if (voiceButton) voiceButton.classList.remove('recording');
+        if (voiceButton) voiceButton.disabled = false;
         
         if (maxDurationTimer) clearTimeout(maxDurationTimer);
         if (warningTimer) clearTimeout(warningTimer);
@@ -288,7 +317,8 @@ function stopWhisperRecording() {
     isRecording = false;
     const voiceButton = document.getElementById('voice-button');
     if (voiceButton) voiceButton.classList.remove('recording');
-    
+    if (voiceButton) voiceButton.disabled = true;
+
     if (mediaRecorder && mediaRecorder.state !== 'inactive') {
         mediaRecorder.stop();
         console.log('Whisper recording stopped');
@@ -380,6 +410,9 @@ async function transcribeWithWhisper(audioBlob) {
                 const sendButton = document.getElementById('send-button');
                 if (inputBox) inputBox.disabled = false;
                 if (sendButton) sendButton.disabled = false;
+                const voiceButton = document.getElementById('voice-button');
+                if (voiceButton) voiceButton.disabled = false;
+
                 return;
             }
             
@@ -394,6 +427,8 @@ async function transcribeWithWhisper(audioBlob) {
             
             const sendButton = document.getElementById('send-button');
             if (sendButton) sendButton.disabled = false;
+            const voiceButton = document.getElementById('voice-button');
+            if (voiceButton) voiceButton.disabled = false;
             
             console.log('Whisper transcription:', result.text);
             
@@ -405,8 +440,10 @@ async function transcribeWithWhisper(audioBlob) {
             console.error('Whisper transcription error:', result.error);
             const inputBox = document.getElementById('input-box');
             const sendButton = document.getElementById('send-button');
+            const voiceButton = document.getElementById('voice-button');
             if (inputBox) inputBox.disabled = false;
             if (sendButton) sendButton.disabled = false;
+            if (voiceButton) voiceButton.disabled = false;
         }
         
     } catch (error) {
@@ -418,8 +455,10 @@ async function transcribeWithWhisper(audioBlob) {
         
         const inputBox = document.getElementById('input-box');
         const sendButton = document.getElementById('send-button');
+        const voiceButton = document.getElementById('voice-button');
         if (inputBox) inputBox.disabled = false;
         if (sendButton) sendButton.disabled = false;
+        if (voiceButton) voiceButton.disabled = false;
     }
 }
 

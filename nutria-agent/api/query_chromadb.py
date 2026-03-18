@@ -1,13 +1,12 @@
 import os
 import json
 import re
+import random
 from pathlib import Path
 from dotenv import load_dotenv
+import requests
 from openai import OpenAI
-import chromadb
-from chromadb.config import Settings
-import google.generativeai as genai
-from core.refusal_engine import validate_user_query
+from api.refusal_engine import validate_user_query
 
 # Get project root directory
 PROJECT_ROOT = Path(__file__).parent.parent
@@ -16,9 +15,13 @@ load_dotenv(dotenv_path=PROJECT_ROOT / '.env')
 # Initialize ChromaDB client (local storage)
 chroma_client = None
 collection = None
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 
+# Initialize Vercel AI Gateway client (OpenAI-compatible)
+# See https://vercel.com/docs/ai-gateway/sdks-and-apis/openai-chat-completions
+client = OpenAI(
+    api_key=os.getenv("AI_GATEWAY_API_KEY"),
+    base_url="https://ai-gateway.vercel.sh/v1"
+)
 
 
 def load_style_guides():
@@ -64,7 +67,6 @@ def load_prompts(kb_name=None):
     try:
         kb_path = PROJECT_ROOT / "knowledge-base" / "agent"
         prompts_path = kb_path / 'prompts.json'
-            
         with open(prompts_path, 'r', encoding='utf-8') as f:
             return json.load(f)
     except Exception as e:
@@ -129,46 +131,17 @@ def build_prompt_from_template(language, context, question, history_text="", age
     
     return prompt, model_config
 
-def get_collection(kb_name=None):
-    """
-    Get or create ChromaDB collection for the specified knowledge base
+def query_chromadb(data=None):
+
+    try:
+        chromadb_url = os.getenv("CHROMADB_CENTRAL_URL")
+        url = f"{chromadb_url}/nutria/query"
+        resp = requests.post(url, json=data, timeout=30)
+        return resp.json()
+    except Exception as e:
+        return {"error": f"Failed to query central ChromaDB: {str(e)}"}
     
-    Args:
-        kb_name: Name of the knowledge base (default: from "agent" env var)
-    """
-    global chroma_client, collection
-    
-    if kb_name is None:
-        kb_name = "agent"
-    
-    if collection is None:
-        try:
-            kb_path = PROJECT_ROOT / "knowledge-base" / kb_name
-            chroma_path = str(kb_path / "chroma_db")
-            
-            if not os.path.exists(chroma_path):
-                return None
-            
-            # Create ChromaDB client with optimized settings for Cloud Run
-            chroma_client = chromadb.PersistentClient(
-                path=chroma_path,
-                settings=Settings(
-                    anonymized_telemetry=False,
-                    allow_reset=False
-                )
-            )
-            
-            # Get collection (will create if doesn't exist)
-            try:
-                collection = chroma_client.get_collection(name="gdrive_documents")
-            except:
-                collection = chroma_client.create_collection(
-                    name="gdrive_documents"
-                )
-                
-        except Exception as e:
-            return None
-    return collection
+
 
 def is_substantial_question(question):
     """
@@ -236,25 +209,7 @@ def get_links_from_contexts(contexts, metadatas=None, agent=None):
     # Priority 2: Fallback - check the matched chunks text themselves
     for doc in contexts:
         links.update(extract_pmids_from_text(doc))
-    
-    # Priority 3: If still no links and metadatas available, look up chunk_0
-    if not links and metadatas:
-        col = get_collection(kb_name=agent)
-        if col:
-            sources = set()
-            for meta in metadatas:
-                if isinstance(meta, dict) and 'source' in meta:
-                    sources.add(meta['source'])
-            chunk0_ids = [src + '_chunk0' for src in sources]
-            if chunk0_ids:
-                try:
-                    results = col.get(ids=chunk0_ids, include=['documents'])
-                    for doc in results.get('documents', []):
-                        if doc:
-                            links.update(extract_pmids_from_text(doc))
-                except Exception as e:
-                    print(f'Error fetching chunk_0 for links: {e}')
-    
+     
     return list(links)
 
 def ask_question_stream(question, language="fr", timezone="UTC", locale="fr-FR", top_k=5, conversation_history=None, session=None, question_id=None, agent=None):
@@ -284,10 +239,6 @@ def ask_question_stream(question, language="fr", timezone="UTC", locale="fr-FR",
         yield refusal_result["answer"]
         return
 
-    col = get_collection()
-    if col is None:
-        yield "Error: ChromaDB collection is not available. Please run 'python index_chromadb.py' first to index your documents."
-        return
 
     try:
         # Get embedding for the question
@@ -297,11 +248,15 @@ def ask_question_stream(question, language="fr", timezone="UTC", locale="fr-FR",
         ).data[0].embedding
 
         # Query ChromaDB
-        results = col.query(
-            query_embeddings=[query_emb],
-            n_results=top_k,
-            include=['documents', 'metadatas']
-        )
+        query_params = {
+            "query_embedding": query_emb,
+            "n_results": top_k,
+            "include": ['documents', 'metadatas']
+        }
+            
+        # Ensure query_params is JSON serializable
+        query_params = json.loads(json.dumps(query_params, default=str))
+        results = query_chromadb(query_params)
 
         if not results['documents'] or not results['documents'][0]:
             yield "No relevant information found. Please make sure you have indexed some transcripts."
@@ -333,54 +288,29 @@ def ask_question_stream(question, language="fr", timezone="UTC", locale="fr-FR",
             yield "Error: Unable to load prompt template."
             return
 
-        # Get streaming response from configured LLM
-        model_name = model_config.get('name', 'gpt-4o-mini')
-        model_supplier = model_config.get('supplier', 'openai')
+        # Get streaming response from Vercel AI Gateway
+        model_name = model_config.get('name', 'openai/gpt-4o-mini')
         
-        if model_supplier == 'openai':
-            # OpenAI streaming
-            stream = client.chat.completions.create(
-                model=model_name,
-                messages=[
-                    {"role": "user", "content": prompt}
-                ],
-                temperature=0.7,
-                stream=True
-            )
-
-            first_chunk = True
-            answer = ""
-            for chunk in stream:
-                if chunk.choices[0].delta.content is not None:
-                    content = chunk.choices[0].delta.content
-                    # Strip leading whitespace from first chunk only
-                    if first_chunk:
-                        content = content.lstrip()
-                        first_chunk = False
-                    if content:
-                        answer += content
-                        yield content
-                        
-        elif model_supplier == 'gemini':
-            # Gemini streaming
-            model = genai.GenerativeModel(model_name, generation_config={
-                "temperature": 0.7
-            })
-            
-            response = model.generate_content(prompt, stream=True)
-            
-            first_chunk = True
-            for chunk in response:
-                text = getattr(chunk, "text", None)
-                if text:
-                    if first_chunk:
-                        text = text.lstrip()
-                        first_chunk = False
-                    if text:
-                        yield text
-        else:
-            yield f"Error: Model supplier '{model_supplier}' not supported. Use 'openai' or 'gemini'."
-            return
+        stream = client.chat.completions.create(
+            model=model_name,
+            messages=[
+                {"role": "user", "content": prompt}
+            ],
+            temperature=1.0,
+            stream=True
+        )
+        first_chunk = True
+        answer = ""
+        for chunk in stream:
+            if chunk.choices[0].delta.content is not None:
+                content = chunk.choices[0].delta.content
+                # Strip leading whitespace from first chunk only
+                if first_chunk:
+                    content = content.lstrip()
+                    first_chunk = False
+                if content:
+                    answer += content
+                    yield content
 
     except Exception as e:
         yield f"Error processing your question: {str(e)}"

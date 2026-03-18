@@ -1,3 +1,12 @@
+/*
+====================================================
+ firebase-config.js – Firebase App Check Configuration
+----------------------------------------------------
+ Initializes Firebase App Check to protect API endpoints from unauthorized access.
+ Handles reCAPTCHA v3, debug tokens, and secure fetch for the Translator Agent UI.
+====================================================
+*/
+
 // ===================================
 // FIREBASE APP CHECK CONFIGURATION
 // ===================================
@@ -5,10 +14,16 @@
 /**
  * Firebase App Check initialization
  * Protects API endpoints from unauthorized access
- * 
+ *
  * Configuration via environment variables:
- * - FIREBASE_PROJECT_ID: Your Firebase project ID
- * - RECAPTCHA_SITE_KEY: reCAPTCHA v3 site key for App Check
+ *   - FIREBASE_PROJECT_ID: Your Firebase project ID
+ *   - RECAPTCHA_SITE_KEY: reCAPTCHA v3 site key for App Check
+ *
+ * Exports:
+ *   - initialize: Initialize Firebase App Check
+ *   - getToken: Get App Check token
+ *   - secureFetch: Fetch with App Check token
+ *   - isEnabled: Check if App Check is enabled
  */
 
 // Firebase configuration (must match your Firebase project)

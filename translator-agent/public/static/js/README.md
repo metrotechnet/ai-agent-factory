@@ -1,21 +1,58 @@
-# Translator Agent – Documentation
-# JavaScript Modular Structure
 
-This document describes the modular JavaScript frontend structure for the **Translator Agent** project (public static assets). It explains the purpose of each module and the rationale for the architecture.
+# Translator Agent – JavaScript Frontend Modules
+----------------------------------------------------
+**Modular JavaScript Architecture for Translator Agent UI**
+
+This document provides an overview of the modular JavaScript frontend structure for the **Translator Agent** project. It explains the purpose of each module, the rationale for the architecture, and onboarding notes for maintainers.
+
+---
+
 
 ## Overview
-The frontend JavaScript code has been refactored from a single monolithic `script.js` file into a modular architecture with clear separation of concerns.
+The frontend JavaScript code is organized into focused modules, each with a clear responsibility. This modular approach improves maintainability, testability, and onboarding for new contributors.
+
 
 ## Module Structure
 
-### 0. **backend-url.js** - Backend URL Configuration
-- **Purpose**: Sets `window.BACKEND_URL` for all other modules to use
-- **Features**:
-  - Auto-detects localhost:3000 → points to localhost:8080 for local dev
-  - Auto-generated during Firebase deployment with production URL from `.env`
-  - Must load first before any module that makes API calls
-- **Exports**: `window.BACKEND_URL` (string)
-- **Note**: This is a simple utility file, not a full module with exported functions
+
+### JavaScript Modules
+
+- **backend-url.js** – Backend URL Configuration
+  - Sets `window.BACKEND_URL` for all modules
+  - Auto-detects local/production backend
+  - Must load first before any API calls
+
+- **config.js** – Configuration & Internationalization
+  - Loads agent config, manages language switching, translations
+  - Exports: `window.ConfigModule`
+
+- **components.js** – Component Registry System
+  - Manages reusable UI components (language selector, input area)
+  - Exports: `window.ComponentsModule`
+
+- **ui-utils.js** – UI Utilities & Interactions
+  - Handles sidebar, keyboard detection, scroll indicator, cookie consent, popups
+  - Exports: `window.UIUtilsModule`
+
+- **chat.js** – Chat Messaging Functionality
+  - Handles message sending, streaming, and UI
+  - Exports: `window.ChatModule`
+
+- **voice-recognition.js** – Voice Input
+  - Handles Web Speech API and Whisper transcription
+  - Exports: `window.VoiceRecognitionModule`
+
+- **tts.js** – Text-to-Speech
+  - Handles TTS via OpenAI API
+  - Exports: `window.TTSModule`
+
+- **agents.js** – Agent Management
+  - Handles agent switching and translation
+  - Exports: `window.AgentsModule`
+
+- **firebase-config.js** – Firebase App Check Configuration
+  - Initializes Firebase App Check, secure fetch
+  - Exports: `window.FirebaseAppCheck`
 
 ### 1. **config.js** - Configuration & Internationalization
 - **Purpose**: Handles configuration loading and language management for single-agent setup
@@ -100,6 +137,7 @@ The frontend JavaScript code has been refactored from a single monolithic `scrip
   - Event handler setup for all buttons and inputs
   - Module initialization orchestration
 
+
 ## Load Order
 
 The modules must be loaded in this specific order to resolve dependencies:
@@ -116,12 +154,14 @@ The modules must be loaded in this specific order to resolve dependencies:
 <script src="/static/js/main.js"></script>            <!-- Main initializes everything last -->
 ```
 
+
 ## Module Communication
 
 Modules communicate via the `window` object:
 - Each module exports its public API to `window.[ModuleName]Module`
 - Modules can access other modules' functions through these exports
 - Example: `window.ConfigModule.getCurrentLanguage()`
+
 
 ## File Locations
 
@@ -135,6 +175,7 @@ Modules communicate via the `window` object:
 - **HTML**: `/public/index.html`
 - **Script paths**: `static/js/...` (no leading slash)
 
+
 ## Benefits of Modular Architecture
 
 1. **Maintainability**: Each module has a single, clear responsibility
@@ -144,6 +185,7 @@ Modules communicate via the `window` object:
 5. **Readability**: Smaller, focused files are easier to understand
 6. **Debugging**: Errors are easier to locate and fix
 7. **Collaboration**: Multiple developers can work on different modules
+
 
 ## Migration from script.js
 
@@ -160,6 +202,7 @@ The original `script.js` (~2500 lines) has been split into 9 focused modules:
 
 **Total**: ~2365 lines (similar to original, but much better organized)
 
+
 ## Future Enhancements
 
 Potential future modules:
@@ -169,6 +212,7 @@ Potential future modules:
 - `api.js` - Centralized API call management
 - `markdown.js` - Markdown rendering utilities
 - `validation.js` - Input validation helpers
+
 
 ## Notes
 

@@ -1,3 +1,12 @@
+/*
+====================================================
+ config.js – Configuration & Internationalization
+----------------------------------------------------
+ Handles config loading, language switching, and translations for the Translator Agent UI.
+ Provides functions for loading agent config, applying translations, and managing language state.
+====================================================
+*/
+
 // ===================================
 // CONFIGURATION & INTERNATIONALIZATION
 // ===================================
@@ -5,6 +14,15 @@
 /**
  * Configuration and internationalization module
  * Handles config loading, language switching, and translations
+ *
+ * Exports:
+ *   - loadConfig: Load agent configuration
+ *   - applyConfig: Apply translations to DOM
+ *   - populateSuggestionCards: Render suggestion cards
+ *   - switchLanguage: Change interface language
+ *   - t: Get translation for a key
+ *   - getCurrentLanguage: Get current language
+ *   - getMainConfig: Get loaded config object
  */
 
 // Backend URL - can be overridden by window.BACKEND_URL from config.js

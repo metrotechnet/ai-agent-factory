@@ -12,7 +12,7 @@ from slowapi.util import get_remote_address
 from api.models import QueryRequest
 from api.sessions import get_or_create_session, is_session_rate_limited
 from api.logging import save_question_response, contains_medical_disclaimer
-from core.query_chromadb import ask_question_stream
+from api.query_chromadb import ask_question_stream
 
 router = APIRouter()
 limiter = Limiter(key_func=get_remote_address)

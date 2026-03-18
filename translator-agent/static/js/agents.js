@@ -1,3 +1,12 @@
+/*
+====================================================
+ agents.js – Agents Module
+----------------------------------------------------
+ Handles agent switching, translation, and agent-specific UI for the Translator Agent.
+ Provides functions for translation direction, agent intro, and component rendering.
+====================================================
+*/
+
 // ===================================
 // AGENTS MODULE
 // ===================================
@@ -5,6 +14,13 @@
 /**
  * Agents module
  * Handles agent switching and translation
+ *
+ * Exports:
+ *   - sendTranslation: Main translation handler
+ *   - isTranslationReversed: Get translation direction state
+ *   - updateAgentSelectorLabels: Update agent selector UI
+ *   - updateSourceLanguageDisplay: Swap source/target languages
+ *   - getCurrentAgent: Return current agent (single-agent setup)
  */
 
 

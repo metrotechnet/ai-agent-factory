@@ -1,6 +1,12 @@
 """
-Agent Routes - Agent configuration endpoints
+====================================================
+ config.py – Agent Configuration Endpoints (Routes)
+----------------------------------------------------
+ Provides endpoints for retrieving agent configuration and debugging file listings.
+ Used for frontend config loading and developer diagnostics.
+====================================================
 """
+
 from fastapi import APIRouter, Query
 from typing import Optional
 import os
@@ -15,9 +21,7 @@ router = APIRouter()
 def get_config_endpoint():
     """
     Get configuration for single-agent deployment.
-    
-    Returns:
-        Configuration dictionary 
+    Returns the merged configuration dictionary for the agent.
     """
     return get_config()
 
@@ -26,16 +30,16 @@ def get_config_endpoint():
 def list_files_endpoint(path: str = "/app"):
     """
     Debug endpoint to list files in a directory.
-    Only works if path exists.
+    Only works if path exists. Used for developer diagnostics.
     """
     try:
         target_path = Path(path)
         if not target_path.exists():
             return {"error": f"Path does not exist: {path}"}
-        
+
         files = []
         dirs = []
-        
+
         for item in target_path.iterdir():
             if item.is_file():
                 files.append({
@@ -48,7 +52,7 @@ def list_files_endpoint(path: str = "/app"):
                     "name": item.name,
                     "path": str(item)
                 })
-        
+
         return {
             "path": str(target_path),
             "exists": True,

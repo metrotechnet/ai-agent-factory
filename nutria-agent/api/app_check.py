@@ -4,7 +4,8 @@ router = APIRouter()
 
 """
 Firebase App Check Middleware
-Verifies App Check tokens to ensure requests come from legitimate app instances
+
+This module provides middleware and utilities to verify App Check tokens and ensure requests come from legitimate app instances in the Nutria Agent backend.
 """
 
 from fastapi import Request
@@ -47,10 +48,17 @@ EXEMPT_PATHS = [
 
 async def verify_app_check_middleware(request: Request, call_next):
     """
-    Middleware to verify Firebase App Check tokens
-    
-    Only applied to API routes, not static files or templates
-    Can be disabled via APP_CHECK_ENABLED environment variable
+    Middleware to verify Firebase App Check tokens for protected API routes.
+
+    Only applied to API routes, not static files or templates.
+    Can be disabled via APP_CHECK_ENABLED environment variable.
+
+    Args:
+        request (Request): FastAPI request object.
+        call_next (callable): The next middleware or route handler.
+
+    Returns:
+        Response: The response from the next handler or an error if verification fails.
     """
     
     # Debug trace: Entry

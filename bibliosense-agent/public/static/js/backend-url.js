@@ -1,1 +1,1 @@
-window.BACKEND_URL = 'https://imx-bibliosense-206155864266.us-east4.run.app'; 
+window.BACKEND_URL = 'https://imx-bibliosense-r7ud57ydna-uk.a.run.app'; 

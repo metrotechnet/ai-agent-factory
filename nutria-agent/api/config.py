@@ -1,5 +1,7 @@
 """
-Configuration Management - Configuration loading and merging
+Configuration Management Utilities
+
+This module provides functions for loading and merging configuration files in the Nutria Agent backend.
 """
 from pathlib import Path
 import json
@@ -14,13 +16,13 @@ def deep_merge(base_config: dict, override_config: dict) -> dict:
     """
     Deep merge two configuration dictionaries.
     Override values take precedence over base values.
-    
+
     Args:
-        base_config: Base configuration dictionary
-        override_config: Override configuration dictionary
-        
+        base_config (dict): Base configuration dictionary.
+        override_config (dict): Override configuration dictionary.
+
     Returns:
-        Merged configuration dictionary
+        dict: Merged configuration dictionary.
     """
     result = base_config.copy()
     
@@ -40,9 +42,9 @@ def get_config():
     Get configuration for single-agent deployment.
     Merges common config with agent-specific config.
     Agent config takes precedence over common config.
-    
+
     Returns:
-        Configuration dictionary for agent
+        dict: Configuration dictionary for the agent.
     """
     try:
         # Get knowledge base from environment variable or use default

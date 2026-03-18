@@ -1,5 +1,7 @@
 """
-Logging - Question and response logging with comments and likes
+Logging Utilities
+
+This module provides functions for logging questions, responses, comments, and likes in the Nutria Agent backend.
 """
 from pathlib import Path
 from datetime import datetime
@@ -13,8 +15,14 @@ question_log_lock = threading.Lock()
 
 def contains_medical_disclaimer(response_text):
     """
-    Detect if response contains phrases suggesting to consult a professional.
-    Returns True if response doesn't deserve links (medical disclaimer present).
+    Detect if a response contains phrases suggesting to consult a professional.
+    Returns True if a medical disclaimer is present (no links should be shown).
+
+    Args:
+        response_text (str): The response text to check.
+
+    Returns:
+        bool: True if a disclaimer is present, False otherwise.
     """
     if not response_text:
         return False
@@ -74,6 +82,11 @@ def contains_medical_disclaimer(response_text):
 def save_question_response(question_id, question, response):
     """
     Save a question and its response to the log file.
+
+    Args:
+        question_id (str): The unique ID of the question.
+        question (str): The question text.
+        response (str): The agent's response.
     """
     entry = {
         "question_id": question_id,

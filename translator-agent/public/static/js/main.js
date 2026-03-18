@@ -1,3 +1,12 @@
+/*
+====================================================
+ main.js – Main Initialization & Event Handlers
+----------------------------------------------------
+ Entry point for the Translator Agent UI. Initializes all modules,
+ sets up event handlers, and manages backend warmup and UI state.
+====================================================
+*/
+
 // ===================================
 // MAIN INITIALIZATION & EVENT HANDLERS
 // ===================================
@@ -5,6 +14,11 @@
 /**
  * Main module
  * Initializes the application and sets up event handlers
+ *
+ * Responsibilities:
+ *   - Warm up backend to avoid cold start
+ *   - Initialize all modules and UI components
+ *   - Set up event handlers for input, buttons, language selector, etc.
  */
 /**
  * Warm up the backend to avoid cold start delay on first user query

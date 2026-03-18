@@ -7,7 +7,7 @@ from fastapi import APIRouter, Request, Query
 from datetime import datetime
 from typing import Optional
 
-from core.update_gdrive import run_pipeline
+from api.update_gdrive import run_pipeline
 
 router = APIRouter()
 

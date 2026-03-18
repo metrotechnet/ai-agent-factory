@@ -191,7 +191,7 @@ This will process files from the specified knowledge base folder, creating a vec
 
 ```powershell
 # Download, transcribe, and index content from Google Drive
-python -c "from core.update_gdrive import run_pipeline; run_pipeline()"
+python -c "from api.update_gdrive import run_pipeline; run_pipeline()"
 ```
 
 Or via API:

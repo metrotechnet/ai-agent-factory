@@ -3,12 +3,15 @@
 // ===================================
 
 /**
- * Main module
- * Initializes the application and sets up event handlers
+ * Main entry point for the application.
+ * Handles backend warmup, UI initialization, and event binding.
+ * All logic is organized in clear sections for maintainability.
  */
 
 /**
- * Warm up the backend to avoid cold start delay on first user query
+ * Attempts to warm up the backend server to avoid cold start delays.
+ * Shows a loading overlay while trying to reach the backend health endpoint.
+ * If the backend is unreachable, displays an error message to the user.
  */
 async function warmupBackend() {
     const overlay = document.getElementById('initial-loading-overlay');
@@ -59,7 +62,7 @@ async function warmupBackend() {
             }
         }, 500);
     }
-    
+
     // Show error message if connection failed
     if (!connectionSucceeded) {
         setTimeout(() => {
@@ -68,7 +71,7 @@ async function warmupBackend() {
                 const errorDiv = document.createElement('div');
                 errorDiv.style.cssText = 'color: #d32f2f; padding: 1rem; background: #ffebee; border-radius: 8px; border-left: 4px solid #d32f2f; margin: 1rem 0; max-width: 600px;';
                 errorDiv.innerHTML = '<strong>⚠️ Erreur de connexion au serveur</strong><br><small style="color: #c62828;">Le serveur n\'a pas pu être atteint. Veuillez rafraîchir la page ou réessayer plus tard.</small>';
-                
+
                 // Insert after the disclaimer paragraph
                 const disclaimer = emptyState.querySelector('p strong[data-i18n="intro.disclaimer"]');
                 if (disclaimer && disclaimer.parentElement) {
@@ -77,12 +80,17 @@ async function warmupBackend() {
                     emptyState.appendChild(errorDiv);
                 }
             }
-            
+
         }, 600); // Wait for overlay fade out
     }
 }
+
+// =============================
+// DOMContentLoaded: App Startup
+// =============================
 /**
- * Initialize all modules and event handlers
+ * Initializes all modules and event handlers after DOM is ready.
+ * Loads agent config, sets up UI, and binds all interactive elements.
  */
 document.addEventListener('DOMContentLoaded', async function() {
     // Warm up backend before initializing UI
@@ -106,25 +114,28 @@ document.addEventListener('DOMContentLoaded', async function() {
     
 
     
-    // Load  agent directly (single-agent setup)
+
+    // =============================
+    // AGENT CONFIG & UI RENDERING
+    // =============================
+    // Load agent config (single-agent setup)
     await loadConfig();
-    
+
     // Display agent intro (creates library selector dynamically)
     const { displayAgentIntro } = window.AgentsModule;
     if (displayAgentIntro) displayAgentIntro();
-    
-    // Render initial components
+
+    // Render initial components based on language config
     const mainConfig = getMainConfig();
     const langData = mainConfig[getCurrentLanguage()] || mainConfig['fr'];
-    
-    // Render agent components
+
+    // Render agent components (language selector, input area)
     if (langData.components) {
         if (langData.components.languageSelector) {
             componentRegistry.languageSelector.render(langData.components.languageSelector);
         } else {
             componentRegistry.languageSelector.hide();
         }
-        
         if (langData.components.inputArea) {
             componentRegistry.inputArea.render(langData.components.inputArea);
         } else if (langData.input) {
@@ -138,28 +149,30 @@ document.addEventListener('DOMContentLoaded', async function() {
     }
 
     populateSuggestionCards(getCurrentLanguage());
-    
-    // Initialize UI components
+
+    // =============================
+    // UI COMPONENT INITIALIZATION
+    // =============================
     initSidebar();
     initCookieConsent();
     initLegalLinks();
     initSpeechRecognition();
-    
-    // Create scroll indicator
+
+    // Create scroll indicator for chat
     const scrollIndicator = createScrollIndicator();
     if (chatContainer && scrollIndicator) {
         chatContainer.addEventListener('scroll', updateScrollIndicator);
         updateScrollIndicator();
     }
-    
-    // Initialize mobile keyboard detection
+
+    // Mobile keyboard detection
     if (isMobileDevice()) {
         initKeyboardDetection();
     }
-    
-    // ===================================
+
+    // =============================
     // INPUT BOX EVENT HANDLERS
-    // ===================================
+    // =============================
     // Display input area when connection failed
     if (inputArea) {
         inputArea.style.display = 'block';
@@ -170,8 +183,8 @@ document.addEventListener('DOMContentLoaded', async function() {
             this.style.height = 'auto';
             this.style.height = Math.min(this.scrollHeight, 200) + 'px';
         });
-        
-        // Handle Enter key
+
+        // Handle Enter key for sending message
         inputBox.addEventListener('keydown', function(e) {
             if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
@@ -179,8 +192,8 @@ document.addEventListener('DOMContentLoaded', async function() {
                 this.blur();
             }
         });
-        
-        // Handle focus for mobile
+
+        // Handle focus for mobile (scroll into view)
         inputBox.addEventListener('focus', function() {
             setTimeout(() => {
                 try {
@@ -189,11 +202,11 @@ document.addEventListener('DOMContentLoaded', async function() {
                         block: 'nearest',
                         inline: 'nearest'
                     });
-                    
+
                     const rect = this.getBoundingClientRect();
                     const viewportHeight = window.innerHeight;
                     const estimatedKeyboardHeight = viewportHeight * 0.4;
-                    
+
                     if (rect.bottom > viewportHeight - estimatedKeyboardHeight) {
                         const scrollAmount = rect.bottom - (viewportHeight - estimatedKeyboardHeight) + 20;
                         window.scrollBy(0, scrollAmount);
@@ -204,11 +217,11 @@ document.addEventListener('DOMContentLoaded', async function() {
             }, 300);
         });
     }
-    
-    // ===================================
+
+    // =============================
     // BUTTON EVENT HANDLERS
-    // ===================================
-    
+    // =============================
+
     if (sendButton) {
         sendButton.addEventListener('click', () => {
             const isKeyboardVisible = document.activeElement === inputBox;
@@ -218,7 +231,7 @@ document.addEventListener('DOMContentLoaded', async function() {
             }
         });
     }
-    
+
     const stopButton = document.getElementById('stop-button');
     if (stopButton) {
         stopButton.addEventListener('click', () => {
@@ -229,27 +242,30 @@ document.addEventListener('DOMContentLoaded', async function() {
             }
         });
     }
-    
+
     if (voiceButton) {
         voiceButton.addEventListener('click', toggleRecording);
     }
-    
-    // ===================================
+
+    // =============================
     // LANGUAGE SELECTOR
-    // ===================================
-    
+    // =============================
+
     if (languageSelector) {
         languageSelector.addEventListener('change', function() {
             switchLanguage(this.value);
         });
     }
-    
-    // ===================================
+
+    // =============================
     // SPEECH METHOD INDICATOR
-    // ===================================
-    
+    // =============================
+
     const speechMethodIndicator = document.getElementById('speech-method-indicator');
     if (speechMethodIndicator) {
+        /**
+         * Updates the indicator to show which speech recognition method is active.
+         */
         function updateIndicator() {
             if (useWhisper()) {
                 speechMethodIndicator.textContent = '🎤 Whisper';
@@ -259,15 +275,15 @@ document.addEventListener('DOMContentLoaded', async function() {
                 speechMethodIndicator.style.background = '#2196F3';
             }
         }
-        
+
         speechMethodIndicator.addEventListener('click', () => {
             toggleRecognitionMethod();
             updateIndicator();
         });
-        
+
         updateIndicator();
     }
-    
 
+    // App ready
     console.log('Application initialized successfully');
 });

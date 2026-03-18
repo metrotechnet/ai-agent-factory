@@ -1,4 +1,7 @@
+# Nutria Agent – Documentation
 # IMX Agent Factory 🧠
+
+This is the main documentation for the **Nutria Agent** project, based on the IMX Agent Factory template. It describes the features, architecture, and usage for this specialized agent.
 
 An AI assistant platform template. Features a **Document Assistant** powered by RAG (Retrieval-Augmented Generation) over your documents, and a **Translation Agent** with speech-to-text via OpenAI Whisper. Built with FastAPI, ChromaDB, and OpenAI GPT-4o-mini.
 

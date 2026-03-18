@@ -1,15 +1,18 @@
+
 // ===================================
 // AGENTS MODULE
 // ===================================
 
 /**
  * Agents module
- * Handles agent switching and translation
+ * Handles agent switching, translation, and agent-specific UI logic.
+ * All logic is organized in clear sections for maintainability.
  */
 
 
 /**
- * Display agent intro
+ * Display agent intro section with profile, title, description, and library selector.
+ * @param {string} agent - (optional) agent name for multi-agent setups
  */
 function displayAgentIntro(agent) {
     const emptyState = document.getElementById('empty-state');
@@ -84,7 +87,8 @@ function displayAgentIntro(agent) {
 }
 
 /**
- * Render agent components
+ * Render agent components (language selector, input area, suggestions) for the current language.
+ * @param {object} langData - Language data from config
  */
 function renderAgentComponents(langData) {
     const { componentRegistry } = window.ComponentsModule;
@@ -117,7 +121,7 @@ function renderAgentComponents(langData) {
 
 
 /**
- * Update agent selector labels
+ * Update agent selector option labels based on current language.
  */
 function updateAgentSelectorLabels() {
     const agentSelector = document.getElementById('agent-selector');
@@ -137,7 +141,8 @@ function updateAgentSelectorLabels() {
 }
 
 /**
- * Send translation
+ * Send translation request to backend and update UI with streaming response.
+ * Handles UI state, error display, and auto-reverse of translation direction.
  */
 async function sendTranslation() {
     const inputBox = document.getElementById('input-box');
@@ -299,7 +304,8 @@ async function sendTranslation() {
 
 
 /**
- * Check if translation is reversed
+ * Check if translation is reversed (source/target swapped).
+ * @returns {boolean}
  */
 function isTranslationReversed() {
     const { isTranslationReversed } = window.ComponentsModule;
@@ -307,7 +313,7 @@ function isTranslationReversed() {
 }
 
 /**
- * Update source language display (swap languages)
+ * Update source language display (swap source/target languages in UI).
  */
 function updateSourceLanguageDisplay() {
     const { componentRegistry } = window.ComponentsModule || {};
@@ -319,7 +325,8 @@ function updateSourceLanguageDisplay() {
 }
 
 /**
- * Get current agent (for single-agent deployment)
+ * Get current agent (for single-agent deployment).
+ * @returns {string}
  */
 function getCurrentAgent() {
     return 'agent';

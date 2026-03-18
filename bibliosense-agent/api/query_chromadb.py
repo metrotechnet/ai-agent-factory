@@ -5,8 +5,7 @@ import random
 from pathlib import Path
 from dotenv import load_dotenv
 from openai import OpenAI
-import chromadb
-from chromadb.config import Settings
+import requests
 
 # Get project root directory
 PROJECT_ROOT = Path(__file__).parent.parent
@@ -140,67 +139,18 @@ def build_prompt_from_template(language, context, question, history_text="", age
     
     return prompt, model_config
 
-def get_collection(kb_name=None):
-    """
-    Get or create ChromaDB collection for the specified knowledge base
+
+def query_chromadb(data=None):
+
+    try:
+        chromadb_url = os.getenv("CHROMADB_CENTRAL_URL")
+        url = f"{chromadb_url}/bibliosense/query"
+        resp = requests.post(url, json=data, timeout=30)
+        return resp.json()
+    except Exception as e:
+        return {"error": f"Failed to query central ChromaDB: {str(e)}"}
     
-    Args:
-        kb_name: Name of the knowledge base (default: from "agent" env var)
-    """
-    global chroma_client, collection
-    
-    if kb_name is None:
-        kb_name = "agent"
-    
-    print(f"[get_collection] Called with kb_name: {kb_name}", flush=True)
-    print(f"[get_collection] Collection already loaded: {collection is not None}", flush=True)
-    
-    if collection is None:
-        try:
-            kb_path = PROJECT_ROOT / "knowledge-base" / kb_name
-            chroma_path = str(kb_path / "chroma_db")
-            
-            print(f"[get_collection] KB path: {kb_path}", flush=True)
-            print(f"[get_collection] Chroma path: {chroma_path}", flush=True)
-            print(f"[get_collection] Path exists: {os.path.exists(chroma_path)}", flush=True)
-            
-            if not os.path.exists(chroma_path):
-                print(f"[get_collection] ERROR: ChromaDB path does not exist!", flush=True)
-                return None
-            
-            # Create ChromaDB client with optimized settings for Cloud Run
-            print(f"[get_collection] Initializing ChromaDB client...", flush=True)
-            chroma_client = chromadb.PersistentClient(
-                path=chroma_path,
-                settings=Settings(
-                    anonymized_telemetry=False,
-                    allow_reset=False
-                )
-            )
-            print(f"[get_collection] ChromaDB client initialized", flush=True)
-            
-            # Get collection (will create if doesn't exist)
-            try:
-                print(f"[get_collection] Getting collection 'gdrive_documents'...", flush=True)
-                collection = chroma_client.get_collection(name="gdrive_documents")
-                print(f"[get_collection] Collection loaded successfully", flush=True)
-                print(f"[get_collection] Collection document count: {collection.count()}", flush=True)
-            except Exception as e:
-                print(f"[get_collection] Collection not found, creating new one. Error: {e}", flush=True)
-                collection = chroma_client.create_collection(
-                    name="gdrive_documents"
-                )
-                print(f"[get_collection] New collection created", flush=True)
-                
-        except Exception as e:
-            print(f"[get_collection] ERROR during initialization: {str(e)}", flush=True)
-            import traceback
-            traceback.print_exc()
-            return None
-    else:
-        print(f"[get_collection] Returning cached collection (count: {collection.count()})", flush=True)
-    
-    return collection
+
 
 def is_substantial_question(question):
     """
@@ -240,54 +190,6 @@ def extract_pmids_from_text(text):
     """Extrait toutes les références PMID d'un texte."""
     return re.findall(r'PMID:\s*\d+', text)
 
-def get_links_from_contexts(contexts, metadatas=None, agent=None):
-    """Extract links from contexts and metadata.
-    
-    Priority:
-    1. Check metadatas for 'links' field (new ChromaDB format)
-    2. Extract from matched chunks text (fallback)
-    3. Look up chunk_0 of source documents (last resort)
-    """
-    links = set()
-    
-    # Priority 1: Check metadatas for direct link references (new format)
-    if metadatas:
-        for meta in metadatas:
-            if isinstance(meta, dict) and 'links' in meta and meta['links']:
-                # Links are stored as comma-separated string
-                link_list = meta['links'].split(',')
-                for link in link_list:
-                    link = link.strip()
-                    if link:
-                        links.add(f"PMID: {link}")
-    
-    # If we found links in metadata, return them immediately
-    if links:
-        return list(links)
-    
-    # Priority 2: Fallback - check the matched chunks text themselves
-    for doc in contexts:
-        links.update(extract_pmids_from_text(doc))
-    
-    # Priority 3: If still no links and metadatas available, look up chunk_0
-    if not links and metadatas:
-        col = get_collection(kb_name=agent)
-        if col:
-            sources = set()
-            for meta in metadatas:
-                if isinstance(meta, dict) and 'source' in meta:
-                    sources.add(meta['source'])
-            chunk0_ids = [src + '_chunk0' for src in sources]
-            if chunk0_ids:
-                try:
-                    results = col.get(ids=chunk0_ids, include=['documents'])
-                    for doc in results.get('documents', []):
-                        if doc:
-                            links.update(extract_pmids_from_text(doc))
-                except Exception as e:
-                    print(f'Error fetching chunk_0 for links: {e}')
-    
-    return list(links)
 
 def detect_vague_question(question, language="fr"):
     """
@@ -463,10 +365,6 @@ def ask_question_stream(question, language="fr", timezone="UTC", locale="fr-FR",
                 previously_recommended.update(titles)
     
 
-    col = get_collection()
-    if col is None:
-        yield "Error: ChromaDB collection is not available. Please run 'python index_chromadb.py' first to index your documents."
-        return
 
     try:
         # Détecter si la question est trop vague et nécessite clarification
@@ -498,15 +396,18 @@ def ask_question_stream(question, language="fr", timezone="UTC", locale="fr-FR",
         # Query ChromaDB with optional library filter
         nbr_results = 500
         query_params = {
-            "query_embeddings": [query_emb],
+            "query_embedding": query_emb,
             "n_results": nbr_results,
             "include": ['documents', 'metadatas']
         }
         if where_filter:
             query_params["where"] = where_filter
+            
+        # Ensure query_params is JSON serializable
+        query_params = json.loads(json.dumps(query_params, default=str))
+        results = query_chromadb(query_params)
+        print(f"ChromaDB results: {results}")  # Debug log for ChromaDB results
         
-        results = col.query(**query_params)
-         
         if not results['documents'] or not results['documents'][0]:
             yield "No relevant information found. Please make sure you have indexed some transcripts."
             return
@@ -518,7 +419,6 @@ def ask_question_stream(question, language="fr", timezone="UTC", locale="fr-FR",
         filtered_results = []
         for doc, meta in zip(documents, metadatas_list):
             title = meta.get('titre') or meta.get('title') or ''
-            
             # Inclure les livres non recommandés dans l'historique
             if title and title not in previously_recommended:
                 filtered_results.append((doc, meta))
@@ -566,17 +466,6 @@ def ask_question_stream(question, language="fr", timezone="UTC", locale="fr-FR",
             contexts.append(context_entry)
         context = "\n\n".join(contexts)
 
-        # Extraire les liens du contexte (with source metadata lookup)
-        # Only extract links for substantial questions (not for generic/short questions)
-        links = []
-        if is_substantial_question(question):
-            links = get_links_from_contexts(contexts, metadatas=metadatas_list, agent=agent)
-        
-        # Save links in session if provided
-        if session is not None and question_id is not None:
-            if 'links' not in session:
-                session['links'] = {}
-            session['links'][question_id] = links
 
         # Build prompt using template from JSON
         prompt, model_config = build_prompt_from_template(language, context, question, history_text, agent=agent)

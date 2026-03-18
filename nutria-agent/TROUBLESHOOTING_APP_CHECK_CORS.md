@@ -1,4 +1,7 @@
+# Nutria Agent – Documentation
 # 🚨 Dépannage: Erreur CORS Firebase App Check
+
+Ce document explique comment diagnostiquer et résoudre les problèmes de CORS liés à Firebase App Check pour le projet **Nutria Agent**. Suivez ces étapes pour garantir une configuration correcte lors du déploiement ou du développement.
 
 ## Problème
 ```

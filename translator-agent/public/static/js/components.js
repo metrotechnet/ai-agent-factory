@@ -1,9 +1,23 @@
+/*
+====================================================
+ components.js – Component Registry System
+----------------------------------------------------
+ Manages reusable UI components for the Translator Agent UI.
+ Handles language selector, input area, and translation direction state.
+====================================================
+*/
+
 // ===================================
 // COMPONENT REGISTRY SYSTEM
 // ===================================
 
 /**
  * Component Registry - manages UI components for different agents
+ *
+ * Exports:
+ *   - componentRegistry: Registry of UI components (languageSelector, inputArea)
+ *   - isTranslationReversed: Get translation direction state
+ *   - setTranslationReversed: Set translation direction state
  */
 
 // Translation state
