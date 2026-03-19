@@ -86,18 +86,19 @@ echo.
 
 REM Deploy to Cloud Run
 call gcloud run deploy %GCP_SERVICE_NAME% ^
-  --image %GCP_IMAGE_NAME% ^
-  --platform managed ^
-  --region %GCP_REGION% ^
-  --allow-unauthenticated ^
-  --set-env-vars AI_GATEWAY_API_KEY=%AI_GATEWAY_API_KEY%,OPENAI_API_KEY=%OPENAI_API_KEY%,GCP_PROJECT_ID=%GCP_PROJECT%,GCP_REGION=%GCP_REGION%,GDRIVE_FOLDER_ID=%GDRIVE_FOLDER_ID%,FIREBASE_PROJECT_ID=%FIREBASE_PROJECT_ID%,ADDITIONAL_CORS_ORIGINS=%ADDITIONAL_CORS_ORIGINS%,KNOWLEDGE_BASE=%KNOWLEDGE_BASE%,CHROMADB_CENTRAL_URL=%CHROMADB_CENTRAL_URL% ^
-  --update-secrets /secrets/gdrive/credentials.json=gdrive-credentials:latest ^
-  --memory %CLOUD_RUN_MEMORY% ^
-  --timeout %CLOUD_RUN_TIMEOUT%s ^
-  --min-instances %CLOUD_RUN_MIN_INSTANCES% ^
-  --max-instances %CLOUD_RUN_MAX_INSTANCES% ^
-  --cpu 2 ^
-  --concurrency 80
+    --image %GCP_IMAGE_NAME% ^
+    --platform managed ^
+    --region %GCP_REGION% ^
+    --allow-unauthenticated ^
+    --set-env-vars AI_GATEWAY_API_KEY=%AI_GATEWAY_API_KEY%,OPENAI_API_KEY=%OPENAI_API_KEY%,GCP_PROJECT_ID=%GCP_PROJECT%,GCP_REGION=%GCP_REGION%,GDRIVE_FOLDER_ID=%GDRIVE_FOLDER_ID%,FIREBASE_PROJECT_ID=%FIREBASE_PROJECT_ID%,ADDITIONAL_CORS_ORIGINS=%ADDITIONAL_CORS_ORIGINS%,KNOWLEDGE_BASE=%KNOWLEDGE_BASE%,CHROMADB_CENTRAL_URL=%CHROMADB_CENTRAL_URL% ^
+    --update-secrets /secrets/gdrive/credentials.json=gdrive-credentials:latest ^
+    --memory %CLOUD_RUN_MEMORY% ^
+    --timeout %CLOUD_RUN_TIMEOUT%s ^
+    --min-instances %CLOUD_RUN_MIN_INSTANCES% ^
+    --max-instances %CLOUD_RUN_MAX_INSTANCES% ^
+    --cpu 2 ^
+    --concurrency 80 ^
+    --execution-environment gen1
 
 if !ERRORLEVEL! NEQ 0 (
     echo.

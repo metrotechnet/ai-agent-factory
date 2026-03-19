@@ -96,8 +96,10 @@ call gcloud run deploy %GCP_SERVICE_NAME% ^
   --timeout %CLOUD_RUN_TIMEOUT%s ^
   --min-instances %CLOUD_RUN_MIN_INSTANCES% ^
   --max-instances %CLOUD_RUN_MAX_INSTANCES% ^
-  --cpu 1
-
+  --cpu 2 ^
+  --concurrency 80 ^
+  --execution-environment gen1
+  
 if !ERRORLEVEL! NEQ 0 (
     echo.
     echo ERROR: Cloud Run deployment failed with exit code !ERRORLEVEL!
