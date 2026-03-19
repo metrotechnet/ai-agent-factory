@@ -114,22 +114,17 @@
                         id="input-box" 
                         class="input-box" 
                         placeholder="Pose-moi une question..." 
-                        data-i18n-placeholder="input.placeholder"
+                        data-i18n-placeholder="components.inputArea.placeholder"
                         rows="1"
                     ></textarea>
                     <div class="input-buttons">
-                        <button id="voice-button" class="voice-button" title="Enregistrer un message vocal" data-i18n-title="input.voiceButton">
-                            <svg viewBox="0 0 24 24">
-                                <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/>
-                                <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
-                            </svg>
-                        </button>
-                        <button id="send-button" class="send-button bi bi-send" style="color: white;" title="" data-i18n-title="input.sendButton"> </button>
-                        <button id="stop-button" class="send-button bi bi-stop-fill" style="color: white; display: none;" title="Cancel" data-i18n-title="input.stopButton"> </button>
+                        <button id="voice-button" class="voice-button bi bi-mic-fill" style="color: white;" title="Enregistrer un message vocal" data-i18n-title="components.inputArea.voiceButton"></button>
+                        <button id="send-button" class="send-button bi bi-send" style="color: white;" title="" data-i18n-title="components.inputArea.sendButton"> </button>
+                        <button id="stop-button" class="send-button bi bi-stop-fill" style="color: white; display: none;" title="Cancel" data-i18n-title="components.inputArea.stopButton"> </button>
                     </div>
                 </div>
                 <div class="input-disclaimer">
-                    <span data-i18n="input.disclaimer">⚠️ Peut contenir des erreurs. Ne remplace pas un avis professionnel.</span>
+                    <span data-i18n="components.inputArea.disclaimer">⚠️ Peut contenir des erreurs. Ne remplace pas un avis professionnel.</span>
                     <span id="speech-method-indicator" style="margin-left: 10px; padding: 2px 8px; background: #4CAF50; color: white; border-radius: 12px; font-size: 0.75em; cursor: pointer;" title="Click to toggle recognition method">
                         🎤 Whisper
                     </span>

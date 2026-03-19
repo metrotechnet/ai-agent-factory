@@ -31,6 +31,8 @@ for /f "usebackq eol=# tokens=1* delims==" %%a in (.env) do (
     if "%%a"=="ADDITIONAL_CORS_ORIGINS" set "ADDITIONAL_CORS_ORIGINS=%%b"
     if "%%a"=="KNOWLEDGE_BASE" set "KNOWLEDGE_BASE=%%b"
     if "%%a"=="CHROMADB_CENTRAL_URL" set "CHROMADB_CENTRAL_URL=%%b"
+    if "%%a"=="CLOUD_RUN_CPU" set "CLOUD_RUN_CPU=%%b"
+
 
 )
 
@@ -96,8 +98,8 @@ call gcloud run deploy %GCP_SERVICE_NAME% ^
   --timeout %CLOUD_RUN_TIMEOUT%s ^
   --min-instances %CLOUD_RUN_MIN_INSTANCES% ^
   --max-instances %CLOUD_RUN_MAX_INSTANCES% ^
-  --cpu 2 ^
-  --concurrency 80   ^ 
+  --cpu %CLOUD_RUN_CPU% ^
+  --concurrency 80 ^
   --execution-environment gen1
 
 
