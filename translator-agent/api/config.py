@@ -68,10 +68,10 @@ def get_config():
             return common_config
         
         # Provide detailed error with debugging info
-        kb_dir = PROJECT_ROOT / "knowledge-base"
-        available_kbs = []
-        if kb_dir.exists():
-            available_kbs = [d.name for d in kb_dir.iterdir() if d.is_dir()]
+        config_dir = PROJECT_ROOT / "config"
+        available_configs = []
+        if config_dir.exists():
+            available_configs = [d.name for d in config_dir.iterdir() if d.is_dir()]
         
         return {
             "error": f"config not found at {agent_config_path}",
@@ -79,8 +79,7 @@ def get_config():
                 "project_root": str(PROJECT_ROOT),
                 "config_path": str(agent_config_path),
                 "common_config_path": str(common_config_path),
-                "kb_dir_exists": kb_dir.exists(),
-                "available_knowledge_bases": available_kbs
+                "available_configs": available_configs
             }
         }
         
