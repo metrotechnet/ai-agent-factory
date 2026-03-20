@@ -59,13 +59,13 @@ def load_system_prompts():
 
 def load_prompts(kb_name=None):
     """
-    Load prompts from JSON file in the knowledge base folder (single-agent setup)
+    Load prompts from JSON file in the config folder (single-agent setup)
     
     Args:
         kb_name: Ignored for single-agent setup
     """
     try:
-        kb_path = PROJECT_ROOT / "knowledge-base" / "agent"
+        kb_path = PROJECT_ROOT / "config"
         prompts_path = kb_path / 'prompts.json'
             
         with open(prompts_path, 'r', encoding='utf-8') as f:

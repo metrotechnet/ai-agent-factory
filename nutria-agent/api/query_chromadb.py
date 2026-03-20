@@ -65,7 +65,7 @@ def load_prompts(kb_name=None):
         kb_name: Ignored for single-agent setup
     """
     try:
-        kb_path = PROJECT_ROOT / "knowledge-base" / "agent"
+        kb_path = PROJECT_ROOT / "config"
         prompts_path = kb_path / 'prompts.json'
         with open(prompts_path, 'r', encoding='utf-8') as f:
             return json.load(f)

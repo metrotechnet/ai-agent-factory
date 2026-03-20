@@ -86,12 +86,7 @@ python scripts/index_chromadb.py $Name extracted_texts
 python scripts/index_chromadb.py $Name transcripts
 ``````
 
-### Use This Knowledge Base
 
-Update `.env` file:
-``````env
-KNOWLEDGE_BASE=$Name
-``````
 
 Then restart the application.
 
@@ -116,6 +111,5 @@ Write-Host ""
 Write-Host "Next steps:" -ForegroundColor Yellow
 Write-Host "1. Add your documents to: $kbPath\extracted_texts\" -ForegroundColor White
 Write-Host "2. Index the documents: python scripts\index_chromadb.py $Name extracted_texts" -ForegroundColor White
-Write-Host "3. Update .env: KNOWLEDGE_BASE=$Name" -ForegroundColor White
 Write-Host "4. Restart the application" -ForegroundColor White
 Write-Host ""

@@ -145,11 +145,11 @@ def save_config_json(agent_dir: Path, config: dict):
     """Create config.json from configuration"""
     config_data = config.get("config", {})
     
-    config_path = agent_dir / "config.json"
+    config_path = agent_dir / "agent_config.json"
     with open(config_path, 'w', encoding='utf-8') as f:
         json.dump(config_data, f, ensure_ascii=False, indent=2)
     
-    print(f"✅ Created: config.json")
+    print(f"✅ Created: agent_config.json")
 
 
 def copy_logo(agent_dir: Path, config: dict, config_file_path: Path):

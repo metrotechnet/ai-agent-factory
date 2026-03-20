@@ -59,7 +59,7 @@ def load_translator_prompts(language: str = "en") -> tuple:
     Returns:
         tuple: (prompts dict for the specified language, model_config dict)
     """
-    prompts_path = PROJECT_ROOT / "knowledge-base" / "translator" / "prompts.json"
+    prompts_path = PROJECT_ROOT / "config" / "prompts.json"
     try:
         with open(prompts_path, 'r', encoding='utf-8') as f:
             prompts_data = json.load(f)

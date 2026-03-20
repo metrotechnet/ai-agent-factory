@@ -47,18 +47,16 @@ def get_config():
         dict: Configuration dictionary for the agent.
     """
     try:
-        # Get knowledge base from environment variable or use default
-        knowledge_base = os.getenv("KNOWLEDGE_BASE", "agent")
         
         # Load common config (base configuration)
-        common_config_path = PROJECT_ROOT / "knowledge-base" / "common" / "config.json"
+        common_config_path = PROJECT_ROOT / "config" /  "common_config.json"
         common_config = {}
         if common_config_path.exists():
             with open(common_config_path, 'r', encoding='utf-8') as f:
                 common_config = json.load(f)
         
         # Load agent-specific config (override configuration)
-        agent_config_path = PROJECT_ROOT / "knowledge-base" / knowledge_base / "config.json"
+        agent_config_path = PROJECT_ROOT / "config" / "agent_config.json"
         
         if agent_config_path.exists():
             with open(agent_config_path, 'r', encoding='utf-8') as f:
@@ -81,7 +79,6 @@ def get_config():
             "error": f"config not found at {agent_config_path}",
             "debug": {
                 "project_root": str(PROJECT_ROOT),
-                "knowledge_base": knowledge_base,
                 "config_path": str(agent_config_path),
                 "common_config_path": str(common_config_path),
                 "kb_dir_exists": kb_dir.exists(),
@@ -90,16 +87,14 @@ def get_config():
         }
         
     except FileNotFoundError:
-        knowledge_base = os.getenv("KNOWLEDGE_BASE", "agent")
-        agent_config_path = PROJECT_ROOT / "knowledge-base" / knowledge_base / "config.json"
+        agent_config_path = PROJECT_ROOT / "config" / "agent_config.json"
         return {
             "error": f"config not found at {agent_config_path}",
-            "debug": {"knowledge_base": knowledge_base}
+            "debug": {"config_path": str(agent_config_path)}
         }
     except Exception as e:
-        knowledge_base = os.getenv("KNOWLEDGE_BASE", "agent")
-        agent_config_path = PROJECT_ROOT / "knowledge-base" / knowledge_base / "config.json"
+        agent_config_path = PROJECT_ROOT / "config" / "agent_config.json"
         return {
             "error": f"Error loading config from {agent_config_path}: {str(e)}",
-            "debug": {"knowledge_base": knowledge_base}
+            "debug": {"config_path": str(agent_config_path)}
         }

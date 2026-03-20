@@ -103,7 +103,6 @@ Create a `.env` file with:
 
 ```env
 OPENAI_API_KEY=your-openai-api-key
-KNOWLEDGE_BASE=nutria               # Name of the knowledge base to use
 GCP_PROJECT_ID=your-gcp-project-id  # For Google Drive pipeline
 GCS_BUCKET_NAME=your-bucket-name
 GCS_REGION=us-east4

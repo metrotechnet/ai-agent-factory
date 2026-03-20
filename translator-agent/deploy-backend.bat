@@ -27,7 +27,6 @@ for /f "usebackq eol=# tokens=1* delims==" %%a in (.env) do (
     if "%%a"=="CLOUD_RUN_TIMEOUT" set "CLOUD_RUN_TIMEOUT=%%b"
     if "%%a"=="FIREBASE_PROJECT_ID" set "FIREBASE_PROJECT_ID=%%b"
     if "%%a"=="ADDITIONAL_CORS_ORIGINS" set "ADDITIONAL_CORS_ORIGINS=%%b"
-    if "%%a"=="KNOWLEDGE_BASE" set "KNOWLEDGE_BASE=%%b"
     if "%%a"=="AI_GATEWAY_API_KEY" set "CONFIG_AI_GATEWAY_KEY=%%b"
     if "%%a"=="CLOUD_RUN_CPU" set "CLOUD_RUN_CPU=%%b"
 
@@ -42,7 +41,6 @@ echo   Image: %GCP_IMAGE_NAME%
 echo   Memory: %CLOUD_RUN_MEMORY%
 echo   Timeout: %CLOUD_RUN_TIMEOUT%s
 echo   Firebase Project: %FIREBASE_PROJECT_ID%
-echo   Knowledge Base: %KNOWLEDGE_BASE%
 echo.
 
 REM Validate configuration
@@ -92,7 +90,7 @@ call gcloud run deploy %GCP_SERVICE_NAME% ^
   --platform managed ^
   --region %GCP_REGION% ^
   --allow-unauthenticated ^
-  --set-env-vars OPENAI_API_KEY=%OPENAI_API_KEY%,GEMINI_API_KEY=%GEMINI_API_KEY%,AI_GATEWAY_API_KEY=%AI_GATEWAY_API_KEY%,GCP_PROJECT_ID=%GCP_PROJECT%,GCP_REGION=%GCP_REGION%,GDRIVE_FOLDER_ID=%GDRIVE_FOLDER_ID%,FIREBASE_PROJECT_ID=%FIREBASE_PROJECT_ID%,ADDITIONAL_CORS_ORIGINS=%ADDITIONAL_CORS_ORIGINS%,KNOWLEDGE_BASE=%KNOWLEDGE_BASE% ^
+  --set-env-vars OPENAI_API_KEY=%OPENAI_API_KEY%,GEMINI_API_KEY=%GEMINI_API_KEY%,AI_GATEWAY_API_KEY=%AI_GATEWAY_API_KEY%,GCP_PROJECT_ID=%GCP_PROJECT%,GCP_REGION=%GCP_REGION%,GDRIVE_FOLDER_ID=%GDRIVE_FOLDER_ID%,FIREBASE_PROJECT_ID=%FIREBASE_PROJECT_ID%,ADDITIONAL_CORS_ORIGINS=%ADDITIONAL_CORS_ORIGINS% ^
   --update-secrets /secrets/gdrive/credentials.json=gdrive-credentials:latest ^
   --memory %CLOUD_RUN_MEMORY% ^
   --timeout %CLOUD_RUN_TIMEOUT%s ^

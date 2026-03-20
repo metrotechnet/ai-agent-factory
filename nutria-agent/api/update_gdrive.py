@@ -23,14 +23,13 @@ load_dotenv(dotenv_path=PROJECT_ROOT / '.env')
 GDRIVE_FOLDER_ID = os.getenv("GDRIVE_FOLDER_ID", "")
 GDRIVE_CREDENTIALS_PATH = os.getenv("GDRIVE_CREDENTIALS_PATH", "")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-KNOWLEDGE_BASE = os.getenv("KNOWLEDGE_BASE")
 
 # Clients (initialized globally, paths determined per agent)
 client_openai = OpenAI(api_key=OPENAI_API_KEY)
 
 def get_agent_paths(agent=None):
     """Get knowledge base paths for specific agent"""
-    kb_name = agent or KNOWLEDGE_BASE
+    kb_name = agent 
     kb_path = PROJECT_ROOT / "knowledge-base" / kb_name
     
     return {
@@ -290,7 +289,7 @@ def run_pipeline(limit=None, folder_id=None, agent=None):
         return {"error": "Folder ID not configured", "authenticated": True}
     
     # Get collection and paths for this agent
-    kb_name = agent or KNOWLEDGE_BASE
+    kb_name = agent 
     print(f"📦 Processing for knowledge base: {kb_name}")
     collection, paths = get_chroma_collection(agent)
     

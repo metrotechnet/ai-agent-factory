@@ -22,7 +22,6 @@ Thumbs.db
 *.old
 videos/
 transcripts/
-
-# Explicitly include knowledge-base
 !knowledge-base/
-!knowledge-base/**
+
+

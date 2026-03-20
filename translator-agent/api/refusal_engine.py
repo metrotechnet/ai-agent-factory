@@ -59,7 +59,7 @@ def load_refusal_patterns():
         return _refusal_patterns_cache
     
     try:
-        with open(PROJECT_ROOT / 'knowledge-base' / 'common' / 'refusal_patterns.json', 'r', encoding='utf-8') as f:
+        with open(PROJECT_ROOT / 'config' / 'refusal_patterns.json', 'r', encoding='utf-8') as f:
             _refusal_patterns_cache = json.load(f)
         return _refusal_patterns_cache
     except Exception as e:

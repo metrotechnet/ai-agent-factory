@@ -201,7 +201,6 @@ GCP_REGION=us-central1
 FIREBASE_PROJECT_ID=nutria-agent-prod
 
 # Application Settings
-KNOWLEDGE_BASE=agent
 CORS_ORIGINS=*
 
 # Optional: DeepL for translation

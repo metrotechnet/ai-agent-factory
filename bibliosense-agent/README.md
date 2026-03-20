@@ -162,7 +162,6 @@ Place your files in the appropriate knowledge base folder:
 - Document files (`.json`) in `knowledge-base/agent/documents/`
 - Extracted text files (`.txt`) in `knowledge-base/agent/extracted_texts/`
 
-**Note**: To use a different knowledge base (like `nutria`), set `KNOWLEDGE_BASE=nutria` in your `.env` file.
 
 ## 🛠️ Usage
 

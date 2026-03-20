@@ -1,15 +1,11 @@
 core/
-knowledge-base/agent/chroma_db/
-knowledge-base/agent/documents/
-knowledge-base/agent/extracted_texts/
-knowledge-base/agent/transcripts/
+knowledge-base/
 __pycache__/
 *.py[cod]
 .env
 .vscode/
 .idea/
 core/
-knowledge-base/agent/chroma_db/
 dist/
 build/
 .git/

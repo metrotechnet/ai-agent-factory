@@ -25,8 +25,8 @@ def generate_transcripts_json(agent_dir: Path):
     documents_dir = agent_dir / "documents"
     output_path = agent_dir / "transcripts_chromadb.json"
     
-    # Get agent ID from config.json
-    config_path = agent_dir / "config.json"
+    # Get agent ID from agent_config.json
+    config_path = agent_dir / "agent_config.json"
     agent_id = "agent"
     if config_path.exists():
         try:
@@ -34,7 +34,7 @@ def generate_transcripts_json(agent_dir: Path):
                 config = json.load(f)
                 agent_id = config.get("agent_id", "agent")
         except Exception as e:
-            print(f"⚠️  Could not read agent_id from config.json: {e}")
+            print(f"⚠️  Could not read agent_id from agent_config.json: {e}")
     
     documents = []
     doc_counter = 0

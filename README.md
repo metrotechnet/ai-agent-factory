@@ -9,7 +9,7 @@ Create a new agent in minutes using the automated setup:
 ```bash
 # 1. Create agent configuration in new-agents/ folder
 # 2. Run the creation script
-python scripts/create_agent.py new-agents/my-agent/config.json
+python scripts/create_agent.py new-agents/config/agent_config.json
 
 # 3. Deploy to Google Cloud
 cd template-agent
@@ -132,7 +132,6 @@ Key environment variables (see [template-agent/README.md](template-agent/README.
 ```bash
 OPENAI_API_KEY=sk-...           # Required for embeddings and completions
 DEEPL_API_KEY=...               # Required for translation
-KNOWLEDGE_BASE=agent            # Which knowledge base to use
 CORS_ORIGINS=*                  # Frontend URLs for CORS
 ```
 
@@ -150,7 +149,7 @@ Create your own by copying `agent-config.example.json` and customizing.
 ### Knowledge Base Structure
 
 Each agent has:
-- **config.json** - Agent name, description, personality
+- **agent_config.json** - Agent name, description, personality
 - **prompts.json** - System prompts and instructions
 - **transcripts_chromadb.json** - Vector database metadata
 - **chroma_db/** - ChromaDB vector store
