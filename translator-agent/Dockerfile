@@ -3,8 +3,6 @@ FROM python:3.11-slim
 # Configure debconf to avoid warnings
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y ffmpeg tesseract-ocr && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
@@ -13,8 +11,10 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy application files explicitly
-COPY . .
+COPY api/ api/
 COPY config/ config/
+COPY app.py .
+COPY startup.sh .
 
 # Make startup script executable
 RUN chmod +x startup.sh

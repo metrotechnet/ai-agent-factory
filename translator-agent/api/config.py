@@ -45,7 +45,13 @@ def get_config():
         Configuration dictionary for agent
     """
     try:
-        
+        #Print all config files for debugging
+        config_dir = PROJECT_ROOT / "config"
+        if config_dir.exists():
+            print(f"Config directory contents: {[d.name for d in config_dir.iterdir()]}")
+        else:
+            print(f"Config directory not found at {config_dir}")
+
         # Load common config (base configuration)
         common_config_path = PROJECT_ROOT / "config" / "common_config.json"
         common_config = {}
@@ -78,7 +84,7 @@ def get_config():
             "debug": {
                 "project_root": str(PROJECT_ROOT),
                 "config_path": str(agent_config_path),
-                "common_config_path": str(common_config_path),
+                "is_config_path": "found" if config_dir.exists() else "not found",
                 "available_configs": available_configs
             }
         }
