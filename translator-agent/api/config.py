@@ -85,6 +85,7 @@ def get_config():
                 "project_root": str(PROJECT_ROOT),
                 "config_path": str(agent_config_path),
                 "is_config_path": "found" if config_dir.exists() else "not found",
+                "is_config_path": "found" if config_dir.exists() else "not found",
                 "available_configs": available_configs
             }
         }
