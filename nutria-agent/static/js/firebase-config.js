@@ -1,3 +1,12 @@
+/*
+====================================================
+ firebase-config.js – Firebase App Check Configuration
+----------------------------------------------------
+ Initializes Firebase App Check to protect API endpoints from unauthorized access.
+ Handles reCAPTCHA v3, debug tokens, and secure fetch for the Translator Agent UI.
+====================================================
+*/
+
 // ===================================
 // FIREBASE APP CHECK CONFIGURATION
 // ===================================
@@ -5,10 +14,16 @@
 /**
  * Firebase App Check initialization
  * Protects API endpoints from unauthorized access
- * 
+ *
  * Configuration via environment variables:
- * - FIREBASE_PROJECT_ID: Your Firebase project ID
- * - RECAPTCHA_SITE_KEY: reCAPTCHA v3 site key for App Check
+ *   - FIREBASE_PROJECT_ID: Your Firebase project ID
+ *   - RECAPTCHA_SITE_KEY: reCAPTCHA v3 site key for App Check
+ *
+ * Exports:
+ *   - initialize: Initialize Firebase App Check
+ *   - getToken: Get App Check token
+ *   - secureFetch: Fetch with App Check token
+ *   - isEnabled: Check if App Check is enabled
  */
 
 // Firebase configuration (must match your Firebase project)
@@ -25,7 +40,7 @@ const firebaseConfig = {
 
 // App Check configuration
 const APP_CHECK_ENABLED = true;
-const RECAPTCHA_SITE_KEY = window.RECAPTCHA_SITE_KEY ;
+const RECAPTCHA_SITE_KEY = window.RECAPTCHA_SITE_KEY || "6LeI834sAAAAAN0tbvdmSeajxCYCj3uarepl_jSh";
 const APP_CHECK_DEBUG_TOKEN = window.APP_CHECK_DEBUG_TOKEN || ""; // Debug token for testing
 
 
@@ -53,16 +68,16 @@ async function initializeFirebaseAppCheck() {
     try {
         // Initialize Firebase
         const app = initializeApp(firebaseConfig);
-        // console.log('[App Check] Firebase initialized');
+        console.log('[App Check] Firebase initialized');
 
         // Enable debug mode for localhost (generates debug token automatically)
         const isLocalhost = location.hostname === "localhost" || location.hostname === "127.0.0.1";
         if (isLocalhost) {
             self.FIREBASE_APPCHECK_DEBUG_TOKEN = true;
-            // console.log('🔧 [App Check] Debug mode enabled for localhost');
-            // console.log('⚠️ [App Check] IMPORTANT: Look for a message like "Firebase App Check debug token:" in the console');
-            // console.log('⚠️ [App Check] Copy that token and add it to Firebase Console:');
-            // console.log('   → https://console.firebase.google.com/u/0/project/' + firebaseConfig.projectId + '/appcheck/apps');
+            console.log('🔧 [App Check] Debug mode enabled for localhost');
+            console.log('⚠️ [App Check] IMPORTANT: Look for a message like "Firebase App Check debug token:" in the console');
+            console.log('⚠️ [App Check] Copy that token and add it to Firebase Console:');
+            console.log('   → https://console.firebase.google.com/u/0/project/' + firebaseConfig.projectId + '/appcheck/apps');
         }
 
         // Check for valid reCAPTCHA key
@@ -83,10 +98,10 @@ async function initializeFirebaseAppCheck() {
             appCheckInitialized = true;
             // console.log('[App Check] ✅ Initialized with reCAPTCHA v3' + (isLocalhost ? ' (debug mode)' : ' (production mode)'));
             
-            if (!isLocalhost) {
-                // console.log('[App Check] Production mode - ensure your app is registered in Firebase Console:');
-                // console.log('   → https://console.firebase.google.com/u/0/project/' + firebaseConfig.projectId + '/appcheck');
-            }
+            // if (!isLocalhost) {
+            //     console.log('[App Check] Production mode - ensure your app is registered in Firebase Console:');
+            //     console.log('   → https://console.firebase.google.com/u/0/project/' + firebaseConfig.projectId + '/appcheck');
+            // }
         }
         else {
             console.warn('[App Check] No valid reCAPTCHA site key provided');
@@ -159,7 +174,7 @@ async function getAppCheckToken() {
             return null;
         }
 
-        console.log('[App Check] Token obtained',token.substring(0, 20) + '...');
+        // console.log('[App Check] Token obtained',token.substring(0, 20) + '...');
         return token;
 
     } catch (error) {

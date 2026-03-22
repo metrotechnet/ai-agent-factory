@@ -1,0 +1,114 @@
+{
+  "fr": {
+    "app": {
+      "title": "Bibliosense | Recommandations de livres",
+      "description": "Agent IA de recommandations de livres par IMX Multi-Agent"
+    },
+    "intro": {
+      "title": "À la recherche de votre prochaine lecture ?",
+      "description": "Partagez vos livres préférés ou vos sujets d'intérêt, et je vous recommanderai des livres disponibles dans nos collections des bibliothèques de Montréal et Québec.",
+      "disclaimer": "Note : Les recommandations sont basées sur les catalogues disponibles dans nos bases de données.",
+      "profileAlt": "Bibliosense Agent",
+      "profileImage": "/static/logos/logo-bibliosense.png"
+    },
+    "suggestions": [
+      {
+        "id": "romance",
+        "title": "💕 Romantique",
+        "description": "Romans d'amour, romance contemporaine",
+        "event": "display: Je cherche des romans romantiques",
+        "color": "#fce4ec"
+      },
+      {
+        "id": "scifi",
+        "title": "🚀 Science-fiction",
+        "description": "Futur, espace, dystopie, cyberpunk",
+        "event": "display: Recommande-moi des livres de science-fiction",
+        "color": "#e1f5fe"
+      },
+      {
+        "id": "quebecois",
+        "title": "⚜️ Livres québécois",
+        "description": "Auteurs du Québec, culture locale",
+        "event": "display: Je veux découvrir des auteurs québécois",
+        "color": "#e8f5e9"
+      },
+      {
+        "id": "thriller",
+        "title": "🕵️ Polar/Thriller",
+        "description": "Suspense, enquêtes, mystères",
+        "event": "display: J'aime les romans policiers et thrillers",
+        "color": "#f3e5f5"
+      }
+    ],
+    "components": {
+      "inputArea": {
+        "showInputOnLoad": true,
+        "placeholder": "Quel type de livre cherchez-vous ? ",
+        "sendButton": "Envoyer",
+        "voiceButton": "Enregistrer un message vocal",
+        "disclaimer": "⚠️ Recommandations basées sur les catalogues Montréal et Québec uniquement."
+      },
+      "librarySelector": {
+        "label": "Bibliothèque:",
+        "quebec": "Ville de Québec",
+        "montreal": "Ville de Montréal"
+      }
+    }
+  },
+  "en": {
+    "app": {
+      "title": "Bibliosense | Book Recommendations",
+      "description": "AI Book Recommendation Agent by IMX Multi-Agent"
+    },
+    "intro": {
+      "title": "Looking for your next read?",
+      "description": "Share your favorite books or subjects of interest, and I'll recommend books available in our Montreal and Quebec library collections.",
+      "disclaimer": "Note: Recommendations are based on catalogs available in our databases.",
+      "profileAlt": "Bibliosense Agent",
+      "profileImage": "/static/logos/logo-bibliosense.png"
+    },
+    "suggestions": [
+      {
+        "id": "romance",
+        "title": "💕 Romance",
+        "description": "Love stories, contemporary romance",
+        "event": "display: I'm looking for romance novels",
+        "color": "#fce4ec"
+      },
+      {
+        "id": "scifi",
+        "title": "🚀 Science Fiction",
+        "description": "Future, space, dystopia, cyberpunk",
+        "event": "display: Recommend me science fiction books",
+        "color": "#e1f5fe"
+      },
+      {
+        "id": "quebecois",
+        "title": "⚜️ Quebec Authors",
+        "description": "Authors from Quebec, local culture",
+        "event": "display: I want to discover Quebec authors",
+        "color": "#e8f5e9"
+      },
+      {
+        "id": "thriller",
+        "title": "🕵️ Mystery/Thriller",
+        "description": "Suspense, investigations, mysteries",
+        "event": "display: I enjoy mystery and thriller novels",
+        "color": "#f3e5f5"
+      }
+    ],
+    "components": {
+      "inputArea": {
+        "showInputOnLoad": true,
+        "placeholder": "What type of book are you looking for? ",
+        "sendButton": "Send",
+        "voiceButton": "Record voice message",
+        "disclaimer": "⚠️ Recommendations based on Montreal and Quebec catalogs only."      },
+      "librarySelector": {
+        "label": "Library:",
+        "quebec": "Quebec City",
+        "montreal": "Montreal City"      }
+    }
+  }
+}

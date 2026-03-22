@@ -2,8 +2,6 @@
 # Imports - Main application imports
 # =====================================================
 from fastapi import FastAPI, Request
-from fastapi.responses import HTMLResponse
-from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
@@ -73,9 +71,6 @@ app.add_middleware(
 # Enable by setting APP_CHECK_ENABLED=true in environment variables
 app.middleware("http")(verify_app_check_middleware)
 
-# Mount static files and templates
-app.mount("/static", StaticFiles(directory=str(PROJECT_ROOT / "static")), name="static")
-templates = Jinja2Templates(directory=str(PROJECT_ROOT / "templates"))
  
 # =====================================================
 # Include API Routes

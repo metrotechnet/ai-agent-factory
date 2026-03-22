@@ -86,9 +86,9 @@ async function initializeFirebaseAppCheck() {
                                  !RECAPTCHA_SITE_KEY.includes('YOUR_');
 
         if (hasValidRecaptcha) {
-            console.log('[App Check] Using reCAPTCHA v3 with key:', RECAPTCHA_SITE_KEY.substring(0, 20) + '...');
-            console.log('[App Check] App ID:', firebaseConfig.appId);
-            console.log('[App Check] Project ID:', firebaseConfig.projectId);
+            // console.log('[App Check] Using reCAPTCHA v3 with key:', RECAPTCHA_SITE_KEY.substring(0, 20) + '...');
+            // console.log('[App Check] App ID:', firebaseConfig.appId);
+            // console.log('[App Check] Project ID:', firebaseConfig.projectId);
             
             // ReCaptchaV3Provider automatically handles debug tokens when FIREBASE_APPCHECK_DEBUG_TOKEN is set
             appCheck = initializeAppCheck(app, {
@@ -96,12 +96,12 @@ async function initializeFirebaseAppCheck() {
                 isTokenAutoRefreshEnabled: true
             });
             appCheckInitialized = true;
-            console.log('[App Check] ✅ Initialized with reCAPTCHA v3' + (isLocalhost ? ' (debug mode)' : ' (production mode)'));
+            // console.log('[App Check] ✅ Initialized with reCAPTCHA v3' + (isLocalhost ? ' (debug mode)' : ' (production mode)'));
             
-            if (!isLocalhost) {
-                console.log('[App Check] Production mode - ensure your app is registered in Firebase Console:');
-                console.log('   → https://console.firebase.google.com/u/0/project/' + firebaseConfig.projectId + '/appcheck');
-            }
+            // if (!isLocalhost) {
+            //     console.log('[App Check] Production mode - ensure your app is registered in Firebase Console:');
+            //     console.log('   → https://console.firebase.google.com/u/0/project/' + firebaseConfig.projectId + '/appcheck');
+            // }
         }
         else {
             console.warn('[App Check] No valid reCAPTCHA site key provided');
@@ -174,7 +174,7 @@ async function getAppCheckToken() {
             return null;
         }
 
-        console.log('[App Check] Token obtained',token.substring(0, 20) + '...');
+        // console.log('[App Check] Token obtained',token.substring(0, 20) + '...');
         return token;
 
     } catch (error) {

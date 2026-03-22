@@ -52,7 +52,7 @@ def load_style_guides():
 def load_system_prompts():
     """Load system prompts from JSON file"""
     try:
-        with open(PROJECT_ROOT / 'config' / 'system_prompts.json', 'r', encoding='utf-8') as f:
+        with open(PROJECT_ROOT / 'api/config' / 'system_prompts.json', 'r', encoding='utf-8') as f:
             return json.load(f)
     except Exception as e:
         return {}

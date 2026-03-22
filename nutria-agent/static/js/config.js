@@ -38,8 +38,6 @@ async function loadConfig(agent) {
             return;
         }
         
-        console.log('Config loaded:', mainConfig);
-
         // Language detection priority: URL parameter > browser language > stored preference
         const urlLang = getUrlParameter('lang');
         const browserLang = navigator.language || navigator.userLanguage;
