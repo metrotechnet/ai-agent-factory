@@ -11,7 +11,7 @@ from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
 
 # Import route modules
-from api.routes import query, translation, tts, report, config as config_routes, sessions, update
+from api.routes import query, translation, tts, report, config as config_routes, sessions
 from api.app_check import verify_app_check_middleware
 
 # =====================================================
@@ -84,7 +84,6 @@ app.include_router(tts.router, tags=["tts"])
 app.include_router(report.router, tags=["report"])
 app.include_router(config_routes.router, tags=["config"])
 app.include_router(sessions.router, tags=["sessions"])
-app.include_router(update.router, tags=["update"])
  
 # =====================================================
 # Main Routes
