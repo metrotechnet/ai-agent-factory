@@ -4,7 +4,10 @@ FROM python:3.11-slim
 WORKDIR /app
 
 # Copy project files
-COPY . .
+COPY api/ api/
+COPY app.py .
+COPY requirements.txt .
+COPY chromadb-database/ chromadb-database/
 
 # Install dependencies
 RUN pip install --no-cache-dir --upgrade pip \
@@ -18,4 +21,4 @@ ENV PYTHONUNBUFFERED=1 \
 	PYTHONDONTWRITEBYTECODE=1
 
 # Start the FastAPI app with Uvicorn
-CMD ["python", "-m", "uvicorn", "api.main:app", "--host", "0.0.0.0", "--port", "8080"]
+CMD ["python", "-m", "uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8080"]

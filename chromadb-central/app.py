@@ -16,7 +16,7 @@ async def lifespan(app: FastAPI):
     print("🚀 Starting IMX Agent Factory...", flush=True)
     print("=" * 60, flush=True)
     try:
-        preload_all_collections()
+        preload_all_collections(["bibliosense", "nutria"])
         for db in ["bibliosense", "nutria"]:
             collection = get_collection(db)
             if collection:
@@ -43,7 +43,7 @@ app = FastAPI(title="IMX Agent Factory - ChromaDB Central API", lifespan=lifespa
 # Root endpoint
 @app.get("/")
 def root():
-    return {"message": "ChromaDB Central API is running. Available endpoints: /bibliosense, /nutria, /translator"}
+    return {"message": "ChromaDB Central API is running."}
 
 
 

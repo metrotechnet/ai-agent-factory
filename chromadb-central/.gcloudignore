@@ -1,28 +1,14 @@
 __pycache__/
 __init__.py
-.firebase/
 .venv/
-core/
 knowledge-base/
 node_modules/
-public/
-scripts/
-static/
-templates/
-.backend-url.tmp
 .env
 .env.example
-.firebaserc
 .gitignore
 .gcloudignore
 *.bat
 *.md
-firebase.json
-package.json
-package-lock.json
-question_log.json
-serve_frondend.py
-*.ps1
-doc/
+
 
 

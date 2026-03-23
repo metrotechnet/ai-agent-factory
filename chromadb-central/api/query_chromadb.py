@@ -16,7 +16,7 @@ def get_collection(project_name):
     # Return preloaded collection if available
     if project_name in _PRELOADED_COLLECTIONS:
         return _PRELOADED_COLLECTIONS[project_name]
-    kb_path = os.path.join(PROJECT_ROOT, "knowledge-base", project_name, "chroma_db")
+    kb_path = os.path.join(PROJECT_ROOT, "chromadb-database", project_name, "chroma_db")
     client = chromadb.PersistentClient(path=kb_path, settings=Settings(anonymized_telemetry=False, allow_reset=False))
     try:
         collection = client.get_collection(name="gdrive_documents")
@@ -25,10 +25,10 @@ def get_collection(project_name):
     return collection
 
 # Preload all collections (to be called at startup)
-def preload_all_collections():
-    for project_name in ["bibliosense", "nutria", "translator"]:
+def preload_all_collections(project_names=[]):
+    for project_name in project_names:
         try:
-            kb_path = os.path.join(PROJECT_ROOT, "knowledge-base", project_name, "chroma_db")
+            kb_path = os.path.join(PROJECT_ROOT, "chromadb-database", project_name, "chroma_db")
             client = chromadb.PersistentClient(path=kb_path, settings=Settings(anonymized_telemetry=False, allow_reset=False))
             try:
                 collection = client.get_collection(name="gdrive_documents")
