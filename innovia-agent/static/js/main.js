@@ -1,0 +1,289 @@
+// ===================================
+// MAIN INITIALIZATION & EVENT HANDLERS
+// ===================================
+
+/**
+ * Main entry point for the application.
+ * Handles backend warmup, UI initialization, and event binding.
+ * All logic is organized in clear sections for maintainability.
+ */
+
+/**
+ * Attempts to warm up the backend server to avoid cold start delays.
+ * Shows a loading overlay while trying to reach the backend health endpoint.
+ * If the backend is unreachable, displays an error message to the user.
+ */
+async function warmupBackend() {
+    const overlay = document.getElementById('initial-loading-overlay');
+    
+    const startTime = Date.now();
+    const timeout = 30000; // 30 seconds total timeout
+    const retryDelay = 1000; // 1 second between retries
+    let connectionSucceeded = false;
+    
+    while (Date.now() - startTime < timeout) {
+        try {
+            const controller = new AbortController();
+            const attemptTimeout = setTimeout(() => controller.abort(), 5000); // 5 second per attempt
+            
+            const response = await fetch(`${window.BACKEND_URL}/health`, {
+                method: 'GET',
+                signal: controller.signal
+            });
+            
+            clearTimeout(attemptTimeout);
+            
+            if (response.ok) {
+                console.log('Backend server reached successfully');
+                connectionSucceeded = true;
+                break; // Success - exit loop
+            } else {
+                console.warn('Backend health check returned non-OK status:', response.status);
+            }
+        } catch (error) {
+            const elapsed = Date.now() - startTime;
+            if (elapsed >= timeout) {
+                console.warn('Backend warmup failed after 30s timeout:', error.message);
+                break;
+            }
+            console.log(`Retrying backend connection... (${Math.round(elapsed/1000)}s elapsed)`);
+            // Wait before next retry
+            await new Promise(resolve => setTimeout(resolve, retryDelay));
+        }
+    }
+    
+    // Hide loading overlay after warmup attempt
+    if (overlay) {
+        overlay.classList.add('hidden');
+        // Remove from DOM after fade out
+        setTimeout(() => {
+            if (overlay.parentNode) {
+                overlay.parentNode.removeChild(overlay);
+            }
+        }, 500);
+    }
+
+    // Show error message if connection failed
+    if (!connectionSucceeded) {
+        setTimeout(() => {
+            const emptyState = document.getElementById('empty-state');
+            if (emptyState) {
+                const errorDiv = document.createElement('div');
+                errorDiv.style.cssText = 'color: #d32f2f; padding: 1rem; background: #ffebee; border-radius: 8px; border-left: 4px solid #d32f2f; margin: 1rem 0; max-width: 600px;';
+                errorDiv.innerHTML = '<strong>⚠️ Erreur de connexion au serveur</strong><br><small style="color: #c62828;">Le serveur n\'a pas pu être atteint. Veuillez rafraîchir la page ou réessayer plus tard.</small>';
+
+                // Insert after the disclaimer paragraph
+                const disclaimer = emptyState.querySelector('p strong[data-i18n="intro.disclaimer"]');
+                if (disclaimer && disclaimer.parentElement) {
+                    disclaimer.parentElement.insertAdjacentElement('afterend', errorDiv);
+                } else {
+                    emptyState.appendChild(errorDiv);
+                }
+            }
+
+        }, 600); // Wait for overlay fade out
+    }
+}
+
+// =============================
+// DOMContentLoaded: App Startup
+// =============================
+/**
+ * Initializes all modules and event handlers after DOM is ready.
+ * Loads agent config, sets up UI, and binds all interactive elements.
+ */
+document.addEventListener('DOMContentLoaded', async function() {
+    // Warm up backend before initializing UI
+    await warmupBackend();
+    // Get modules
+    const { loadConfig, switchLanguage, getCurrentLanguage, getMainConfig, populateSuggestionCards } = window.ConfigModule;
+    const { isMobileDevice, initKeyboardDetection, createScrollIndicator, updateScrollIndicator, 
+            initSidebar, initCookieConsent, initLegalLinks } = window.UIUtilsModule;
+    const { sendMessage } = window.ChatModule;
+    const { initSpeechRecognition, toggleRecording, toggleRecognitionMethod, useWhisper } = window.VoiceRecognitionModule;
+    const { switchAgent, updateAgentSelectorLabels } = window.AgentsModule;
+    const { componentRegistry } = window.ComponentsModule;
+    
+    // DOM elements
+    const inputArea = document.getElementById('input-area');
+    const inputBox = document.getElementById('input-box');
+    const sendButton = document.getElementById('send-button');
+    const voiceButton = document.getElementById('voice-button');
+    const languageSelector = document.getElementById('language-selector');
+    const chatContainer = document.getElementById('chat-container');
+    
+
+    
+
+    // =============================
+    // AGENT CONFIG & UI RENDERING
+    // =============================
+    // Load agent config (single-agent setup)
+    await loadConfig();
+
+    // Display agent intro (creates library selector dynamically)
+    const { displayAgentIntro } = window.AgentsModule;
+    if (displayAgentIntro) displayAgentIntro();
+
+    // Render initial components based on language config
+    const mainConfig = getMainConfig();
+    const langData = mainConfig[getCurrentLanguage()] || mainConfig['fr'];
+
+    // Render agent components (language selector, input area)
+    if (langData.components) {
+        if (langData.components.languageSelector) {
+            componentRegistry.languageSelector.render(langData.components.languageSelector);
+        } else {
+            componentRegistry.languageSelector.hide();
+        }
+        if (langData.components.inputArea) {
+            componentRegistry.inputArea.render(langData.components.inputArea);
+        } else if (langData.input) {
+            componentRegistry.inputArea.render(langData.input);
+        }
+    } else {
+        componentRegistry.languageSelector.hide();
+        if (langData.input) {
+            componentRegistry.inputArea.render(langData.input);
+        }
+    }
+
+    populateSuggestionCards(getCurrentLanguage());
+
+    // =============================
+    // UI COMPONENT INITIALIZATION
+    // =============================
+    initSidebar();
+    initCookieConsent();
+    initLegalLinks();
+    initSpeechRecognition();
+
+    // Create scroll indicator for chat
+    const scrollIndicator = createScrollIndicator();
+    if (chatContainer && scrollIndicator) {
+        chatContainer.addEventListener('scroll', updateScrollIndicator);
+        updateScrollIndicator();
+    }
+
+    // Mobile keyboard detection
+    if (isMobileDevice()) {
+        initKeyboardDetection();
+    }
+
+    // =============================
+    // INPUT BOX EVENT HANDLERS
+    // =============================
+    // Display input area when connection failed
+    if (inputArea) {
+        inputArea.style.display = 'block';
+    }
+    if (inputBox) {
+        // Auto-resize textarea
+        inputBox.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 200) + 'px';
+        });
+
+        // Handle Enter key for sending message
+        inputBox.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+                this.blur();
+            }
+        });
+
+        // Handle focus for mobile (scroll into view)
+        inputBox.addEventListener('focus', function() {
+            setTimeout(() => {
+                try {
+                    this.scrollIntoView({ 
+                        behavior: 'smooth', 
+                        block: 'nearest',
+                        inline: 'nearest'
+                    });
+
+                    const rect = this.getBoundingClientRect();
+                    const viewportHeight = window.innerHeight;
+                    const estimatedKeyboardHeight = viewportHeight * 0.4;
+
+                    if (rect.bottom > viewportHeight - estimatedKeyboardHeight) {
+                        const scrollAmount = rect.bottom - (viewportHeight - estimatedKeyboardHeight) + 20;
+                        window.scrollBy(0, scrollAmount);
+                    }
+                } catch (error) {
+                    console.log('Input focus scroll failed:', error);
+                }
+            }, 300);
+        });
+    }
+
+    // =============================
+    // BUTTON EVENT HANDLERS
+    // =============================
+
+    if (sendButton) {
+        sendButton.addEventListener('click', () => {
+            const isKeyboardVisible = document.activeElement === inputBox;
+            sendMessage();
+            if (isKeyboardVisible && inputBox) {
+                inputBox.blur();
+            }
+        });
+    }
+
+    const stopButton = document.getElementById('stop-button');
+    if (stopButton) {
+        stopButton.addEventListener('click', () => {
+            const { cancelMessage, cleanupAfterMessage } = window.ChatModule;
+            if (cancelMessage) {
+                cancelMessage();
+                if (cleanupAfterMessage) cleanupAfterMessage();
+            }
+        });
+    }
+
+    if (voiceButton) {
+        voiceButton.addEventListener('click', toggleRecording);
+    }
+
+    // =============================
+    // LANGUAGE SELECTOR
+    // =============================
+
+    if (languageSelector) {
+        languageSelector.addEventListener('change', function() {
+            switchLanguage(this.value);
+        });
+    }
+
+    // =============================
+    // SPEECH METHOD INDICATOR
+    // =============================
+
+    const speechMethodIndicator = document.getElementById('speech-method-indicator');
+    if (speechMethodIndicator) {
+        /**
+         * Updates the indicator to show which speech recognition method is active.
+         */
+        function updateIndicator() {
+            if (useWhisper()) {
+                speechMethodIndicator.textContent = '🎤 Whisper';
+                speechMethodIndicator.style.background = '#4CAF50';
+            } else {
+                speechMethodIndicator.textContent = '🎤 Web Speech';
+                speechMethodIndicator.style.background = '#2196F3';
+            }
+        }
+
+        speechMethodIndicator.addEventListener('click', () => {
+            toggleRecognitionMethod();
+            updateIndicator();
+        });
+
+        updateIndicator();
+    }
+
+    // App ready
+    console.log('Application initialized successfully');
+});

@@ -1,0 +1,14 @@
+python-docx
+google-api-python-client
+firebase-admin
+requests
+fastapi
+uvicorn
+slowapi
+openai
+python-multipart
+pydantic
+python-dotenv
+jinja2
+PyPDF2
+chromadb

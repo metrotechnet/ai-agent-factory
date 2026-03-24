@@ -1,0 +1,74 @@
+{
+  "fr": {
+    "app": {
+      "title": "InnovIA | Ressources en innovation pour entrepreneurs",
+      "description": "Agent IA pour entrepreneurs : décrivez votre problème et découvrez les ressources de recherche au Québec (CCTT, universités, institutions de recherche, etc.) adaptées à vos besoins."
+    },
+    "intro": {
+      "title": "Trouvez des ressources pour vos défis d'entrepreneur !",
+      "description": "Décrivez votre problème d'affaires ou d'innovation, et je vous aiderai à découvrir les ressources de recherche au Québec (CCTT, universités, institutions, etc.) qui peuvent vous accompagner.",
+      "disclaimer": "Note : Les recommandations sont basées sur les catalogues disponibles dans nos bases de données.",
+      "profileAlt": "InnovIA Agent",
+      "profileImage": "/static/logos/logo-innovia.png"
+    },
+    "suggestions": [
+      {
+        "id": "partenaires",
+        "title": "🎓 Trouver des partenaires",
+        "description": "Identifiez des partenaires de recherche ou d'innovation (CCTT, universités, centres, etc.) pour vos projets.",
+        "event": "display: Je cherche des partenaires pour mon projet",
+        "color": "#e1f5fe"
+      },
+      {
+        "id": "financement",
+        "title": "💸 Recherche de financement",
+        "description": "Découvrez des programmes de financement et d'accompagnement pour l'innovation au Québec.",
+        "event": "display: J'ai besoin de financement pour innover",
+        "color": "#e8f5e9"
+      },
+      {
+        "id": "ressources",
+        "title": "🔎 Accès aux ressources de recherche",
+        "description": "Trouvez des laboratoires, experts ou équipements pour répondre à vos besoins d'affaires.",
+        "event": "display: Je veux accéder à des ressources de recherche",
+        "color": "#fce4ec"
+      }
+    ]
+  },
+  "en": {
+    "app": {
+      "title": "InnovIA | Innovation Resources for Entrepreneurs",
+      "description": "AI assistant for entrepreneurs: find partners, funding, and research resources in Quebec."
+    },
+    "intro": {
+      "title": "Looking for innovation resources?",
+      "description": "Describe your business or innovation challenge, and I'll help you discover research resources in Quebec (CCTT, universities, research institutions, etc.) that can support you.",
+      "disclaimer": "Note: Recommendations are based on catalogs available in our databases.",
+      "profileAlt": "InnovIA Agent",
+      "profileImage": "/static/logos/logo-innovia.png"
+    },
+    "suggestions": [
+      {
+        "id": "partners",
+        "title": "🎓 Find Partners",
+        "description": "Identify research or innovation partners (CCTT, universities, centers, etc.) for your projects.",
+        "event": "display: I'm looking for partners for my project",
+        "color": "#e1f5fe"
+      },
+      {
+        "id": "funding",
+        "title": "💸 Search for Funding",
+        "description": "Discover funding and support programs for innovation in Quebec.",
+        "event": "display: I need funding for innovation",
+        "color": "#e8f5e9"
+      },
+      {
+        "id": "resources",
+        "title": "🔎 Access Research Resources",
+        "description": "Find labs, experts, or equipment to meet your business needs.",
+        "event": "display: I want access to research resources",
+        "color": "#fce4ec"
+      }
+    ]
+  }
+}
