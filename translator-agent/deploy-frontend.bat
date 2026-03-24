@@ -90,14 +90,16 @@ REM Create and copy files
 if not exist "public" mkdir public
 if not exist "public\static" mkdir public\static
 
+
 copy /Y "templates\index.html" "public\index.html" >nul
 if !errorlevel! neq 0 (
     echo ERROR: Failed to copy index.html
     exit /b 1
 )
+
 REM Inject Firebase configuration into HTML
 echo Injecting Firebase configuration...
-powershell -Command "(Get-Content 'public\index.html') -replace '{{FIREBASE_PROJECT_ID}}', '!FIREBASE_PROJECT!' -replace '{{FIREBASE_API_KEY}}', '!FIREBASE_API_KEY!' -replace '{{FIREBASE_AUTH_DOMAIN}}', '!FIREBASE_AUTH_DOMAIN!' -replace '{{FIREBASE_STORAGE_BUCKET}}', '!FIREBASE_STORAGE_BUCKET!' -replace '{{FIREBASE_MESSAGING_SENDER_ID}}', '!FIREBASE_MESSAGING_SENDER_ID!' -replace '{{FIREBASE_APP_ID}}', '!FIREBASE_APP_ID!' -replace '{{FIREBASE_MEASUREMENT_ID}}', '!FIREBASE_MEASUREMENT_ID!' -replace '{{RECAPTCHA_SITE_KEY}}', '!RECAPTCHA_SITE_KEY!' -replace '{{APP_CHECK_ENABLED}}', '!APP_CHECK_ENABLED!' -replace '{{APP_CHECK_DEBUG_TOKEN}}', '!APP_CHECK_DEBUG_TOKEN!' | Set-Content 'public\index.html'"
+powershell -Command "(Get-Content 'public\index.html')  -replace '{{FIREBASE_PROJECT_ID}}', '!FIREBASE_PROJECT!' -replace '{{FIREBASE_API_KEY}}', '!FIREBASE_API_KEY!' -replace '{{FIREBASE_AUTH_DOMAIN}}', '!FIREBASE_AUTH_DOMAIN!' -replace '{{FIREBASE_STORAGE_BUCKET}}', '!FIREBASE_STORAGE_BUCKET!' -replace '{{FIREBASE_MESSAGING_SENDER_ID}}', '!FIREBASE_MESSAGING_SENDER_ID!' -replace '{{FIREBASE_APP_ID}}', '!FIREBASE_APP_ID!' -replace '{{FIREBASE_MEASUREMENT_ID}}', '!FIREBASE_MEASUREMENT_ID!' -replace '{{RECAPTCHA_SITE_KEY}}', '!RECAPTCHA_SITE_KEY!' -replace '{{APP_CHECK_ENABLED}}', '!APP_CHECK_ENABLED!' -replace '{{APP_CHECK_DEBUG_TOKEN}}', '!APP_CHECK_DEBUG_TOKEN!' | Set-Content 'public\index.html'"
 if !errorlevel! neq 0 (
     echo ERROR: Failed to inject Firebase configuration!
     exit /b 1
@@ -112,6 +114,7 @@ if !errorlevel! neq 0 (
 
 powershell -Command "(Get-Content 'public\index.html') -replace '/static/', 'static/' | Set-Content 'public\index.html'"
 echo window.BACKEND_URL = '!BACKEND_URL!'; > "public\static\js\backend-url.js"
+
 
 echo Files prepared successfully!
 echo.
