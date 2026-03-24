@@ -406,7 +406,6 @@ def ask_question_stream(question, language="fr", timezone="UTC", locale="fr-FR",
         # Ensure query_params is JSON serializable
         query_params = json.loads(json.dumps(query_params, default=str))
         results = query_chromadb(query_params)
-        print(f"ChromaDB results: {results}")  # Debug log for ChromaDB results
         
         if not results['documents'] or not results['documents'][0]:
             yield "No relevant information found. Please make sure you have indexed some transcripts."
@@ -440,30 +439,35 @@ def ask_question_stream(question, language="fr", timezone="UTC", locale="fr-FR",
         metadatas_list = list(metadatas_list)
 
         #Print title of first 10 books for debugging
-        print(f"[Query] Top {len(documents)} results (after filtering & shuffle):", flush=True)
-        for i, meta in enumerate(metadatas_list[:10]):
+        for i, meta in enumerate(metadatas_list[:50]):
             title = meta.get('titre') or meta.get('title') or 'Unknown Title'
             auteur = meta.get('auteur') or meta.get('author') or 'Unknown Author'
-            print(f"  {i+1}. {title} by {auteur}", flush=True)                                                         
-
-        # Build context from results with metadata
+            print(f"  {i+1}. {title} by {auteur}", flush=True)  
+            #print cover url if exists
+            cover = meta.get('image') or meta.get('couverture') or meta.get('cover') or meta.get('image_url') or meta.get('cover_url')
+            if cover:
+                print(f"     Cover URL: {cover}", flush=True)
+        # Build context from results with harmonized metadata (JSON structure)
         contexts = []
         for i, doc in enumerate(documents):
-            # Include metadata with each document
             metadata = metadatas_list[i] if i < len(metadatas_list) else {}
-            context_entry = f"Document {i+1}:\n{doc}"
+            # Harmonisation des champs pour le LLM
             
-            # Add relevant metadata fields
-            if metadata:
-                metadata_str = "\nMétadonnées:"
-                for key, value in metadata.items():
-                    if key in ['image', 'couverture', 'cover', 'image_url', 'cover_url', 'titre', 'title', 
-                               'auteur', 'author', 'lien', 'resume', 'summary', 'categorie', 'category',
-                               'editeur', 'publisher', 'parution', 'publication', 'pages', 'langue', 'language', 'bibliotheque']:
-                        metadata_str += f"\n- {key}: {value}"
-                context_entry += metadata_str
-            
-            contexts.append(context_entry)
+            livre_struct = {
+                "id": metadata.get('id') ,
+                "titre": metadata.get('titre') or metadata.get('title'),
+                "auteur": metadata.get('auteur') or metadata.get('author'),
+                "couverture": metadata.get('couverture'),
+                "lien": metadata.get('lien'),
+                "resume": metadata.get('resume'),
+                "categorie": metadata.get('categorie'),
+                "editeur": metadata.get('editeur'),
+                "parution": metadata.get('parution'),
+                "pages": metadata.get('pages'),
+                "langue": metadata.get('langue'),
+                "bibliotheque": metadata.get('bibliotheque')
+            }
+            contexts.append(f"```\n{json.dumps(livre_struct, ensure_ascii=False, indent=2)}\n```")
         context = "\n\n".join(contexts)
 
 
