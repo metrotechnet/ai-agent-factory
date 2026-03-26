@@ -304,7 +304,8 @@ function positionMessageAtBottom(chatContainer, userMessageDiv, messageDiv) {
             const messageContent = messageDiv.querySelector('.message-content');
             if (messageContent) {
                 const currentHeight = messageContent.offsetHeight;
-                messageContent.style.minHeight = (currentHeight + endPadding) + 'px';
+                // messageContent.style.minHeight = (currentHeight + endPadding) + 'px';
+                messageContent.style.marginBottom = (endPadding) + 'px';
             }
         }
         
@@ -502,7 +503,7 @@ async function handleStreamingResponse(question, contentDiv, actionsDiv) {
                     if (data.session_id && !sessionId) {
                         sessionId = data.session_id;
                         window.sessionId = sessionId;
-                        console.log('Session ID received:', sessionId);
+                        // console.log('Session ID received:', sessionId);
                     }
                     
                     if (data.question_id && !questionId) {
@@ -512,7 +513,7 @@ async function handleStreamingResponse(question, contentDiv, actionsDiv) {
 
                     if (data.links !== undefined) {
                         linksReceived = data.links;
-                        console.log('Links received via stream:', linksReceived);
+                        // console.log('Links received via stream:', linksReceived);
                     }
 
                     if (data.chunk) {

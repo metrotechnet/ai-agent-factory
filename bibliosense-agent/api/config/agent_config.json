@@ -1,7 +1,7 @@
 {
   "fr": {
     "app": {
-      "title": "Bibliosense | Recommandations de livres",
+      "title": "IMX - Bibliosense | Recommandations de livres",
       "description": "Agent IA de recommandations de livres par IMX Multi-Agent"
     },
     "intro": {
@@ -58,7 +58,7 @@
   },
   "en": {
     "app": {
-      "title": "Bibliosense | Book Recommendations",
+      "title": "IMX - Bibliosense | Book Recommendations",
       "description": "AI Book Recommendation Agent by IMX Multi-Agent"
     },
     "intro": {

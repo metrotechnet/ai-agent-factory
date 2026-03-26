@@ -1,7 +1,6 @@
 __pycache__/
 __init__.py
 .venv/
-knowledge-base/
 node_modules/
 .env
 .env.example

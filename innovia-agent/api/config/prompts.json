@@ -58,7 +58,7 @@
         "Propose la liste des programmes de financement (dans CONTEXT_FUNDING) sous forme de liste à puces en Markdown, chaque programme étant structuré ainsi :",
         "Exemple :",
         "- **Titre du programme** : [Nom]",
-        "  - **Logo** : [URL du logo]",
+        "  - [URL du logo]",
         "  - **Détails** : [description ou conditions]",
         "Utilise toujours ce format Markdown clair et structuré, sans tableaux ni autres formats."
       ]

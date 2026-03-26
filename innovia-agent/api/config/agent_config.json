@@ -1,7 +1,7 @@
 {
   "fr": {
     "app": {
-      "title": "InnovIA | Ressources en innovation pour entrepreneurs",
+      "title": "IMX - InnovIA | Ressources en innovation pour entrepreneurs",
       "description": "Agent IA pour entrepreneurs : décrivez votre problème et découvrez les ressources de recherche au Québec (CCTT) adaptées à vos besoins."
     },
     "intro": {
@@ -46,7 +46,7 @@
   },
   "en": {
     "app": {
-      "title": "InnovIA | Innovation Resources for Entrepreneurs",
+      "title": "IMX - InnovIA | Innovation Resources for Entrepreneurs",
       "description": "AI assistant for entrepreneurs: find partners, funding, and research resources in Quebec."
     },
     "intro": {

@@ -44,11 +44,7 @@ function displayAgentIntro(agent) {
         descEl.textContent = intro.description;
     }
     
-   
     
-    if (disclaimerEl && intro.disclaimer) {
-        disclaimerEl.textContent = intro.disclaimer;
-    }
     
     emptyState.style.display = '';
 }

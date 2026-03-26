@@ -6,6 +6,8 @@ from pathlib import Path
 from dotenv import load_dotenv
 from openai import OpenAI
 import requests
+import google.auth.transport.requests
+import google.oauth2.id_token
 
 # Get project root directory
 PROJECT_ROOT = Path(__file__).parent.parent
@@ -158,21 +160,65 @@ def format_context(documents, metadatas_list):
         }
         context.append(f"```\n{json.dumps(entry, ensure_ascii=False, indent=2)}\n```")
     return context
-    
 def query_chromadb(project_name, collection_name=None, data=None):
-
     try:
         chromadb_url = os.getenv("CHROMADB_CENTRAL_URL")
+
+        if not chromadb_url:
+            raise ValueError("Missing CHROMADB_CENTRAL_URL")
+
+        # =========================
+        # 🔐 GET IAM TOKEN
+        # =========================
+        auth_req = google.auth.transport.requests.Request()
+
+        id_token = google.oauth2.id_token.fetch_id_token(
+            auth_req,
+            chromadb_url
+        )
+
+        headers = {
+            "Authorization": f"Bearer {id_token}",
+            "Content-Type": "application/json"
+        }
+
+        # =========================
+        # 📦 PAYLOAD
+        # =========================
         payload = {
             "project_name": project_name,
             "collection_name": collection_name,
             "query": data
         }
+
         url = f"{chromadb_url}/query"
-        resp = requests.post(url, json=payload, timeout=30)
+
+        # =========================
+        # 🚀 REQUEST
+        # =========================
+        resp = requests.post(
+            url,
+            json=payload,
+            headers=headers,
+            timeout=30
+        )
+
+        resp.raise_for_status()
+
         return resp.json()
+
+    except requests.exceptions.HTTPError as e:
+        return {
+            "error": "HTTP error",
+            "status_code": resp.status_code if 'resp' in locals() else None,
+            "details": str(e)
+        }
+
     except Exception as e:
-        return {"error": f"Failed to query central ChromaDB: {str(e)}"}
+        return {
+            "error": "Failed to query central ChromaDB",
+            "details": str(e)
+        }
     
 
 

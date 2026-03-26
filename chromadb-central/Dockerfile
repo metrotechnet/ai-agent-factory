@@ -7,7 +7,7 @@ WORKDIR /app
 COPY api/ api/
 COPY app.py .
 COPY requirements.txt .
-COPY chromadb-database/ chromadb-database/
+COPY knowledge-base/ knowledge-base/
 
 # Install dependencies
 RUN pip install --no-cache-dir --upgrade pip \

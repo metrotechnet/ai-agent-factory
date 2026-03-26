@@ -1,7 +1,7 @@
 {
   "fr": {
     "app": {
-      "title": "Nutria | Agent Nutritionniste",
+      "title": "IMX - Nutria | Agent Nutritionniste",
       "description": "Agent IA nutritionniste par IMX Multi-Agent"
     },
     "intro": {
@@ -46,7 +46,7 @@
   },
   "en": {
     "app": {
-      "title": "Nutria | Nutritionist Agent",
+      "title": "IMX - Nutria | Nutritionist Agent",
       "description": "AI Nutritionist Agent by IMX Multi-Agent"
     },
     "intro": {
