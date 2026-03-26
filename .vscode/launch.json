@@ -6,7 +6,7 @@
     "configurations": [
         
          {
-            "name": "Nutria - FastAPI",
+            "name": "IMX - NutrIA - FastAPI",
             "type": "debugpy",
             "request": "launch",
             "module": "uvicorn",
@@ -23,16 +23,8 @@
             "cwd": "${workspaceFolder}",
             "console": "integratedTerminal"
         },
-        {
-            "name": "create_agent - Nutria",
-            "type": "debugpy",
-            "request": "launch",
-            "program": "${workspaceFolder}/create_agent.py",
-            "console": "integratedTerminal",
-            "args": ["new-agents/nutria/nutria-agent.json"]
-        },
-         {
-            "name": "bibliosense - FastAPI",
+        {   
+            "name": "IMX - Bibliosense - FastAPI",
             "type": "debugpy",
             "request": "launch",
             "module": "uvicorn",
@@ -50,15 +42,7 @@
             "console": "integratedTerminal"
         },
          {
-            "name": "index_chromadb_json - Bibliosense",
-            "type": "debugpy",
-            "request": "launch",
-            "program": "${workspaceFolder}/bibliosense-agent/core/index_chromadb_json.py",
-            "console": "integratedTerminal",
-            "args": ["${workspaceFolder}/bibliosense-agent/knowledge-base/agent"]
-        },
-         {
-            "name": "Translator - FastAPI",
+            "name": "IMX - Translator - FastAPI",
             "type": "debugpy",
             "request": "launch",
             "module": "uvicorn",
@@ -75,16 +59,9 @@
             "cwd": "${workspaceFolder}",
             "console": "integratedTerminal"
         },
+
          {
-            "name": "index_chromadb_json - Translator",
-            "type": "debugpy",
-            "request": "launch",
-            "program": "${workspaceFolder}/translator-agent/core/index_chromadb_json.py",
-            "console": "integratedTerminal",
-            "args": ["${workspaceFolder}/translator-agent/knowledge-base/agent"]
-        },
-         {
-            "name": "Innovia - FastAPI",
+            "name": "IMX - InnovIA - FastAPI",
             "type": "debugpy",
             "request": "launch",
             "module": "uvicorn",
@@ -101,5 +78,13 @@
             "cwd": "${workspaceFolder}",
             "console": "integratedTerminal"
         },
+        {
+            "name": "index_chromadb_json ",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/translator-agent/core/index_chromadb_json.py",
+            "console": "integratedTerminal",
+            "args": ["${workspaceFolder}/translator-agent/knowledge-base/agent"]
+        }
     ]
 }

@@ -51,7 +51,7 @@ echo Service: %GCP_SERVICE_NAME%
 echo.
 
 echo Deploying to Cloud Run...
-gcloud run deploy %GCP_SERVICE_NAME% --image %GCP_IMAGE_NAME% --region %GCP_REGION% --platform managed --ingress internal --no-allow-unauthenticated --project=%GCP_PROJECT_ID% --memory=%GCP_MEMORY% --cpu=%GCP_CPU% --max-instances=%GCP_MAX_INSTANCES% --min-instances=%GCP_MIN_INSTANCES%
+gcloud run deploy %GCP_SERVICE_NAME% --image %GCP_IMAGE_NAME% --region %GCP_REGION% --platform managed --no-allow-unauthenticated --project=%GCP_PROJECT_ID% --memory=%GCP_MEMORY% --cpu=%GCP_CPU% --max-instances=%GCP_MAX_INSTANCES% --min-instances=%GCP_MIN_INSTANCES%
 set DEPLOY_STATUS=%ERRORLEVEL%
 if %DEPLOY_STATUS% NEQ 0 (
     echo.
