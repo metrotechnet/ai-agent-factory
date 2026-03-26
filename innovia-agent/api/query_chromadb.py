@@ -139,13 +139,37 @@ def build_prompt_from_template(language, context, question, history_text="", age
     
     return prompt, model_config
 
-
-def query_chromadb(data=None):
+def format_context(documents, metadatas_list):
+    # Build context from results with harmonized metadata (JSON structure)
+    context = []
+    for i, doc in enumerate(documents):
+        metadata = metadatas_list[i] if i < len(metadatas_list) else {}
+        # Build structure: {id, text, metadata}
+        doc_id = metadata.get('name') 
+        # Try to get the main text: prefer 'text' in doc, fallback to 'resume' or 'summary' in metadata
+        doc_text = doc if isinstance(doc, str) else doc.get('text') if isinstance(doc, dict) else None
+        if not doc_text:
+            doc_text = metadata.get('resume') or metadata.get('summary') or ""
+        # Compose the structure
+        entry = {
+            "id": doc_id,
+            "text": doc_text,
+            "metadata": metadata
+        }
+        context.append(f"```\n{json.dumps(entry, ensure_ascii=False, indent=2)}\n```")
+    return context
+    
+def query_chromadb(project_name, collection_name=None, data=None):
 
     try:
         chromadb_url = os.getenv("CHROMADB_CENTRAL_URL")
-        url = f"{chromadb_url}/bibliosense/query"
-        resp = requests.post(url, json=data, timeout=30)
+        payload = {
+            "project_name": project_name,
+            "collection_name": collection_name,
+            "query": data
+        }
+        url = f"{chromadb_url}/query"
+        resp = requests.post(url, json=payload, timeout=30)
         return resp.json()
     except Exception as e:
         return {"error": f"Failed to query central ChromaDB: {str(e)}"}
@@ -190,64 +214,110 @@ def extract_pmids_from_text(text):
     """Extrait toutes les références PMID d'un texte."""
     return re.findall(r'PMID:\s*\d+', text)
 
+def analyze_query_llm(query: str, history_text: str):
 
-def detect_vague_question(question, language="fr"):
+    print(f"[analyze_query_llm] Analyzing query: '{query}' ", flush=True)
+    print(f"[analyze_query_llm] History text: {history_text}", flush=True)
+    prompt = f"""
+    Tu es un expert en innovation et financement R&D au Québec.
+
+    Analyse la question utilisateur et déteermine si le domaine et le contexte du projet sont bien définis
+    Voici la question de l'utilisateur et l'historique de la conversation:
+    QUESTION:
+    \"\"\"{query}\"\"\"
+    HISTORIQUE DE LA CONVERSATION:
+    \"\"\"{history_text}\"\"\"\"
+
+    Fournis une analyse structurée de la question en retournant un JSON avec les champs suivants:
+    - domaines: liste (ex: IA, santé, chimie, foresterie)
+    - clarity_score: entre 0 et 1
+    - contexte: une reformulation de la question qui intègre le contexte de l'historique pour mieux comprendre les besoins de l'utilisateur
+    - reply_question: une question courte que tu poserais à l'utilisateur pour clarifier le domaine et le contexte si il manque des informations.
+
+    Règles:
+    - Évite de demander la même question ou la même information plusieurs fois en te fiant à l'HISTORIQUE DE LA CONVERSATION
+    - Si des informations sont manquantes, pose une question de clarification courte et précise (reply_question) pour obtenir les informations manquantes.
+
+
+    Réponds uniquement en JSON valide, sans explication."""
+
+    prompts_data = load_prompts()
+    reformulation_model = prompts_data.get("model_name", "openai/gpt-4o-mini")
+
+    response = client.chat.completions.create(
+        model=reformulation_model,
+        messages=[
+            {"role": "system", "content": "Tu réponds uniquement en JSON valide."},
+            {"role": "user", "content": prompt}
+        ],
+        temperature=0.2
+    )
+
+
+    content = response.choices[0].message.content.strip()
+
+    # Remove Markdown code block if present
+    if content.startswith('```'):
+        content = re.sub(r'^```[a-zA-Z]*\n?', '', content)
+        content = re.sub(r'```$', '', content).strip()
+    
+    try:
+        return json.loads(content)
+    except Exception:
+        return {
+            "error": "Invalid JSON from LLM",
+            "raw": content
+        }
+    
+def generate_clarification_llm(missing_info):
+    questions = {
+        "domaine": "Dans quel domaine se situe votre projet (IA, santé, énergie…)?",
+        "besoin": "Cherchez-vous du financement, un partenaire ou un développement technique?",
+        "stade_projet": "À quel stade est votre projet (idée, prototype, produit)?"
+    }
+
+
+    return [questions[m] for m in missing_info if m in questions]
+
+
+# Nouvelle version : vérifie si une question similaire a déjà été posée dans l'historique
+import difflib
+import unicodedata
+
+def normalize_text(text):
     """
-    Détecte si une question est trop vague et nécessite des clarifications.
-    
-    Args:
-        question: Question de l'utilisateur
-        language: Langue de la question
-        
-    Returns:
-        tuple (is_vague: bool, clarification_message: str or None)
+    Normalise le texte pour comparaison : minuscule, sans accents, sans ponctuation, espaces réduits.
     """
-    question_lower = question.lower().strip()
-    
-    # Questions très courtes (moins de 3 mots non-vides)
-    words = [w for w in question_lower.split() if len(w) > 2]
-    if len(words) < 3:
-        # Vérifier si c'est juste des termes génériques
-        generic_terms_fr = ['livre', 'livres', 'roman', 'romans', 'auteur', 'auteurs', 'lecture', 'lire']
-        generic_terms_en = ['book', 'books', 'novel', 'novels', 'author', 'authors', 'read', 'reading']
-        generic_terms = generic_terms_fr if language == 'fr' else generic_terms_en
-        
-        if any(term in question_lower for term in generic_terms) and len(words) <= 2:
-            if language == 'fr':
-                return True, "Pouvez-vous préciser ce que vous recherchez? Par exemple:\n- Un genre spécifique (roman policier, science-fiction, romance, etc.)?\n- Un auteur en particulier?\n- Un thème ou sujet qui vous intéresse?\n- Un type de lecture (facile, complexe, court, série, etc.)?"
-            else:
-                return True, "Could you be more specific about what you're looking for? For example:\n- A specific genre (mystery, sci-fi, romance, etc.)?\n- A particular author?\n- A theme or topic of interest?\n- A type of reading (easy, complex, short, series, etc.)?"
-    
-    # Termes très vagues sans qualificatifs
-    vague_patterns_fr = [
-        (r'^(un|une|des)\s+(bon|bonne|bons|bonnes)\s+(livre|livres|roman|romans)[\s?!.]*$', 
-         "Qu'est-ce qui rend un livre 'bon' pour vous? Pourriez-vous préciser:\n- Le genre que vous préférez?\n- Les thèmes qui vous intéressent?\n- Le style d'écriture que vous aimez?\n- Des auteurs que vous avez appréciés?"),
-        (r'^(quelque chose|qqch)\s+(d[\'e])?intéressant', 
-         "Qu'est-ce qui vous intéresse en particulier? Un genre, un auteur, un thème spécifique?"),
-        (r'^(un|une)\s+(livre|roman)\s*[\s?!.]*$',
-         "Quel type de livre recherchez-vous? (genre, auteur, thème, style...)"),
-        (r'^\s*(livre|livres|roman|romans)\s*[\s?!.]*$',
-         "Pouvez-vous préciser quel type de livre vous intéresse? (genre, auteur, thème...)"),
-    ]
-    
-    vague_patterns_en = [
-        (r'^(a|an|some)\s+good\s+(book|books|novel|novels)[\s?!.]*$',
-         "What makes a book 'good' for you? Could you specify:\n- Your preferred genre?\n- Topics of interest?\n- Writing style you enjoy?\n- Authors you've liked?"),
-        (r'^something\s+interesting',
-         "What interests you in particular? A genre, author, or specific theme?"),
-        (r'^(a|an)\s+(book|novel)\s*[\s?!.]*$',
-         "What type of book are you looking for? (genre, author, theme, style...)"),
-        (r'^\s*(book|books|novel|novels)\s*[\s?!.]*$',
-         "Could you specify what type of book interests you? (genre, author, theme...)"),
-    ]
-    
-    patterns = vague_patterns_fr if language == 'fr' else vague_patterns_en
-    
-    for pattern, message in patterns:
-        if re.match(pattern, question_lower):
-            return True, message
-    
-    return False, None
+    if not text:
+        return ""
+    # Minuscule
+    text = text.lower()
+    # Supprime les accents
+    text = ''.join(c for c in unicodedata.normalize('NFD', text) if unicodedata.category(c) != 'Mn')
+    # Supprime la ponctuation
+    text = ''.join(c for c in text if c.isalnum() or c.isspace())
+    # Réduit les espaces
+    text = ' '.join(text.split())
+    return text
+
+def is_question_already_asked(reply_question, conversation_history, threshold=0.55):
+    """
+    Vérifie si la reply_question (ou une question très similaire) a déjà été posée dans l'historique.
+    Utilise une similarité de séquence (difflib) sur texte normalisé.
+    """
+    if not reply_question or not conversation_history:
+        return False
+    norm_reply = normalize_text(reply_question)
+    for msg in conversation_history:
+        if msg.get('role') == 'assistant':
+            content = msg.get('content', '')
+            norm_content = normalize_text(content)
+            # Similarité
+            ratio = difflib.SequenceMatcher(None, norm_reply, norm_content).ratio()
+            # print(f"[is_question_already_asked] Comparing '{norm_reply}' to '{norm_content}' => similarity: {ratio:.2f}", flush=True)
+            if ratio >= threshold:
+                return True
+    return False
 
 
 def reformulate_question_with_context(question, conversation_history, language="fr"):
@@ -303,38 +373,40 @@ Respond ONLY in JSON, no explanation:
         response = client.chat.completions.create(
             model=reformulation_model,
             messages=[
+                {"role": "system", "content": "Tu réponds uniquement en JSON valide."},
                 {"role": "user", "content": reformulation_prompt}
             ],
             temperature=0.3,
             max_tokens=200
         )
-        
-        raw = response.choices[0].message.content.strip()
-        
+
+        content = response.choices[0].message.content.strip()
+
         # Parse JSON response
-        result = json.loads(raw)
+        result = json.loads(content)
         reformulated = result.get("question", question).strip()
         question_type = result.get("type", "specific").strip().lower()
-        
+
         # Validate question_type
         if question_type not in ("general", "specific"):
             question_type = "specific"
-        
+
         # Log pour débug
         print(f"[Reformulation] Original: '{question}'")
         if reformulated.lower() != question.lower():
             print(f"[Reformulation] Reformulée: '{reformulated}'")
         print(f"[Reformulation] Type: {question_type}")
-        
+
         return reformulated, question_type
-        
+
     except json.JSONDecodeError:
         # If JSON parsing fails, try to extract the text anyway
-        print(f"[Reformulation] JSON parse error, raw: {raw}")
-        return raw if raw else question, "specific"
+        print(f"[Reformulation] JSON parse error, raw: {content}")
+        return content if content else question, "specific"
     except Exception as e:
         print(f"[Reformulation] Error: {e}, using original question")
         return question, "specific"
+
 
 def ask_question_stream(question, language="fr", timezone="UTC", locale="fr-FR", top_k=100, conversation_history=None, session=None, question_id=None, agent=None, bibliotheque="all", distance_threshold=None):
     """Streaming version of ask_question with language support and conversation history
@@ -368,108 +440,55 @@ def ask_question_stream(question, language="fr", timezone="UTC", locale="fr-FR",
 
     try:
         # Détecter si la question est trop vague et nécessite clarification
-        is_vague, clarification_msg = detect_vague_question(question, language)
-        if is_vague and not conversation_history:
-            # Seulement demander clarification si pas d'historique (première question)
-            # Si historique existe, la reformulation pourrait aider
-            print(f"[Vague Question Detected] Question: '{question}'")
-            yield clarification_msg
-            return
-        
-        # Reformuler la question en tenant compte du contexte si nécessaire
-        # Cela permet de gérer des questions comme "du même auteur", "similaire", etc.
-        search_question, question_type = reformulate_question_with_context(question, conversation_history, language)
-        print(f"[ask_question_stream] Search question after reformulation: '{search_question}' (type: {question_type})", flush=True)
+        result  = analyze_query_llm(question,history_text)
+        print(f"[ask_question_stream] Query analysis result: {result}", flush=True)
+        if result and result.get("clarity_score") < 0.5 and result.get("reply_question"):
+            # Vérifie si la reply_question a déjà été posée dans l'historique
+            if not is_question_already_asked(result.get("reply_question"), conversation_history):
+                yield result.get("reply_question")
+                return
+            else:
+                print("[ask_question_stream] Clarification déjà posée, on ne la repose pas.")
+            
 
+
+        print(f"[ask_question_stream] Question contexte: {result.get('contexte')}", flush=True)
+        question_data = "domain: " + result.get("domain", "") + "\ncontext: " + result.get("contexte", "")
+  
         # Get embedding for the reformulated question
         query_emb = client.embeddings.create(
-            model="openai/text-embedding-3-large", 
-            input=search_question
+            model="text-embedding-3-small",  # 3072 dimensions, supported by OpenAI/Vercel
+            input=question_data
         ).data[0].embedding
-
-        # Build where filter for library selection
-        where_filter = None
-        if bibliotheque and bibliotheque != "all":
-            where_filter = {"bibliotheque": bibliotheque}
 
         # We only need top 150 for diversity filtering before shuffling and taking top 50
         # Query ChromaDB with optional library filter
-        nbr_results = 500
+        nbr_results = 20
         query_params = {
             "query_embedding": query_emb,
             "n_results": nbr_results,
             "include": ['documents', 'metadatas']
         }
-        if where_filter:
-            query_params["where"] = where_filter
-            
+           
         # Ensure query_params is JSON serializable
         query_params = json.loads(json.dumps(query_params, default=str))
-        results = query_chromadb(query_params)
+        cctt_results = query_chromadb("innovia","cctt",query_params)
         
-        if not results['documents'] or not results['documents'][0]:
+        if not cctt_results['documents'] or not cctt_results['documents'][0]:
             yield "No relevant information found. Please make sure you have indexed some transcripts."
             return
-        
-        documents = results['documents'][0]
-        metadatas_list = results.get('metadatas', [[]])[0]
+        context = "\n\n**CONTEXT_CENTER**:".join(format_context(cctt_results['documents'][0], cctt_results.get('metadatas', [[]])[0]))
 
-        # Filtrer pour limiter le nombre de livres par auteur (max 2)
-        filtered_results = []
-        for doc, meta in zip(documents, metadatas_list):
-            title = meta.get('titre') or meta.get('title') or ''
-            # Inclure les livres non recommandés dans l'historique
-            if title and title not in previously_recommended:
-                filtered_results.append((doc, meta))
 
-        
-        # Si on a trop filtré, garder quand même des résultats
-        if len(filtered_results) < 20:
-            filtered_results = list(zip(documents, metadatas_list))[:50]
-        
-        # Shuffle les résultats si la question est générale pour plus de diversité
-        if question_type == 'general':
-            random.shuffle(filtered_results)
-            print(f"[Query] Shuffled results (general question)", flush=True)
-
-        # Prendre les 50 premiers
-        filtered_results = filtered_results[:50]
-        documents, metadatas_list = zip(*filtered_results) if filtered_results else ([], [])
-        documents = list(documents)
-        metadatas_list = list(metadatas_list)
-
-        #Print title of first 10 books for debugging
-        for i, meta in enumerate(metadatas_list[:50]):
-            title = meta.get('titre') or meta.get('title') or 'Unknown Title'
-            auteur = meta.get('auteur') or meta.get('author') or 'Unknown Author'
-            print(f"  {i+1}. {title} by {auteur}", flush=True)  
-            #print cover url if exists
-            cover = meta.get('image') or meta.get('couverture') or meta.get('cover') or meta.get('image_url') or meta.get('cover_url')
-            if cover:
-                print(f"     Cover URL: {cover}", flush=True)
-        # Build context from results with harmonized metadata (JSON structure)
-        contexts = []
-        for i, doc in enumerate(documents):
-            metadata = metadatas_list[i] if i < len(metadatas_list) else {}
-            # Harmonisation des champs pour le LLM
-            
-            livre_struct = {
-                "id": metadata.get('id') ,
-                "titre": metadata.get('titre') or metadata.get('title'),
-                "auteur": metadata.get('auteur') or metadata.get('author'),
-                "couverture": metadata.get('couverture'),
-                "lien": metadata.get('lien'),
-                "resume": metadata.get('resume'),
-                "categorie": metadata.get('categorie'),
-                "editeur": metadata.get('editeur'),
-                "parution": metadata.get('parution'),
-                "pages": metadata.get('pages'),
-                "langue": metadata.get('langue'),
-                "bibliotheque": metadata.get('bibliotheque')
-            }
-            contexts.append(f"```\n{json.dumps(livre_struct, ensure_ascii=False, indent=2)}\n```")
-        context = "\n\n".join(contexts)
-
+        #Get funding info from the same collection
+        funding_query_params = {
+            "query_embedding": query_emb,
+            "n_results": 100,
+            "include": ['documents', 'metadatas']
+        }
+        funding_results = query_chromadb("innovia","funding",funding_query_params)
+        if(funding_results):
+            context += "\n\n**CONTEXT_FUNDING**:".join(format_context(funding_results['documents'][0], funding_results.get('metadatas', [[]])[0]))
 
         # Build prompt using template from JSON
         prompt, model_config = build_prompt_from_template(language, context, question, history_text, agent=agent)
@@ -502,6 +521,9 @@ def ask_question_stream(question, language="fr", timezone="UTC", locale="fr-FR",
                 if content:
                     answer += content
                     yield content
+
+        # À la fin de la réponse, envoyer un flag spécial pour demander au parent d'effacer l'historique utilisateur
+        yield "__CLEAR_USER_HISTORY__"
 
     except Exception as e:
         yield f"Error processing your question: {str(e)}"

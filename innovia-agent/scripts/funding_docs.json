@@ -1,0 +1,758 @@
+[
+  {
+    "id": "prog-001",
+    "text": "CRSNG Alliance financement R&D santé foresterie CRSNG Alliance supporte des projets en agriculture, énergie",
+    "metadata": {
+      "type": "PROGRAM",
+      "name": "CRSNG Alliance",
+      "trl": "3-7"
+    }
+  },
+  {
+    "id": "prog-002",
+    "text": "CRSNG ARD financement R&D biotech énergie CRSNG ARD supporte des projets en IA, transport",
+    "metadata": {
+      "type": "PROGRAM",
+      "name": "CRSNG ARD",
+      "trl": "1-9"
+    }
+  },
+  {
+    "id": "prog-003",
+    "text": "Mitacs Accélération financement R&D énergie manufacturier Mitacs Accélération supporte des projets en santé, manufacturier",
+    "metadata": {
+      "type": "PROGRAM",
+      "name": "Mitacs Accélération",
+      "trl": "3-8"
+    }
+  },
+  {
+    "id": "prog-004",
+    "text": "PARI CNRC financement R&D foresterie santé PARI CNRC supporte des projets en numérique, agriculture",
+    "metadata": {
+      "type": "PROGRAM",
+      "name": "PARI CNRC",
+      "trl": "3-7"
+    }
+  },
+  {
+    "id": "prog-005",
+    "text": "RS&DE financement R&D transport foresterie RS&DE supporte des projets en manufacturier, foresterie",
+    "metadata": {
+      "type": "PROGRAM",
+      "name": "RS&DE",
+      "trl": "2-7"
+    }
+  },
+  {
+    "id": "prog-006",
+    "text": "Programme PART financement R&D manufacturier agriculture Programme PART supporte des projets en numérique, foresterie",
+    "metadata": {
+      "type": "PROGRAM",
+      "name": "Programme PART",
+      "trl": "1-5"
+    }
+  },
+  {
+    "id": "prog-007",
+    "text": "Prompt financement R&D manufacturier foresterie Prompt supporte des projets en énergie, manufacturier",
+    "metadata": {
+      "type": "PROGRAM",
+      "name": "Prompt",
+      "trl": "4-7"
+    }
+  },
+  {
+    "id": "prog-008",
+    "text": "MEDTEQ+ financement R&D IA santé MEDTEQ+ supporte des projets en biotech, manufacturier",
+    "metadata": {
+      "type": "PROGRAM",
+      "name": "MEDTEQ+",
+      "trl": "4-7"
+    }
+  },
+  {
+    "id": "prog-009",
+    "text": "CRIBIQ financement R&D biotech santé CRIBIQ supporte des projets en biotech, IA",
+    "metadata": {
+      "type": "PROGRAM",
+      "name": "CRIBIQ",
+      "trl": "2-9"
+    }
+  },
+  {
+    "id": "prog-010",
+    "text": "Programme Innovation 10 financement R&D biotech manufacturier Programme de soutien à l'innovation",
+    "metadata": {
+      "type": "PROGRAM",
+      "name": "Programme Innovation 10",
+      "trl": "3-9"
+    }
+  },
+  {
+    "id": "prog-011",
+    "text": "Programme Innovation 11 financement R&D foresterie transport Programme de soutien à l'innovation",
+    "metadata": {
+      "type": "PROGRAM",
+      "name": "Programme Innovation 11",
+      "trl": "4-8"
+    }
+  },
+  {
+    "id": "prog-012",
+    "text": "Programme Innovation 12 financement R&D transport biotech Programme de soutien à l'innovation",
+    "metadata": {
+      "type": "PROGRAM",
+      "name": "Programme Innovation 12",
+      "trl": "2-8"
+    }
+  },
+  {
+    "id": "prog-013",
+    "text": "Programme Innovation 13 financement R&D numérique énergie Programme de soutien à l'innovation",
+    "metadata": {
+      "type": "PROGRAM",
+      "name": "Programme Innovation 13",
+      "trl": "3-6"
+    }
+  },
+  {
+    "id": "prog-014",
+    "text": "Programme Innovation 14 financement R&D énergie agriculture Programme de soutien à l'innovation",
+    "metadata": {
+      "type": "PROGRAM",
+      "name": "Programme Innovation 14",
+      "trl": "3-9"
+    }
+  },
+  {
+    "id": "prog-015",
+    "text": "Programme Innovation 15 financement R&D foresterie énergie Programme de soutien à l'innovation",
+    "metadata": {
+      "type": "PROGRAM",
+      "name": "Programme Innovation 15",
+      "trl": "1-9"
+    }
+  },
+  {
+    "id": "prog-016",
+    "text": "Programme Innovation 16 financement R&D IA biotech Programme de soutien à l'innovation",
+    "metadata": {
+      "type": "PROGRAM",
+      "name": "Programme Innovation 16",
+      "trl": "3-6"
+    }
+  },
+  {
+    "id": "prog-017",
+    "text": "Programme Innovation 17 financement R&D manufacturier santé Programme de soutien à l'innovation",
+    "metadata": {
+      "type": "PROGRAM",
+      "name": "Programme Innovation 17",
+      "trl": "3-9"
+    }
+  },
+  {
+    "id": "prog-018",
+    "text": "Programme Innovation 18 financement R&D transport foresterie Programme de soutien à l'innovation",
+    "metadata": {
+      "type": "PROGRAM",
+      "name": "Programme Innovation 18",
+      "trl": "4-7"
+    }
+  },
+  {
+    "id": "prog-019",
+    "text": "Programme Innovation 19 financement R&D manufacturier biotech Programme de soutien à l'innovation",
+    "metadata": {
+      "type": "PROGRAM",
+      "name": "Programme Innovation 19",
+      "trl": "4-8"
+    }
+  },
+  {
+    "id": "prog-020",
+    "text": "Programme Innovation 20 financement R&D manufacturier agriculture Programme de soutien à l'innovation",
+    "metadata": {
+      "type": "PROGRAM",
+      "name": "Programme Innovation 20",
+      "trl": "2-9"
+    }
+  },
+  {
+    "id": "prog-021",
+    "text": "Programme Innovation 21 financement R&D santé agriculture Programme de soutien à l'innovation",
+    "metadata": {
+      "type": "PROGRAM",
+      "name": "Programme Innovation 21",
+      "trl": "1-8"
+    }
+  },
+  {
+    "id": "prog-022",
+    "text": "Programme Innovation 22 financement R&D foresterie santé Programme de soutien à l'innovation",
+    "metadata": {
+      "type": "PROGRAM",
+      "name": "Programme Innovation 22",
+      "trl": "4-9"
+    }
+  },
+  {
+    "id": "prog-023",
+    "text": "Programme Innovation 23 financement R&D IA agriculture Programme de soutien à l'innovation",
+    "metadata": {
+      "type": "PROGRAM",
+      "name": "Programme Innovation 23",
+      "trl": "4-8"
+    }
+  },
+  {
+    "id": "prog-024",
+    "text": "Programme Innovation 24 financement R&D transport foresterie Programme de soutien à l'innovation",
+    "metadata": {
+      "type": "PROGRAM",
+      "name": "Programme Innovation 24",
+      "trl": "1-7"
+    }
+  },
+  {
+    "id": "prog-025",
+    "text": "Programme Innovation 25 financement R&D biotech transport Programme de soutien à l'innovation",
+    "metadata": {
+      "type": "PROGRAM",
+      "name": "Programme Innovation 25",
+      "trl": "1-6"
+    }
+  },
+  {
+    "id": "prog-026",
+    "text": "Programme Innovation 26 financement R&D IA foresterie Programme de soutien à l'innovation",
+    "metadata": {
+      "type": "PROGRAM",
+      "name": "Programme Innovation 26",
+      "trl": "1-8"
+    }
+  },
+  {
+    "id": "prog-027",
+    "text": "Programme Innovation 27 financement R&D manufacturier santé Programme de soutien à l'innovation",
+    "metadata": {
+      "type": "PROGRAM",
+      "name": "Programme Innovation 27",
+      "trl": "4-6"
+    }
+  },
+  {
+    "id": "prog-028",
+    "text": "Programme Innovation 28 financement R&D biotech transport Programme de soutien à l'innovation",
+    "metadata": {
+      "type": "PROGRAM",
+      "name": "Programme Innovation 28",
+      "trl": "3-6"
+    }
+  },
+  {
+    "id": "prog-029",
+    "text": "Programme Innovation 29 financement R&D transport foresterie Programme de soutien à l'innovation",
+    "metadata": {
+      "type": "PROGRAM",
+      "name": "Programme Innovation 29",
+      "trl": "1-7"
+    }
+  },
+  {
+    "id": "prog-030",
+    "text": "Programme Innovation 30 financement R&D manufacturier santé Programme de soutien à l'innovation",
+    "metadata": {
+      "type": "PROGRAM",
+      "name": "Programme Innovation 30",
+      "trl": "3-5"
+    }
+  },
+  {
+    "id": "prog-031",
+    "text": "Programme Innovation 31 financement R&D santé énergie Programme de soutien à l'innovation",
+    "metadata": {
+      "type": "PROGRAM",
+      "name": "Programme Innovation 31",
+      "trl": "1-9"
+    }
+  },
+  {
+    "id": "prog-032",
+    "text": "Programme Innovation 32 financement R&D biotech numérique Programme de soutien à l'innovation",
+    "metadata": {
+      "type": "PROGRAM",
+      "name": "Programme Innovation 32",
+      "trl": "1-6"
+    }
+  },
+  {
+    "id": "prog-033",
+    "text": "Programme Innovation 33 financement R&D transport foresterie Programme de soutien à l'innovation",
+    "metadata": {
+      "type": "PROGRAM",
+      "name": "Programme Innovation 33",
+      "trl": "3-9"
+    }
+  },
+  {
+    "id": "prog-034",
+    "text": "Programme Innovation 34 financement R&D transport numérique Programme de soutien à l'innovation",
+    "metadata": {
+      "type": "PROGRAM",
+      "name": "Programme Innovation 34",
+      "trl": "3-9"
+    }
+  },
+  {
+    "id": "prog-035",
+    "text": "Programme Innovation 35 financement R&D énergie transport Programme de soutien à l'innovation",
+    "metadata": {
+      "type": "PROGRAM",
+      "name": "Programme Innovation 35",
+      "trl": "1-5"
+    }
+  },
+  {
+    "id": "prog-036",
+    "text": "Programme Innovation 36 financement R&D biotech énergie Programme de soutien à l'innovation",
+    "metadata": {
+      "type": "PROGRAM",
+      "name": "Programme Innovation 36",
+      "trl": "3-6"
+    }
+  },
+  {
+    "id": "prog-037",
+    "text": "Programme Innovation 37 financement R&D numérique transport Programme de soutien à l'innovation",
+    "metadata": {
+      "type": "PROGRAM",
+      "name": "Programme Innovation 37",
+      "trl": "3-9"
+    }
+  },
+  {
+    "id": "prog-038",
+    "text": "Programme Innovation 38 financement R&D manufacturier numérique Programme de soutien à l'innovation",
+    "metadata": {
+      "type": "PROGRAM",
+      "name": "Programme Innovation 38",
+      "trl": "4-9"
+    }
+  },
+  {
+    "id": "prog-039",
+    "text": "Programme Innovation 39 financement R&D énergie santé Programme de soutien à l'innovation",
+    "metadata": {
+      "type": "PROGRAM",
+      "name": "Programme Innovation 39",
+      "trl": "2-5"
+    }
+  },
+  {
+    "id": "prog-040",
+    "text": "Programme Innovation 40 financement R&D numérique foresterie Programme de soutien à l'innovation",
+    "metadata": {
+      "type": "PROGRAM",
+      "name": "Programme Innovation 40",
+      "trl": "1-7"
+    }
+  },
+  {
+    "id": "prog-041",
+    "text": "Programme Innovation 41 financement R&D IA foresterie Programme de soutien à l'innovation",
+    "metadata": {
+      "type": "PROGRAM",
+      "name": "Programme Innovation 41",
+      "trl": "1-5"
+    }
+  },
+  {
+    "id": "prog-042",
+    "text": "Programme Innovation 42 financement R&D biotech transport Programme de soutien à l'innovation",
+    "metadata": {
+      "type": "PROGRAM",
+      "name": "Programme Innovation 42",
+      "trl": "2-6"
+    }
+  },
+  {
+    "id": "prog-043",
+    "text": "Programme Innovation 43 financement R&D IA transport Programme de soutien à l'innovation",
+    "metadata": {
+      "type": "PROGRAM",
+      "name": "Programme Innovation 43",
+      "trl": "4-7"
+    }
+  },
+  {
+    "id": "prog-044",
+    "text": "Programme Innovation 44 financement R&D manufacturier énergie Programme de soutien à l'innovation",
+    "metadata": {
+      "type": "PROGRAM",
+      "name": "Programme Innovation 44",
+      "trl": "3-7"
+    }
+  },
+  {
+    "id": "prog-045",
+    "text": "Programme Innovation 45 financement R&D biotech manufacturier Programme de soutien à l'innovation",
+    "metadata": {
+      "type": "PROGRAM",
+      "name": "Programme Innovation 45",
+      "trl": "1-8"
+    }
+  },
+  {
+    "id": "prog-046",
+    "text": "Programme Innovation 46 financement R&D agriculture biotech Programme de soutien à l'innovation",
+    "metadata": {
+      "type": "PROGRAM",
+      "name": "Programme Innovation 46",
+      "trl": "2-9"
+    }
+  },
+  {
+    "id": "prog-047",
+    "text": "Programme Innovation 47 financement R&D énergie transport Programme de soutien à l'innovation",
+    "metadata": {
+      "type": "PROGRAM",
+      "name": "Programme Innovation 47",
+      "trl": "4-6"
+    }
+  },
+  {
+    "id": "prog-048",
+    "text": "Programme Innovation 48 financement R&D manufacturier numérique Programme de soutien à l'innovation",
+    "metadata": {
+      "type": "PROGRAM",
+      "name": "Programme Innovation 48",
+      "trl": "1-5"
+    }
+  },
+  {
+    "id": "prog-049",
+    "text": "Programme Innovation 49 financement R&D foresterie santé Programme de soutien à l'innovation",
+    "metadata": {
+      "type": "PROGRAM",
+      "name": "Programme Innovation 49",
+      "trl": "3-9"
+    }
+  },
+  {
+    "id": "prog-050",
+    "text": "Programme Innovation 50 financement R&D santé numérique Programme de soutien à l'innovation",
+    "metadata": {
+      "type": "PROGRAM",
+      "name": "Programme Innovation 50",
+      "trl": "4-8"
+    }
+  },
+  {
+    "id": "prog-051",
+    "text": "Programme Innovation 51 financement R&D santé biotech Programme de soutien à l'innovation",
+    "metadata": {
+      "type": "PROGRAM",
+      "name": "Programme Innovation 51",
+      "trl": "2-9"
+    }
+  },
+  {
+    "id": "prog-052",
+    "text": "Programme Innovation 52 financement R&D énergie foresterie Programme de soutien à l'innovation",
+    "metadata": {
+      "type": "PROGRAM",
+      "name": "Programme Innovation 52",
+      "trl": "4-8"
+    }
+  },
+  {
+    "id": "prog-053",
+    "text": "Programme Innovation 53 financement R&D biotech transport Programme de soutien à l'innovation",
+    "metadata": {
+      "type": "PROGRAM",
+      "name": "Programme Innovation 53",
+      "trl": "2-5"
+    }
+  },
+  {
+    "id": "prog-054",
+    "text": "Programme Innovation 54 financement R&D énergie IA Programme de soutien à l'innovation",
+    "metadata": {
+      "type": "PROGRAM",
+      "name": "Programme Innovation 54",
+      "trl": "4-9"
+    }
+  },
+  {
+    "id": "prog-055",
+    "text": "Programme Innovation 55 financement R&D santé énergie Programme de soutien à l'innovation",
+    "metadata": {
+      "type": "PROGRAM",
+      "name": "Programme Innovation 55",
+      "trl": "1-8"
+    }
+  },
+  {
+    "id": "prog-056",
+    "text": "Programme Innovation 56 financement R&D numérique IA Programme de soutien à l'innovation",
+    "metadata": {
+      "type": "PROGRAM",
+      "name": "Programme Innovation 56",
+      "trl": "2-6"
+    }
+  },
+  {
+    "id": "prog-057",
+    "text": "Programme Innovation 57 financement R&D santé transport Programme de soutien à l'innovation",
+    "metadata": {
+      "type": "PROGRAM",
+      "name": "Programme Innovation 57",
+      "trl": "3-6"
+    }
+  },
+  {
+    "id": "prog-058",
+    "text": "Programme Innovation 58 financement R&D IA biotech Programme de soutien à l'innovation",
+    "metadata": {
+      "type": "PROGRAM",
+      "name": "Programme Innovation 58",
+      "trl": "3-7"
+    }
+  },
+  {
+    "id": "prog-059",
+    "text": "Programme Innovation 59 financement R&D biotech agriculture Programme de soutien à l'innovation",
+    "metadata": {
+      "type": "PROGRAM",
+      "name": "Programme Innovation 59",
+      "trl": "3-8"
+    }
+  },
+  {
+    "id": "prog-060",
+    "text": "Programme Innovation 60 financement R&D numérique IA Programme de soutien à l'innovation",
+    "metadata": {
+      "type": "PROGRAM",
+      "name": "Programme Innovation 60",
+      "trl": "1-8"
+    }
+  },
+  {
+    "id": "prog-061",
+    "text": "Programme Innovation 61 financement R&D biotech santé Programme de soutien à l'innovation",
+    "metadata": {
+      "type": "PROGRAM",
+      "name": "Programme Innovation 61",
+      "trl": "3-5"
+    }
+  },
+  {
+    "id": "prog-062",
+    "text": "Programme Innovation 62 financement R&D santé transport Programme de soutien à l'innovation",
+    "metadata": {
+      "type": "PROGRAM",
+      "name": "Programme Innovation 62",
+      "trl": "4-7"
+    }
+  },
+  {
+    "id": "prog-063",
+    "text": "Programme Innovation 63 financement R&D transport numérique Programme de soutien à l'innovation",
+    "metadata": {
+      "type": "PROGRAM",
+      "name": "Programme Innovation 63",
+      "trl": "2-9"
+    }
+  },
+  {
+    "id": "prog-064",
+    "text": "Programme Innovation 64 financement R&D santé numérique Programme de soutien à l'innovation",
+    "metadata": {
+      "type": "PROGRAM",
+      "name": "Programme Innovation 64",
+      "trl": "3-8"
+    }
+  },
+  {
+    "id": "prog-065",
+    "text": "Programme Innovation 65 financement R&D IA manufacturier Programme de soutien à l'innovation",
+    "metadata": {
+      "type": "PROGRAM",
+      "name": "Programme Innovation 65",
+      "trl": "1-7"
+    }
+  },
+  {
+    "id": "prog-066",
+    "text": "Programme Innovation 66 financement R&D foresterie transport Programme de soutien à l'innovation",
+    "metadata": {
+      "type": "PROGRAM",
+      "name": "Programme Innovation 66",
+      "trl": "4-8"
+    }
+  },
+  {
+    "id": "prog-067",
+    "text": "Programme Innovation 67 financement R&D énergie manufacturier Programme de soutien à l'innovation",
+    "metadata": {
+      "type": "PROGRAM",
+      "name": "Programme Innovation 67",
+      "trl": "4-5"
+    }
+  },
+  {
+    "id": "prog-068",
+    "text": "Programme Innovation 68 financement R&D foresterie agriculture Programme de soutien à l'innovation",
+    "metadata": {
+      "type": "PROGRAM",
+      "name": "Programme Innovation 68",
+      "trl": "2-9"
+    }
+  },
+  {
+    "id": "prog-069",
+    "text": "Programme Innovation 69 financement R&D santé IA Programme de soutien à l'innovation",
+    "metadata": {
+      "type": "PROGRAM",
+      "name": "Programme Innovation 69",
+      "trl": "2-5"
+    }
+  },
+  {
+    "id": "prog-070",
+    "text": "Programme Innovation 70 financement R&D énergie manufacturier Programme de soutien à l'innovation",
+    "metadata": {
+      "type": "PROGRAM",
+      "name": "Programme Innovation 70",
+      "trl": "4-7"
+    }
+  },
+  {
+    "id": "prog-071",
+    "text": "Programme Innovation 71 financement R&D énergie agriculture Programme de soutien à l'innovation",
+    "metadata": {
+      "type": "PROGRAM",
+      "name": "Programme Innovation 71",
+      "trl": "4-7"
+    }
+  },
+  {
+    "id": "prog-072",
+    "text": "Programme Innovation 72 financement R&D numérique transport Programme de soutien à l'innovation",
+    "metadata": {
+      "type": "PROGRAM",
+      "name": "Programme Innovation 72",
+      "trl": "1-9"
+    }
+  },
+  {
+    "id": "prog-073",
+    "text": "Programme Innovation 73 financement R&D numérique énergie Programme de soutien à l'innovation",
+    "metadata": {
+      "type": "PROGRAM",
+      "name": "Programme Innovation 73",
+      "trl": "1-7"
+    }
+  },
+  {
+    "id": "prog-074",
+    "text": "Programme Innovation 74 financement R&D IA transport Programme de soutien à l'innovation",
+    "metadata": {
+      "type": "PROGRAM",
+      "name": "Programme Innovation 74",
+      "trl": "2-9"
+    }
+  },
+  {
+    "id": "prog-075",
+    "text": "Programme Innovation 75 financement R&D numérique agriculture Programme de soutien à l'innovation",
+    "metadata": {
+      "type": "PROGRAM",
+      "name": "Programme Innovation 75",
+      "trl": "1-9"
+    }
+  },
+  {
+    "id": "prog-076",
+    "text": "Programme Innovation 76 financement R&D manufacturier numérique Programme de soutien à l'innovation",
+    "metadata": {
+      "type": "PROGRAM",
+      "name": "Programme Innovation 76",
+      "trl": "1-7"
+    }
+  },
+  {
+    "id": "prog-077",
+    "text": "Programme Innovation 77 financement R&D transport santé Programme de soutien à l'innovation",
+    "metadata": {
+      "type": "PROGRAM",
+      "name": "Programme Innovation 77",
+      "trl": "4-6"
+    }
+  },
+  {
+    "id": "prog-078",
+    "text": "Programme Innovation 78 financement R&D transport manufacturier Programme de soutien à l'innovation",
+    "metadata": {
+      "type": "PROGRAM",
+      "name": "Programme Innovation 78",
+      "trl": "4-5"
+    }
+  },
+  {
+    "id": "prog-079",
+    "text": "Programme Innovation 79 financement R&D numérique énergie Programme de soutien à l'innovation",
+    "metadata": {
+      "type": "PROGRAM",
+      "name": "Programme Innovation 79",
+      "trl": "3-7"
+    }
+  },
+  {
+    "id": "prog-080",
+    "text": "Programme Innovation 80 financement R&D manufacturier agriculture Programme de soutien à l'innovation",
+    "metadata": {
+      "type": "PROGRAM",
+      "name": "Programme Innovation 80",
+      "trl": "3-5"
+    }
+  },
+  {
+    "id": "prog-081",
+    "text": "Programme Innovation 81 financement R&D santé numérique Programme de soutien à l'innovation",
+    "metadata": {
+      "type": "PROGRAM",
+      "name": "Programme Innovation 81",
+      "trl": "1-6"
+    }
+  },
+  {
+    "id": "prog-082",
+    "text": "Programme Innovation 82 financement R&D énergie agriculture Programme de soutien à l'innovation",
+    "metadata": {
+      "type": "PROGRAM",
+      "name": "Programme Innovation 82",
+      "trl": "4-9"
+    }
+  },
+  {
+    "id": "prog-083",
+    "text": "Programme Innovation 83 financement R&D manufacturier IA Programme de soutien à l'innovation",
+    "metadata": {
+      "type": "PROGRAM",
+      "name": "Programme Innovation 83",
+      "trl": "3-7"
+    }
+  },
+  {
+    "id": "prog-084",
+    "text": "Programme Innovation 84 financement R&D agriculture transport Programme de soutien à l'innovation",
+    "metadata": {
+      "type": "PROGRAM",
+      "name": "Programme Innovation 84",
+      "trl": "4-8"
+    }
+  }
+]

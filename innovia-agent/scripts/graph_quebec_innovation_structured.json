@@ -1,0 +1,959 @@
+{
+  "metadata": {
+    "version": "ULTIME GRAPH 2.0",
+    "nodes": 25,
+    "edges": 154,
+    "description": "Graph structur\u00e9 non-al\u00e9atoire Qu\u00e9bec innovation"
+  },
+  "nodes": [
+    {
+      "id": "domain_chimie_verte",
+      "type": "DOMAIN",
+      "name": "chimie verte"
+    },
+    {
+      "id": "domain_biotechnologie",
+      "type": "DOMAIN",
+      "name": "biotechnologie"
+    },
+    {
+      "id": "domain_foresterie",
+      "type": "DOMAIN",
+      "name": "foresterie"
+    },
+    {
+      "id": "domain_sant\u00e9",
+      "type": "DOMAIN",
+      "name": "sant\u00e9"
+    },
+    {
+      "id": "domain_IA",
+      "type": "DOMAIN",
+      "name": "IA"
+    },
+    {
+      "id": "domain_\u00e9nergie",
+      "type": "DOMAIN",
+      "name": "\u00e9nergie"
+    },
+    {
+      "id": "domain_manufacturier",
+      "type": "DOMAIN",
+      "name": "manufacturier"
+    },
+    {
+      "id": "domain_agriculture",
+      "type": "DOMAIN",
+      "name": "agriculture"
+    },
+    {
+      "id": "cctt_kemitek",
+      "type": "CCTT",
+      "name": "KEMITEK",
+      "domaines": [
+        "chimie verte",
+        "biotechnologie"
+      ]
+    },
+    {
+      "id": "cctt_serex",
+      "type": "CCTT",
+      "name": "SEREX",
+      "domaines": [
+        "foresterie",
+        "chimie verte"
+      ]
+    },
+    {
+      "id": "cctt_topmed",
+      "type": "CCTT",
+      "name": "TOPMED",
+      "domaines": [
+        "sant\u00e9",
+        "IA"
+      ]
+    },
+    {
+      "id": "cctt_cisa",
+      "type": "CCTT",
+      "name": "CISA",
+      "domaines": [
+        "agriculture",
+        "innovation sociale"
+      ]
+    },
+    {
+      "id": "cctt_cintech",
+      "type": "CCTT",
+      "name": "CINTECH",
+      "domaines": [
+        "agriculture",
+        "biotechnologie"
+      ]
+    },
+    {
+      "id": "cctt_merinov",
+      "type": "CCTT",
+      "name": "MERINOV",
+      "domaines": [
+        "biotechnologie",
+        "environnement"
+      ]
+    },
+    {
+      "id": "cctt_optech",
+      "type": "CCTT",
+      "name": "OPTECH",
+      "domaines": [
+        "IA",
+        "manufacturier"
+      ]
+    },
+    {
+      "id": "cctt_llio",
+      "type": "CCTT",
+      "name": "LLIO",
+      "domaines": [
+        "innovation",
+        "IA"
+      ]
+    },
+    {
+      "id": "cctt_experisens",
+      "type": "CCTT",
+      "name": "EXPERISENS",
+      "domaines": [
+        "num\u00e9rique",
+        "tourisme"
+      ]
+    },
+    {
+      "id": "prog_crsng_alliance",
+      "type": "PROGRAM",
+      "name": "CRSNG Alliance",
+      "trl": "3-7",
+      "collaboration": true
+    },
+    {
+      "id": "prog_crsng_ard",
+      "type": "PROGRAM",
+      "name": "CRSNG ARD",
+      "trl": "3-7",
+      "collaboration": true
+    },
+    {
+      "id": "prog_mitacs_acc\u00e9l\u00e9ration",
+      "type": "PROGRAM",
+      "name": "Mitacs Acc\u00e9l\u00e9ration",
+      "trl": "2-6",
+      "collaboration": true
+    },
+    {
+      "id": "prog_pari_cnrc",
+      "type": "PROGRAM",
+      "name": "PARI CNRC",
+      "trl": "5-9",
+      "collaboration": false
+    },
+    {
+      "id": "prog_rs&de",
+      "type": "PROGRAM",
+      "name": "RS&DE",
+      "trl": "1-9",
+      "collaboration": false
+    },
+    {
+      "id": "prog_programme_part",
+      "type": "PROGRAM",
+      "name": "Programme PART",
+      "trl": "3-7",
+      "collaboration": true
+    },
+    {
+      "id": "prog_prompt",
+      "type": "PROGRAM",
+      "name": "Prompt",
+      "trl": "3-7",
+      "collaboration": true
+    },
+    {
+      "id": "prog_medteq+",
+      "type": "PROGRAM",
+      "name": "MEDTEQ+",
+      "trl": "4-8",
+      "collaboration": true
+    }
+  ],
+  "edges": [
+    {
+      "from": "domain_chimie_verte",
+      "to": "cctt_kemitek",
+      "type": "HAS_EXPERTISE"
+    },
+    {
+      "from": "domain_biotechnologie",
+      "to": "cctt_kemitek",
+      "type": "HAS_EXPERTISE"
+    },
+    {
+      "from": "domain_foresterie",
+      "to": "cctt_serex",
+      "type": "HAS_EXPERTISE"
+    },
+    {
+      "from": "domain_chimie_verte",
+      "to": "cctt_serex",
+      "type": "HAS_EXPERTISE"
+    },
+    {
+      "from": "domain_sant\u00e9",
+      "to": "cctt_topmed",
+      "type": "HAS_EXPERTISE"
+    },
+    {
+      "from": "domain_IA",
+      "to": "cctt_topmed",
+      "type": "HAS_EXPERTISE"
+    },
+    {
+      "from": "domain_agriculture",
+      "to": "cctt_cisa",
+      "type": "HAS_EXPERTISE"
+    },
+    {
+      "from": "domain_innovation_sociale",
+      "to": "cctt_cisa",
+      "type": "HAS_EXPERTISE"
+    },
+    {
+      "from": "domain_agriculture",
+      "to": "cctt_cintech",
+      "type": "HAS_EXPERTISE"
+    },
+    {
+      "from": "domain_biotechnologie",
+      "to": "cctt_cintech",
+      "type": "HAS_EXPERTISE"
+    },
+    {
+      "from": "domain_biotechnologie",
+      "to": "cctt_merinov",
+      "type": "HAS_EXPERTISE"
+    },
+    {
+      "from": "domain_environnement",
+      "to": "cctt_merinov",
+      "type": "HAS_EXPERTISE"
+    },
+    {
+      "from": "domain_IA",
+      "to": "cctt_optech",
+      "type": "HAS_EXPERTISE"
+    },
+    {
+      "from": "domain_manufacturier",
+      "to": "cctt_optech",
+      "type": "HAS_EXPERTISE"
+    },
+    {
+      "from": "domain_innovation",
+      "to": "cctt_llio",
+      "type": "HAS_EXPERTISE"
+    },
+    {
+      "from": "domain_IA",
+      "to": "cctt_llio",
+      "type": "HAS_EXPERTISE"
+    },
+    {
+      "from": "domain_num\u00e9rique",
+      "to": "cctt_experisens",
+      "type": "HAS_EXPERTISE"
+    },
+    {
+      "from": "domain_tourisme",
+      "to": "cctt_experisens",
+      "type": "HAS_EXPERTISE"
+    },
+    {
+      "from": "cctt_kemitek",
+      "to": "prog_crsng_alliance",
+      "type": "POTENTIAL_FIT"
+    },
+    {
+      "from": "cctt_kemitek",
+      "to": "prog_crsng_ard",
+      "type": "POTENTIAL_FIT"
+    },
+    {
+      "from": "cctt_kemitek",
+      "to": "prog_mitacs_acc\u00e9l\u00e9ration",
+      "type": "POTENTIAL_FIT"
+    },
+    {
+      "from": "cctt_kemitek",
+      "to": "prog_pari_cnrc",
+      "type": "POTENTIAL_FIT"
+    },
+    {
+      "from": "cctt_kemitek",
+      "to": "prog_rs&de",
+      "type": "POTENTIAL_FIT"
+    },
+    {
+      "from": "cctt_kemitek",
+      "to": "prog_programme_part",
+      "type": "POTENTIAL_FIT"
+    },
+    {
+      "from": "cctt_kemitek",
+      "to": "prog_prompt",
+      "type": "POTENTIAL_FIT"
+    },
+    {
+      "from": "cctt_kemitek",
+      "to": "prog_medteq+",
+      "type": "POTENTIAL_FIT"
+    },
+    {
+      "from": "cctt_serex",
+      "to": "prog_crsng_alliance",
+      "type": "POTENTIAL_FIT"
+    },
+    {
+      "from": "cctt_serex",
+      "to": "prog_crsng_ard",
+      "type": "POTENTIAL_FIT"
+    },
+    {
+      "from": "cctt_serex",
+      "to": "prog_mitacs_acc\u00e9l\u00e9ration",
+      "type": "POTENTIAL_FIT"
+    },
+    {
+      "from": "cctt_serex",
+      "to": "prog_pari_cnrc",
+      "type": "POTENTIAL_FIT"
+    },
+    {
+      "from": "cctt_serex",
+      "to": "prog_rs&de",
+      "type": "POTENTIAL_FIT"
+    },
+    {
+      "from": "cctt_serex",
+      "to": "prog_programme_part",
+      "type": "POTENTIAL_FIT"
+    },
+    {
+      "from": "cctt_serex",
+      "to": "prog_prompt",
+      "type": "POTENTIAL_FIT"
+    },
+    {
+      "from": "cctt_serex",
+      "to": "prog_medteq+",
+      "type": "POTENTIAL_FIT"
+    },
+    {
+      "from": "cctt_topmed",
+      "to": "prog_crsng_alliance",
+      "type": "POTENTIAL_FIT"
+    },
+    {
+      "from": "cctt_topmed",
+      "to": "prog_crsng_ard",
+      "type": "POTENTIAL_FIT"
+    },
+    {
+      "from": "cctt_topmed",
+      "to": "prog_mitacs_acc\u00e9l\u00e9ration",
+      "type": "POTENTIAL_FIT"
+    },
+    {
+      "from": "cctt_topmed",
+      "to": "prog_pari_cnrc",
+      "type": "POTENTIAL_FIT"
+    },
+    {
+      "from": "cctt_topmed",
+      "to": "prog_rs&de",
+      "type": "POTENTIAL_FIT"
+    },
+    {
+      "from": "cctt_topmed",
+      "to": "prog_programme_part",
+      "type": "POTENTIAL_FIT"
+    },
+    {
+      "from": "cctt_topmed",
+      "to": "prog_prompt",
+      "type": "POTENTIAL_FIT"
+    },
+    {
+      "from": "cctt_topmed",
+      "to": "prog_medteq+",
+      "type": "POTENTIAL_FIT"
+    },
+    {
+      "from": "cctt_cisa",
+      "to": "prog_crsng_alliance",
+      "type": "POTENTIAL_FIT"
+    },
+    {
+      "from": "cctt_cisa",
+      "to": "prog_crsng_ard",
+      "type": "POTENTIAL_FIT"
+    },
+    {
+      "from": "cctt_cisa",
+      "to": "prog_mitacs_acc\u00e9l\u00e9ration",
+      "type": "POTENTIAL_FIT"
+    },
+    {
+      "from": "cctt_cisa",
+      "to": "prog_pari_cnrc",
+      "type": "POTENTIAL_FIT"
+    },
+    {
+      "from": "cctt_cisa",
+      "to": "prog_rs&de",
+      "type": "POTENTIAL_FIT"
+    },
+    {
+      "from": "cctt_cisa",
+      "to": "prog_programme_part",
+      "type": "POTENTIAL_FIT"
+    },
+    {
+      "from": "cctt_cisa",
+      "to": "prog_prompt",
+      "type": "POTENTIAL_FIT"
+    },
+    {
+      "from": "cctt_cisa",
+      "to": "prog_medteq+",
+      "type": "POTENTIAL_FIT"
+    },
+    {
+      "from": "cctt_cintech",
+      "to": "prog_crsng_alliance",
+      "type": "POTENTIAL_FIT"
+    },
+    {
+      "from": "cctt_cintech",
+      "to": "prog_crsng_ard",
+      "type": "POTENTIAL_FIT"
+    },
+    {
+      "from": "cctt_cintech",
+      "to": "prog_mitacs_acc\u00e9l\u00e9ration",
+      "type": "POTENTIAL_FIT"
+    },
+    {
+      "from": "cctt_cintech",
+      "to": "prog_pari_cnrc",
+      "type": "POTENTIAL_FIT"
+    },
+    {
+      "from": "cctt_cintech",
+      "to": "prog_rs&de",
+      "type": "POTENTIAL_FIT"
+    },
+    {
+      "from": "cctt_cintech",
+      "to": "prog_programme_part",
+      "type": "POTENTIAL_FIT"
+    },
+    {
+      "from": "cctt_cintech",
+      "to": "prog_prompt",
+      "type": "POTENTIAL_FIT"
+    },
+    {
+      "from": "cctt_cintech",
+      "to": "prog_medteq+",
+      "type": "POTENTIAL_FIT"
+    },
+    {
+      "from": "cctt_merinov",
+      "to": "prog_crsng_alliance",
+      "type": "POTENTIAL_FIT"
+    },
+    {
+      "from": "cctt_merinov",
+      "to": "prog_crsng_ard",
+      "type": "POTENTIAL_FIT"
+    },
+    {
+      "from": "cctt_merinov",
+      "to": "prog_mitacs_acc\u00e9l\u00e9ration",
+      "type": "POTENTIAL_FIT"
+    },
+    {
+      "from": "cctt_merinov",
+      "to": "prog_pari_cnrc",
+      "type": "POTENTIAL_FIT"
+    },
+    {
+      "from": "cctt_merinov",
+      "to": "prog_rs&de",
+      "type": "POTENTIAL_FIT"
+    },
+    {
+      "from": "cctt_merinov",
+      "to": "prog_programme_part",
+      "type": "POTENTIAL_FIT"
+    },
+    {
+      "from": "cctt_merinov",
+      "to": "prog_prompt",
+      "type": "POTENTIAL_FIT"
+    },
+    {
+      "from": "cctt_merinov",
+      "to": "prog_medteq+",
+      "type": "POTENTIAL_FIT"
+    },
+    {
+      "from": "cctt_optech",
+      "to": "prog_crsng_alliance",
+      "type": "POTENTIAL_FIT"
+    },
+    {
+      "from": "cctt_optech",
+      "to": "prog_crsng_ard",
+      "type": "POTENTIAL_FIT"
+    },
+    {
+      "from": "cctt_optech",
+      "to": "prog_mitacs_acc\u00e9l\u00e9ration",
+      "type": "POTENTIAL_FIT"
+    },
+    {
+      "from": "cctt_optech",
+      "to": "prog_pari_cnrc",
+      "type": "POTENTIAL_FIT"
+    },
+    {
+      "from": "cctt_optech",
+      "to": "prog_rs&de",
+      "type": "POTENTIAL_FIT"
+    },
+    {
+      "from": "cctt_optech",
+      "to": "prog_programme_part",
+      "type": "POTENTIAL_FIT"
+    },
+    {
+      "from": "cctt_optech",
+      "to": "prog_prompt",
+      "type": "POTENTIAL_FIT"
+    },
+    {
+      "from": "cctt_optech",
+      "to": "prog_medteq+",
+      "type": "POTENTIAL_FIT"
+    },
+    {
+      "from": "cctt_llio",
+      "to": "prog_crsng_alliance",
+      "type": "POTENTIAL_FIT"
+    },
+    {
+      "from": "cctt_llio",
+      "to": "prog_crsng_ard",
+      "type": "POTENTIAL_FIT"
+    },
+    {
+      "from": "cctt_llio",
+      "to": "prog_mitacs_acc\u00e9l\u00e9ration",
+      "type": "POTENTIAL_FIT"
+    },
+    {
+      "from": "cctt_llio",
+      "to": "prog_pari_cnrc",
+      "type": "POTENTIAL_FIT"
+    },
+    {
+      "from": "cctt_llio",
+      "to": "prog_rs&de",
+      "type": "POTENTIAL_FIT"
+    },
+    {
+      "from": "cctt_llio",
+      "to": "prog_programme_part",
+      "type": "POTENTIAL_FIT"
+    },
+    {
+      "from": "cctt_llio",
+      "to": "prog_prompt",
+      "type": "POTENTIAL_FIT"
+    },
+    {
+      "from": "cctt_llio",
+      "to": "prog_medteq+",
+      "type": "POTENTIAL_FIT"
+    },
+    {
+      "from": "cctt_experisens",
+      "to": "prog_crsng_alliance",
+      "type": "POTENTIAL_FIT"
+    },
+    {
+      "from": "cctt_experisens",
+      "to": "prog_crsng_ard",
+      "type": "POTENTIAL_FIT"
+    },
+    {
+      "from": "cctt_experisens",
+      "to": "prog_mitacs_acc\u00e9l\u00e9ration",
+      "type": "POTENTIAL_FIT"
+    },
+    {
+      "from": "cctt_experisens",
+      "to": "prog_pari_cnrc",
+      "type": "POTENTIAL_FIT"
+    },
+    {
+      "from": "cctt_experisens",
+      "to": "prog_rs&de",
+      "type": "POTENTIAL_FIT"
+    },
+    {
+      "from": "cctt_experisens",
+      "to": "prog_programme_part",
+      "type": "POTENTIAL_FIT"
+    },
+    {
+      "from": "cctt_experisens",
+      "to": "prog_prompt",
+      "type": "POTENTIAL_FIT"
+    },
+    {
+      "from": "cctt_experisens",
+      "to": "prog_medteq+",
+      "type": "POTENTIAL_FIT"
+    },
+    {
+      "from": "domain_chimie_verte",
+      "to": "prog_crsng_alliance",
+      "type": "ELIGIBLE_FOR"
+    },
+    {
+      "from": "domain_chimie_verte",
+      "to": "prog_crsng_ard",
+      "type": "ELIGIBLE_FOR"
+    },
+    {
+      "from": "domain_chimie_verte",
+      "to": "prog_mitacs_acc\u00e9l\u00e9ration",
+      "type": "ELIGIBLE_FOR"
+    },
+    {
+      "from": "domain_chimie_verte",
+      "to": "prog_pari_cnrc",
+      "type": "ELIGIBLE_FOR"
+    },
+    {
+      "from": "domain_chimie_verte",
+      "to": "prog_rs&de",
+      "type": "ELIGIBLE_FOR"
+    },
+    {
+      "from": "domain_chimie_verte",
+      "to": "prog_programme_part",
+      "type": "ELIGIBLE_FOR"
+    },
+    {
+      "from": "domain_chimie_verte",
+      "to": "prog_prompt",
+      "type": "ELIGIBLE_FOR"
+    },
+    {
+      "from": "domain_chimie_verte",
+      "to": "prog_medteq+",
+      "type": "ELIGIBLE_FOR"
+    },
+    {
+      "from": "domain_biotechnologie",
+      "to": "prog_crsng_alliance",
+      "type": "ELIGIBLE_FOR"
+    },
+    {
+      "from": "domain_biotechnologie",
+      "to": "prog_crsng_ard",
+      "type": "ELIGIBLE_FOR"
+    },
+    {
+      "from": "domain_biotechnologie",
+      "to": "prog_mitacs_acc\u00e9l\u00e9ration",
+      "type": "ELIGIBLE_FOR"
+    },
+    {
+      "from": "domain_biotechnologie",
+      "to": "prog_pari_cnrc",
+      "type": "ELIGIBLE_FOR"
+    },
+    {
+      "from": "domain_biotechnologie",
+      "to": "prog_rs&de",
+      "type": "ELIGIBLE_FOR"
+    },
+    {
+      "from": "domain_biotechnologie",
+      "to": "prog_programme_part",
+      "type": "ELIGIBLE_FOR"
+    },
+    {
+      "from": "domain_biotechnologie",
+      "to": "prog_prompt",
+      "type": "ELIGIBLE_FOR"
+    },
+    {
+      "from": "domain_biotechnologie",
+      "to": "prog_medteq+",
+      "type": "ELIGIBLE_FOR"
+    },
+    {
+      "from": "domain_foresterie",
+      "to": "prog_crsng_alliance",
+      "type": "ELIGIBLE_FOR"
+    },
+    {
+      "from": "domain_foresterie",
+      "to": "prog_crsng_ard",
+      "type": "ELIGIBLE_FOR"
+    },
+    {
+      "from": "domain_foresterie",
+      "to": "prog_mitacs_acc\u00e9l\u00e9ration",
+      "type": "ELIGIBLE_FOR"
+    },
+    {
+      "from": "domain_foresterie",
+      "to": "prog_pari_cnrc",
+      "type": "ELIGIBLE_FOR"
+    },
+    {
+      "from": "domain_foresterie",
+      "to": "prog_rs&de",
+      "type": "ELIGIBLE_FOR"
+    },
+    {
+      "from": "domain_foresterie",
+      "to": "prog_programme_part",
+      "type": "ELIGIBLE_FOR"
+    },
+    {
+      "from": "domain_foresterie",
+      "to": "prog_prompt",
+      "type": "ELIGIBLE_FOR"
+    },
+    {
+      "from": "domain_foresterie",
+      "to": "prog_medteq+",
+      "type": "ELIGIBLE_FOR"
+    },
+    {
+      "from": "domain_sant\u00e9",
+      "to": "prog_crsng_alliance",
+      "type": "ELIGIBLE_FOR"
+    },
+    {
+      "from": "domain_sant\u00e9",
+      "to": "prog_crsng_ard",
+      "type": "ELIGIBLE_FOR"
+    },
+    {
+      "from": "domain_sant\u00e9",
+      "to": "prog_mitacs_acc\u00e9l\u00e9ration",
+      "type": "ELIGIBLE_FOR"
+    },
+    {
+      "from": "domain_sant\u00e9",
+      "to": "prog_pari_cnrc",
+      "type": "ELIGIBLE_FOR"
+    },
+    {
+      "from": "domain_sant\u00e9",
+      "to": "prog_rs&de",
+      "type": "ELIGIBLE_FOR"
+    },
+    {
+      "from": "domain_sant\u00e9",
+      "to": "prog_programme_part",
+      "type": "ELIGIBLE_FOR"
+    },
+    {
+      "from": "domain_sant\u00e9",
+      "to": "prog_prompt",
+      "type": "ELIGIBLE_FOR"
+    },
+    {
+      "from": "domain_sant\u00e9",
+      "to": "prog_medteq+",
+      "type": "ELIGIBLE_FOR"
+    },
+    {
+      "from": "domain_IA",
+      "to": "prog_crsng_alliance",
+      "type": "ELIGIBLE_FOR"
+    },
+    {
+      "from": "domain_IA",
+      "to": "prog_crsng_ard",
+      "type": "ELIGIBLE_FOR"
+    },
+    {
+      "from": "domain_IA",
+      "to": "prog_mitacs_acc\u00e9l\u00e9ration",
+      "type": "ELIGIBLE_FOR"
+    },
+    {
+      "from": "domain_IA",
+      "to": "prog_pari_cnrc",
+      "type": "ELIGIBLE_FOR"
+    },
+    {
+      "from": "domain_IA",
+      "to": "prog_rs&de",
+      "type": "ELIGIBLE_FOR"
+    },
+    {
+      "from": "domain_IA",
+      "to": "prog_programme_part",
+      "type": "ELIGIBLE_FOR"
+    },
+    {
+      "from": "domain_IA",
+      "to": "prog_prompt",
+      "type": "ELIGIBLE_FOR"
+    },
+    {
+      "from": "domain_IA",
+      "to": "prog_medteq+",
+      "type": "ELIGIBLE_FOR"
+    },
+    {
+      "from": "domain_\u00e9nergie",
+      "to": "prog_crsng_alliance",
+      "type": "ELIGIBLE_FOR"
+    },
+    {
+      "from": "domain_\u00e9nergie",
+      "to": "prog_crsng_ard",
+      "type": "ELIGIBLE_FOR"
+    },
+    {
+      "from": "domain_\u00e9nergie",
+      "to": "prog_mitacs_acc\u00e9l\u00e9ration",
+      "type": "ELIGIBLE_FOR"
+    },
+    {
+      "from": "domain_\u00e9nergie",
+      "to": "prog_pari_cnrc",
+      "type": "ELIGIBLE_FOR"
+    },
+    {
+      "from": "domain_\u00e9nergie",
+      "to": "prog_rs&de",
+      "type": "ELIGIBLE_FOR"
+    },
+    {
+      "from": "domain_\u00e9nergie",
+      "to": "prog_programme_part",
+      "type": "ELIGIBLE_FOR"
+    },
+    {
+      "from": "domain_\u00e9nergie",
+      "to": "prog_prompt",
+      "type": "ELIGIBLE_FOR"
+    },
+    {
+      "from": "domain_\u00e9nergie",
+      "to": "prog_medteq+",
+      "type": "ELIGIBLE_FOR"
+    },
+    {
+      "from": "domain_manufacturier",
+      "to": "prog_crsng_alliance",
+      "type": "ELIGIBLE_FOR"
+    },
+    {
+      "from": "domain_manufacturier",
+      "to": "prog_crsng_ard",
+      "type": "ELIGIBLE_FOR"
+    },
+    {
+      "from": "domain_manufacturier",
+      "to": "prog_mitacs_acc\u00e9l\u00e9ration",
+      "type": "ELIGIBLE_FOR"
+    },
+    {
+      "from": "domain_manufacturier",
+      "to": "prog_pari_cnrc",
+      "type": "ELIGIBLE_FOR"
+    },
+    {
+      "from": "domain_manufacturier",
+      "to": "prog_rs&de",
+      "type": "ELIGIBLE_FOR"
+    },
+    {
+      "from": "domain_manufacturier",
+      "to": "prog_programme_part",
+      "type": "ELIGIBLE_FOR"
+    },
+    {
+      "from": "domain_manufacturier",
+      "to": "prog_prompt",
+      "type": "ELIGIBLE_FOR"
+    },
+    {
+      "from": "domain_manufacturier",
+      "to": "prog_medteq+",
+      "type": "ELIGIBLE_FOR"
+    },
+    {
+      "from": "domain_agriculture",
+      "to": "prog_crsng_alliance",
+      "type": "ELIGIBLE_FOR"
+    },
+    {
+      "from": "domain_agriculture",
+      "to": "prog_crsng_ard",
+      "type": "ELIGIBLE_FOR"
+    },
+    {
+      "from": "domain_agriculture",
+      "to": "prog_mitacs_acc\u00e9l\u00e9ration",
+      "type": "ELIGIBLE_FOR"
+    },
+    {
+      "from": "domain_agriculture",
+      "to": "prog_pari_cnrc",
+      "type": "ELIGIBLE_FOR"
+    },
+    {
+      "from": "domain_agriculture",
+      "to": "prog_rs&de",
+      "type": "ELIGIBLE_FOR"
+    },
+    {
+      "from": "domain_agriculture",
+      "to": "prog_programme_part",
+      "type": "ELIGIBLE_FOR"
+    },
+    {
+      "from": "domain_agriculture",
+      "to": "prog_prompt",
+      "type": "ELIGIBLE_FOR"
+    },
+    {
+      "from": "domain_agriculture",
+      "to": "prog_medteq+",
+      "type": "ELIGIBLE_FOR"
+    }
+  ]
+}

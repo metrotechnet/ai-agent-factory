@@ -131,17 +131,21 @@ def build_prompt_from_template(language, context, question, history_text="", age
     
     return prompt, model_config
 
-def query_chromadb(data=None):
+def query_chromadb(project_name, collection_name=None, data=None):
 
     try:
         chromadb_url = os.getenv("CHROMADB_CENTRAL_URL")
-        url = f"{chromadb_url}/nutria/query"
-        resp = requests.post(url, json=data, timeout=30)
+        payload = {
+            "project_name": project_name,
+            "collection_name": collection_name,
+            "query": data
+        }
+        url = f"{chromadb_url}/query"
+        resp = requests.post(url, json=payload, timeout=30)
         return resp.json()
     except Exception as e:
         return {"error": f"Failed to query central ChromaDB: {str(e)}"}
     
-
 
 def is_substantial_question(question):
     """
@@ -256,7 +260,7 @@ def ask_question_stream(question, language="fr", timezone="UTC", locale="fr-FR",
             
         # Ensure query_params is JSON serializable
         query_params = json.loads(json.dumps(query_params, default=str))
-        results = query_chromadb(query_params)
+        results = query_chromadb(project_name="translator", collection_name="gdrive_documents", data=query_params)
 
         if not results['documents'] or not results['documents'][0]:
             yield "No relevant information found. Please make sure you have indexed some transcripts."

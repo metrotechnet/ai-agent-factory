@@ -79,7 +79,6 @@ from fastapi import APIRouter
 
 
 app.include_router(query.router, tags=["query"])
-app.include_router(translation.router, tags=["translation"])
 app.include_router(tts.router, tags=["tts"])
 app.include_router(report.router, tags=["report"])
 app.include_router(config_routes.router, tags=["config"])
@@ -107,4 +106,5 @@ if __name__ == "__main__":
     import uvicorn
     import os
     port = int(os.environ.get("PORT", 8080))
+    print(f"🚀 Starting IMX Innovia API on port {port}...", flush=True)
     uvicorn.run(app, host="0.0.0.0", port=port)

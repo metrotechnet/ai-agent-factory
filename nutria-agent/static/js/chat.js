@@ -304,7 +304,8 @@ function positionMessageAtBottom(chatContainer, userMessageDiv, messageDiv) {
             const messageContent = messageDiv.querySelector('.message-content');
             if (messageContent) {
                 const currentHeight = messageContent.offsetHeight;
-                messageContent.style.minHeight = (currentHeight + endPadding) + 'px';
+                // messageContent.style.minHeight = (currentHeight + endPadding) + 'px';
+                messageContent.style.marginBottom = (endPadding) + 'px';
             }
         }
         

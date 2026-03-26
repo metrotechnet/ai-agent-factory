@@ -278,5 +278,12 @@
     "response": "test",
     "timestamp": "2026-03-20T13:23:24.569419",
     "comments": []
+  },
+  {
+    "question_id": "62abc20f-2dae-4aec-bae2-68a5d74e78e6",
+    "question": "[TRANSLATION fr→en] Traduction automatique",
+    "response": "Automatic translation",
+    "timestamp": "2026-03-26T14:36:54.475199",
+    "comments": []
   }
 ]

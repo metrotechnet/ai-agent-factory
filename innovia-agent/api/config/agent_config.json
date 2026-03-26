@@ -2,11 +2,11 @@
   "fr": {
     "app": {
       "title": "InnovIA | Ressources en innovation pour entrepreneurs",
-      "description": "Agent IA pour entrepreneurs : décrivez votre problème et découvrez les ressources de recherche au Québec (CCTT, universités, institutions de recherche, etc.) adaptées à vos besoins."
+      "description": "Agent IA pour entrepreneurs : décrivez votre problème et découvrez les ressources de recherche au Québec (CCTT) adaptées à vos besoins."
     },
     "intro": {
       "title": "Trouvez des ressources pour vos défis d'entrepreneur !",
-      "description": "Décrivez votre problème d'affaires ou d'innovation, et je vous aiderai à découvrir les ressources de recherche au Québec (CCTT, universités, institutions, etc.) qui peuvent vous accompagner.",
+      "description": "Décrivez votre problème d'affaires ou d'innovation, et je vous aiderai à découvrir les ressources de recherche au Québec (CCTT) qui peuvent vous accompagner.",
       "disclaimer": "Note : Les recommandations sont basées sur les catalogues disponibles dans nos bases de données.",
       "profileAlt": "InnovIA Agent",
       "profileImage": "/static/logos/logo-innovia.png"
@@ -15,7 +15,7 @@
       {
         "id": "partenaires",
         "title": "🎓 Trouver des partenaires",
-        "description": "Identifiez des partenaires de recherche ou d'innovation (CCTT, universités, centres, etc.) pour vos projets.",
+        "description": "Identifiez des partenaires de recherche ou d'innovation (CCTT) pour vos projets.",
         "event": "display: Je cherche des partenaires pour mon projet",
         "color": "#e1f5fe"
       },
@@ -33,7 +33,16 @@
         "event": "display: Je veux accéder à des ressources de recherche",
         "color": "#fce4ec"
       }
-    ]
+    ],
+    "components": {
+      "inputArea": {
+        "showInputOnLoad": true,
+        "placeholder": "Décrivez votre problème ou défi d'innovation...",
+        "sendButton": "Envoyer",
+        "voiceButton": "Enregistrer un message vocal",
+        "disclaimer": "⚠️ Recommandations basées sur la liste des CCTT."
+      }
+    }
   },
   "en": {
     "app": {
@@ -69,6 +78,15 @@
         "event": "display: I want access to research resources",
         "color": "#fce4ec"
       }
-    ]
+    ],
+    "components": {
+      "inputArea": {
+        "showInputOnLoad": true,
+        "placeholder": "Describe your problem or innovation challenge...",
+        "sendButton": "Send",
+        "voiceButton": "Record a voice message",
+        "disclaimer": "⚠️ Recommendations are based on the list of CCTTs."
+      }
+    }
   }
 }

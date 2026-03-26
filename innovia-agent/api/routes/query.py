@@ -54,7 +54,8 @@ async def query_agent(request: Request, query_request: QueryRequest):
             yield f"data: {json.dumps({'session_id': session_id, 'question_id': question_id, 'chunk': ''})}\n\n"
             
             assistant_response = ""
-            
+            clear_history_flag = False
+
             for chunk in ask_question_stream(
                 query_request.question,
                 language=query_request.language,
@@ -66,13 +67,15 @@ async def query_agent(request: Request, query_request: QueryRequest):
                 agent=query_request.agent,
                 bibliotheque=query_request.bibliotheque,
             ):
+                if chunk == "__CLEAR_USER_HISTORY__":
+                    clear_history_flag = True
+                    continue  # Ne pas envoyer ce flag au client
                 assistant_response += chunk
                 yield f"data: {json.dumps({'chunk': chunk})}\n\n"
-            
+
             # Save question and response to log
             save_question_response(question_id, query_request.question, assistant_response)
-            
-            
+
             # Add to history
             assistant_message = {
                 'role': 'assistant',
@@ -80,11 +83,15 @@ async def query_agent(request: Request, query_request: QueryRequest):
                 'timestamp': datetime.now().isoformat()
             }
             conversation_history.append(assistant_message)
-            
+
+            # Efface l'historique utilisateur si flag détecté
+            if clear_history_flag:
+                session['messages'] = []
+
             # Send links as final SSE event
             links = session['links'].get(question_id, [])
             yield f"data: {json.dumps({'links': links})}\n\n"
-            
+
             # Send completion marker
             yield f"data: [DONE]\n\n"
             

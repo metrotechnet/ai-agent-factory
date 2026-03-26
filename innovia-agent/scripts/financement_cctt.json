@@ -1,0 +1,1902 @@
+{
+  "metadata": {
+    "version": "ULTIME 1.0",
+    "entries": 84,
+    "date": "2026-03-25"
+  },
+  "data": [
+    {
+      "id": "prog-001",
+      "nom": "CRSNG Alliance",
+      "organisme": "CRSNG",
+      "niveau": "federal",
+      "type": "subvention",
+      "domaines": [
+        "sant\u00e9",
+        "foresterie"
+      ],
+      "trl_cible": "3-7",
+      "client_cible": [
+        "PME",
+        "startup"
+      ],
+      "financement_max": "1768k$",
+      "conditions": [
+        "projet innovant",
+        "partenariat recommand\u00e9"
+      ],
+      "collaboration_requise": true,
+      "description": "CRSNG Alliance supporte des projets en agriculture, \u00e9nergie"
+    },
+    {
+      "id": "prog-002",
+      "nom": "CRSNG ARD",
+      "organisme": "CRSNG",
+      "niveau": "federal",
+      "type": "subvention",
+      "domaines": [
+        "biotech",
+        "\u00e9nergie"
+      ],
+      "trl_cible": "1-9",
+      "client_cible": [
+        "PME",
+        "startup"
+      ],
+      "financement_max": "326k$",
+      "conditions": [
+        "projet innovant",
+        "partenariat recommand\u00e9"
+      ],
+      "collaboration_requise": false,
+      "description": "CRSNG ARD supporte des projets en IA, transport"
+    },
+    {
+      "id": "prog-003",
+      "nom": "Mitacs Acc\u00e9l\u00e9ration",
+      "organisme": "Mitacs",
+      "niveau": "federal",
+      "type": "subvention",
+      "domaines": [
+        "\u00e9nergie",
+        "manufacturier"
+      ],
+      "trl_cible": "3-8",
+      "client_cible": [
+        "PME",
+        "startup"
+      ],
+      "financement_max": "799k$",
+      "conditions": [
+        "projet innovant",
+        "partenariat recommand\u00e9"
+      ],
+      "collaboration_requise": false,
+      "description": "Mitacs Acc\u00e9l\u00e9ration supporte des projets en sant\u00e9, manufacturier"
+    },
+    {
+      "id": "prog-004",
+      "nom": "PARI CNRC",
+      "organisme": "CNRC",
+      "niveau": "federal",
+      "type": "subvention",
+      "domaines": [
+        "foresterie",
+        "sant\u00e9"
+      ],
+      "trl_cible": "3-7",
+      "client_cible": [
+        "PME",
+        "grande entreprise"
+      ],
+      "financement_max": "1158k$",
+      "conditions": [
+        "projet innovant",
+        "partenariat recommand\u00e9"
+      ],
+      "collaboration_requise": false,
+      "description": "PARI CNRC supporte des projets en num\u00e9rique, agriculture"
+    },
+    {
+      "id": "prog-005",
+      "nom": "RS&DE",
+      "organisme": "Revenu Canada",
+      "niveau": "federal",
+      "type": "financement mixte",
+      "domaines": [
+        "transport",
+        "foresterie"
+      ],
+      "trl_cible": "2-7",
+      "client_cible": [
+        "PME",
+        "grande entreprise"
+      ],
+      "financement_max": "446k$",
+      "conditions": [
+        "projet innovant",
+        "partenariat recommand\u00e9"
+      ],
+      "collaboration_requise": false,
+      "description": "RS&DE supporte des projets en manufacturier, foresterie"
+    },
+    {
+      "id": "prog-006",
+      "nom": "Programme PART",
+      "organisme": "MEIE",
+      "niveau": "provincial",
+      "type": "subvention",
+      "domaines": [
+        "manufacturier",
+        "agriculture"
+      ],
+      "trl_cible": "1-5",
+      "client_cible": [
+        "PME",
+        "grande entreprise"
+      ],
+      "financement_max": "1307k$",
+      "conditions": [
+        "projet innovant",
+        "partenariat recommand\u00e9"
+      ],
+      "collaboration_requise": true,
+      "description": "Programme PART supporte des projets en num\u00e9rique, foresterie"
+    },
+    {
+      "id": "prog-007",
+      "nom": "Prompt",
+      "organisme": "Prompt",
+      "niveau": "provincial",
+      "type": "financement mixte",
+      "domaines": [
+        "manufacturier",
+        "foresterie"
+      ],
+      "trl_cible": "4-7",
+      "client_cible": [
+        "PME",
+        "startup"
+      ],
+      "financement_max": "272k$",
+      "conditions": [
+        "projet innovant",
+        "partenariat recommand\u00e9"
+      ],
+      "collaboration_requise": false,
+      "description": "Prompt supporte des projets en \u00e9nergie, manufacturier"
+    },
+    {
+      "id": "prog-008",
+      "nom": "MEDTEQ+",
+      "organisme": "MEDTEQ+",
+      "niveau": "provincial",
+      "type": "financement mixte",
+      "domaines": [
+        "IA",
+        "sant\u00e9"
+      ],
+      "trl_cible": "4-7",
+      "client_cible": [
+        "PME",
+        "startup"
+      ],
+      "financement_max": "532k$",
+      "conditions": [
+        "projet innovant",
+        "partenariat recommand\u00e9"
+      ],
+      "collaboration_requise": false,
+      "description": "MEDTEQ+ supporte des projets en biotech, manufacturier"
+    },
+    {
+      "id": "prog-009",
+      "nom": "CRIBIQ",
+      "organisme": "CRIBIQ",
+      "niveau": "provincial",
+      "type": "financement mixte",
+      "domaines": [
+        "biotech",
+        "sant\u00e9"
+      ],
+      "trl_cible": "2-9",
+      "client_cible": [
+        "startup"
+      ],
+      "financement_max": "134k$",
+      "conditions": [
+        "projet innovant",
+        "partenariat recommand\u00e9"
+      ],
+      "collaboration_requise": true,
+      "description": "CRIBIQ supporte des projets en biotech, IA"
+    },
+    {
+      "id": "prog-010",
+      "nom": "Programme Innovation 10",
+      "organisme": "CNRC",
+      "niveau": "provincial",
+      "type": "credit_impot",
+      "domaines": [
+        "biotech",
+        "manufacturier"
+      ],
+      "trl_cible": "3-9",
+      "client_cible": [
+        "PME",
+        "startup"
+      ],
+      "financement_max": "2088k$",
+      "conditions": [
+        "innovation",
+        "R&D"
+      ],
+      "collaboration_requise": true,
+      "description": "Programme de soutien \u00e0 l'innovation"
+    },
+    {
+      "id": "prog-011",
+      "nom": "Programme Innovation 11",
+      "organisme": "MEIE",
+      "niveau": "provincial",
+      "type": "credit_impot",
+      "domaines": [
+        "foresterie",
+        "transport"
+      ],
+      "trl_cible": "4-8",
+      "client_cible": [
+        "startup"
+      ],
+      "financement_max": "869k$",
+      "conditions": [
+        "innovation",
+        "R&D"
+      ],
+      "collaboration_requise": false,
+      "description": "Programme de soutien \u00e0 l'innovation"
+    },
+    {
+      "id": "prog-012",
+      "nom": "Programme Innovation 12",
+      "organisme": "CNRC",
+      "niveau": "provincial",
+      "type": "financement mixte",
+      "domaines": [
+        "transport",
+        "biotech"
+      ],
+      "trl_cible": "2-8",
+      "client_cible": [
+        "PME",
+        "grande entreprise"
+      ],
+      "financement_max": "1198k$",
+      "conditions": [
+        "innovation",
+        "R&D"
+      ],
+      "collaboration_requise": false,
+      "description": "Programme de soutien \u00e0 l'innovation"
+    },
+    {
+      "id": "prog-013",
+      "nom": "Programme Innovation 13",
+      "organisme": "MEIE",
+      "niveau": "provincial",
+      "type": "financement mixte",
+      "domaines": [
+        "num\u00e9rique",
+        "\u00e9nergie"
+      ],
+      "trl_cible": "3-6",
+      "client_cible": [
+        "PME",
+        "grande entreprise"
+      ],
+      "financement_max": "1610k$",
+      "conditions": [
+        "innovation",
+        "R&D"
+      ],
+      "collaboration_requise": true,
+      "description": "Programme de soutien \u00e0 l'innovation"
+    },
+    {
+      "id": "prog-014",
+      "nom": "Programme Innovation 14",
+      "organisme": "MEIE",
+      "niveau": "federal",
+      "type": "credit_impot",
+      "domaines": [
+        "\u00e9nergie",
+        "agriculture"
+      ],
+      "trl_cible": "3-9",
+      "client_cible": [
+        "startup"
+      ],
+      "financement_max": "289k$",
+      "conditions": [
+        "innovation",
+        "R&D"
+      ],
+      "collaboration_requise": false,
+      "description": "Programme de soutien \u00e0 l'innovation"
+    },
+    {
+      "id": "prog-015",
+      "nom": "Programme Innovation 15",
+      "organisme": "CNRC",
+      "niveau": "federal",
+      "type": "credit_impot",
+      "domaines": [
+        "foresterie",
+        "\u00e9nergie"
+      ],
+      "trl_cible": "1-9",
+      "client_cible": [
+        "startup"
+      ],
+      "financement_max": "149k$",
+      "conditions": [
+        "innovation",
+        "R&D"
+      ],
+      "collaboration_requise": true,
+      "description": "Programme de soutien \u00e0 l'innovation"
+    },
+    {
+      "id": "prog-016",
+      "nom": "Programme Innovation 16",
+      "organisme": "CRSNG",
+      "niveau": "federal",
+      "type": "credit_impot",
+      "domaines": [
+        "IA",
+        "biotech"
+      ],
+      "trl_cible": "3-6",
+      "client_cible": [
+        "PME",
+        "grande entreprise"
+      ],
+      "financement_max": "1510k$",
+      "conditions": [
+        "innovation",
+        "R&D"
+      ],
+      "collaboration_requise": true,
+      "description": "Programme de soutien \u00e0 l'innovation"
+    },
+    {
+      "id": "prog-017",
+      "nom": "Programme Innovation 17",
+      "organisme": "Mitacs",
+      "niveau": "federal",
+      "type": "subvention",
+      "domaines": [
+        "manufacturier",
+        "sant\u00e9"
+      ],
+      "trl_cible": "3-9",
+      "client_cible": [
+        "startup"
+      ],
+      "financement_max": "2043k$",
+      "conditions": [
+        "innovation",
+        "R&D"
+      ],
+      "collaboration_requise": false,
+      "description": "Programme de soutien \u00e0 l'innovation"
+    },
+    {
+      "id": "prog-018",
+      "nom": "Programme Innovation 18",
+      "organisme": "CRSNG",
+      "niveau": "provincial",
+      "type": "subvention",
+      "domaines": [
+        "transport",
+        "foresterie"
+      ],
+      "trl_cible": "4-7",
+      "client_cible": [
+        "PME",
+        "grande entreprise"
+      ],
+      "financement_max": "2937k$",
+      "conditions": [
+        "innovation",
+        "R&D"
+      ],
+      "collaboration_requise": true,
+      "description": "Programme de soutien \u00e0 l'innovation"
+    },
+    {
+      "id": "prog-019",
+      "nom": "Programme Innovation 19",
+      "organisme": "MEIE",
+      "niveau": "federal",
+      "type": "credit_impot",
+      "domaines": [
+        "manufacturier",
+        "biotech"
+      ],
+      "trl_cible": "4-8",
+      "client_cible": [
+        "startup"
+      ],
+      "financement_max": "2222k$",
+      "conditions": [
+        "innovation",
+        "R&D"
+      ],
+      "collaboration_requise": true,
+      "description": "Programme de soutien \u00e0 l'innovation"
+    },
+    {
+      "id": "prog-020",
+      "nom": "Programme Innovation 20",
+      "organisme": "Mitacs",
+      "niveau": "federal",
+      "type": "subvention",
+      "domaines": [
+        "manufacturier",
+        "agriculture"
+      ],
+      "trl_cible": "2-9",
+      "client_cible": [
+        "PME",
+        "grande entreprise"
+      ],
+      "financement_max": "1780k$",
+      "conditions": [
+        "innovation",
+        "R&D"
+      ],
+      "collaboration_requise": true,
+      "description": "Programme de soutien \u00e0 l'innovation"
+    },
+    {
+      "id": "prog-021",
+      "nom": "Programme Innovation 21",
+      "organisme": "MEIE",
+      "niveau": "provincial",
+      "type": "financement mixte",
+      "domaines": [
+        "sant\u00e9",
+        "agriculture"
+      ],
+      "trl_cible": "1-8",
+      "client_cible": [
+        "PME",
+        "grande entreprise"
+      ],
+      "financement_max": "2924k$",
+      "conditions": [
+        "innovation",
+        "R&D"
+      ],
+      "collaboration_requise": true,
+      "description": "Programme de soutien \u00e0 l'innovation"
+    },
+    {
+      "id": "prog-022",
+      "nom": "Programme Innovation 22",
+      "organisme": "Mitacs",
+      "niveau": "federal",
+      "type": "financement mixte",
+      "domaines": [
+        "foresterie",
+        "sant\u00e9"
+      ],
+      "trl_cible": "4-9",
+      "client_cible": [
+        "PME"
+      ],
+      "financement_max": "113k$",
+      "conditions": [
+        "innovation",
+        "R&D"
+      ],
+      "collaboration_requise": false,
+      "description": "Programme de soutien \u00e0 l'innovation"
+    },
+    {
+      "id": "prog-023",
+      "nom": "Programme Innovation 23",
+      "organisme": "FRQ",
+      "niveau": "federal",
+      "type": "subvention",
+      "domaines": [
+        "IA",
+        "agriculture"
+      ],
+      "trl_cible": "4-8",
+      "client_cible": [
+        "PME",
+        "startup"
+      ],
+      "financement_max": "1588k$",
+      "conditions": [
+        "innovation",
+        "R&D"
+      ],
+      "collaboration_requise": true,
+      "description": "Programme de soutien \u00e0 l'innovation"
+    },
+    {
+      "id": "prog-024",
+      "nom": "Programme Innovation 24",
+      "organisme": "FRQ",
+      "niveau": "provincial",
+      "type": "financement mixte",
+      "domaines": [
+        "transport",
+        "foresterie"
+      ],
+      "trl_cible": "1-7",
+      "client_cible": [
+        "PME"
+      ],
+      "financement_max": "748k$",
+      "conditions": [
+        "innovation",
+        "R&D"
+      ],
+      "collaboration_requise": true,
+      "description": "Programme de soutien \u00e0 l'innovation"
+    },
+    {
+      "id": "prog-025",
+      "nom": "Programme Innovation 25",
+      "organisme": "FRQ",
+      "niveau": "provincial",
+      "type": "credit_impot",
+      "domaines": [
+        "biotech",
+        "transport"
+      ],
+      "trl_cible": "1-6",
+      "client_cible": [
+        "PME",
+        "grande entreprise"
+      ],
+      "financement_max": "1752k$",
+      "conditions": [
+        "innovation",
+        "R&D"
+      ],
+      "collaboration_requise": true,
+      "description": "Programme de soutien \u00e0 l'innovation"
+    },
+    {
+      "id": "prog-026",
+      "nom": "Programme Innovation 26",
+      "organisme": "CNRC",
+      "niveau": "federal",
+      "type": "credit_impot",
+      "domaines": [
+        "IA",
+        "foresterie"
+      ],
+      "trl_cible": "1-8",
+      "client_cible": [
+        "PME",
+        "grande entreprise"
+      ],
+      "financement_max": "1480k$",
+      "conditions": [
+        "innovation",
+        "R&D"
+      ],
+      "collaboration_requise": false,
+      "description": "Programme de soutien \u00e0 l'innovation"
+    },
+    {
+      "id": "prog-027",
+      "nom": "Programme Innovation 27",
+      "organisme": "Mitacs",
+      "niveau": "federal",
+      "type": "subvention",
+      "domaines": [
+        "manufacturier",
+        "sant\u00e9"
+      ],
+      "trl_cible": "4-6",
+      "client_cible": [
+        "PME"
+      ],
+      "financement_max": "198k$",
+      "conditions": [
+        "innovation",
+        "R&D"
+      ],
+      "collaboration_requise": false,
+      "description": "Programme de soutien \u00e0 l'innovation"
+    },
+    {
+      "id": "prog-028",
+      "nom": "Programme Innovation 28",
+      "organisme": "CRSNG",
+      "niveau": "provincial",
+      "type": "financement mixte",
+      "domaines": [
+        "biotech",
+        "transport"
+      ],
+      "trl_cible": "3-6",
+      "client_cible": [
+        "PME"
+      ],
+      "financement_max": "1139k$",
+      "conditions": [
+        "innovation",
+        "R&D"
+      ],
+      "collaboration_requise": false,
+      "description": "Programme de soutien \u00e0 l'innovation"
+    },
+    {
+      "id": "prog-029",
+      "nom": "Programme Innovation 29",
+      "organisme": "FRQ",
+      "niveau": "federal",
+      "type": "financement mixte",
+      "domaines": [
+        "transport",
+        "foresterie"
+      ],
+      "trl_cible": "1-7",
+      "client_cible": [
+        "PME",
+        "grande entreprise"
+      ],
+      "financement_max": "1855k$",
+      "conditions": [
+        "innovation",
+        "R&D"
+      ],
+      "collaboration_requise": false,
+      "description": "Programme de soutien \u00e0 l'innovation"
+    },
+    {
+      "id": "prog-030",
+      "nom": "Programme Innovation 30",
+      "organisme": "MEIE",
+      "niveau": "provincial",
+      "type": "credit_impot",
+      "domaines": [
+        "manufacturier",
+        "sant\u00e9"
+      ],
+      "trl_cible": "3-5",
+      "client_cible": [
+        "PME"
+      ],
+      "financement_max": "304k$",
+      "conditions": [
+        "innovation",
+        "R&D"
+      ],
+      "collaboration_requise": true,
+      "description": "Programme de soutien \u00e0 l'innovation"
+    },
+    {
+      "id": "prog-031",
+      "nom": "Programme Innovation 31",
+      "organisme": "Mitacs",
+      "niveau": "federal",
+      "type": "financement mixte",
+      "domaines": [
+        "sant\u00e9",
+        "\u00e9nergie"
+      ],
+      "trl_cible": "1-9",
+      "client_cible": [
+        "startup"
+      ],
+      "financement_max": "348k$",
+      "conditions": [
+        "innovation",
+        "R&D"
+      ],
+      "collaboration_requise": true,
+      "description": "Programme de soutien \u00e0 l'innovation"
+    },
+    {
+      "id": "prog-032",
+      "nom": "Programme Innovation 32",
+      "organisme": "Mitacs",
+      "niveau": "federal",
+      "type": "credit_impot",
+      "domaines": [
+        "biotech",
+        "num\u00e9rique"
+      ],
+      "trl_cible": "1-6",
+      "client_cible": [
+        "PME"
+      ],
+      "financement_max": "2400k$",
+      "conditions": [
+        "innovation",
+        "R&D"
+      ],
+      "collaboration_requise": false,
+      "description": "Programme de soutien \u00e0 l'innovation"
+    },
+    {
+      "id": "prog-033",
+      "nom": "Programme Innovation 33",
+      "organisme": "CRSNG",
+      "niveau": "federal",
+      "type": "financement mixte",
+      "domaines": [
+        "transport",
+        "foresterie"
+      ],
+      "trl_cible": "3-9",
+      "client_cible": [
+        "PME"
+      ],
+      "financement_max": "79k$",
+      "conditions": [
+        "innovation",
+        "R&D"
+      ],
+      "collaboration_requise": true,
+      "description": "Programme de soutien \u00e0 l'innovation"
+    },
+    {
+      "id": "prog-034",
+      "nom": "Programme Innovation 34",
+      "organisme": "FRQ",
+      "niveau": "provincial",
+      "type": "credit_impot",
+      "domaines": [
+        "transport",
+        "num\u00e9rique"
+      ],
+      "trl_cible": "3-9",
+      "client_cible": [
+        "startup"
+      ],
+      "financement_max": "2694k$",
+      "conditions": [
+        "innovation",
+        "R&D"
+      ],
+      "collaboration_requise": true,
+      "description": "Programme de soutien \u00e0 l'innovation"
+    },
+    {
+      "id": "prog-035",
+      "nom": "Programme Innovation 35",
+      "organisme": "CNRC",
+      "niveau": "provincial",
+      "type": "subvention",
+      "domaines": [
+        "\u00e9nergie",
+        "transport"
+      ],
+      "trl_cible": "1-5",
+      "client_cible": [
+        "PME",
+        "grande entreprise"
+      ],
+      "financement_max": "1658k$",
+      "conditions": [
+        "innovation",
+        "R&D"
+      ],
+      "collaboration_requise": true,
+      "description": "Programme de soutien \u00e0 l'innovation"
+    },
+    {
+      "id": "prog-036",
+      "nom": "Programme Innovation 36",
+      "organisme": "CRSNG",
+      "niveau": "provincial",
+      "type": "credit_impot",
+      "domaines": [
+        "biotech",
+        "\u00e9nergie"
+      ],
+      "trl_cible": "3-6",
+      "client_cible": [
+        "PME"
+      ],
+      "financement_max": "695k$",
+      "conditions": [
+        "innovation",
+        "R&D"
+      ],
+      "collaboration_requise": false,
+      "description": "Programme de soutien \u00e0 l'innovation"
+    },
+    {
+      "id": "prog-037",
+      "nom": "Programme Innovation 37",
+      "organisme": "Mitacs",
+      "niveau": "provincial",
+      "type": "financement mixte",
+      "domaines": [
+        "num\u00e9rique",
+        "transport"
+      ],
+      "trl_cible": "3-9",
+      "client_cible": [
+        "PME",
+        "startup"
+      ],
+      "financement_max": "2949k$",
+      "conditions": [
+        "innovation",
+        "R&D"
+      ],
+      "collaboration_requise": true,
+      "description": "Programme de soutien \u00e0 l'innovation"
+    },
+    {
+      "id": "prog-038",
+      "nom": "Programme Innovation 38",
+      "organisme": "Mitacs",
+      "niveau": "federal",
+      "type": "subvention",
+      "domaines": [
+        "manufacturier",
+        "num\u00e9rique"
+      ],
+      "trl_cible": "4-9",
+      "client_cible": [
+        "startup"
+      ],
+      "financement_max": "1611k$",
+      "conditions": [
+        "innovation",
+        "R&D"
+      ],
+      "collaboration_requise": false,
+      "description": "Programme de soutien \u00e0 l'innovation"
+    },
+    {
+      "id": "prog-039",
+      "nom": "Programme Innovation 39",
+      "organisme": "Mitacs",
+      "niveau": "federal",
+      "type": "subvention",
+      "domaines": [
+        "\u00e9nergie",
+        "sant\u00e9"
+      ],
+      "trl_cible": "2-5",
+      "client_cible": [
+        "PME",
+        "startup"
+      ],
+      "financement_max": "2444k$",
+      "conditions": [
+        "innovation",
+        "R&D"
+      ],
+      "collaboration_requise": false,
+      "description": "Programme de soutien \u00e0 l'innovation"
+    },
+    {
+      "id": "prog-040",
+      "nom": "Programme Innovation 40",
+      "organisme": "CRSNG",
+      "niveau": "federal",
+      "type": "credit_impot",
+      "domaines": [
+        "num\u00e9rique",
+        "foresterie"
+      ],
+      "trl_cible": "1-7",
+      "client_cible": [
+        "PME",
+        "startup"
+      ],
+      "financement_max": "2060k$",
+      "conditions": [
+        "innovation",
+        "R&D"
+      ],
+      "collaboration_requise": false,
+      "description": "Programme de soutien \u00e0 l'innovation"
+    },
+    {
+      "id": "prog-041",
+      "nom": "Programme Innovation 41",
+      "organisme": "CRSNG",
+      "niveau": "federal",
+      "type": "credit_impot",
+      "domaines": [
+        "IA",
+        "foresterie"
+      ],
+      "trl_cible": "1-5",
+      "client_cible": [
+        "PME",
+        "grande entreprise"
+      ],
+      "financement_max": "2783k$",
+      "conditions": [
+        "innovation",
+        "R&D"
+      ],
+      "collaboration_requise": true,
+      "description": "Programme de soutien \u00e0 l'innovation"
+    },
+    {
+      "id": "prog-042",
+      "nom": "Programme Innovation 42",
+      "organisme": "CRSNG",
+      "niveau": "provincial",
+      "type": "subvention",
+      "domaines": [
+        "biotech",
+        "transport"
+      ],
+      "trl_cible": "2-6",
+      "client_cible": [
+        "startup"
+      ],
+      "financement_max": "1632k$",
+      "conditions": [
+        "innovation",
+        "R&D"
+      ],
+      "collaboration_requise": true,
+      "description": "Programme de soutien \u00e0 l'innovation"
+    },
+    {
+      "id": "prog-043",
+      "nom": "Programme Innovation 43",
+      "organisme": "CRSNG",
+      "niveau": "federal",
+      "type": "financement mixte",
+      "domaines": [
+        "IA",
+        "transport"
+      ],
+      "trl_cible": "4-7",
+      "client_cible": [
+        "PME",
+        "startup"
+      ],
+      "financement_max": "58k$",
+      "conditions": [
+        "innovation",
+        "R&D"
+      ],
+      "collaboration_requise": true,
+      "description": "Programme de soutien \u00e0 l'innovation"
+    },
+    {
+      "id": "prog-044",
+      "nom": "Programme Innovation 44",
+      "organisme": "CNRC",
+      "niveau": "federal",
+      "type": "financement mixte",
+      "domaines": [
+        "manufacturier",
+        "\u00e9nergie"
+      ],
+      "trl_cible": "3-7",
+      "client_cible": [
+        "PME"
+      ],
+      "financement_max": "1743k$",
+      "conditions": [
+        "innovation",
+        "R&D"
+      ],
+      "collaboration_requise": true,
+      "description": "Programme de soutien \u00e0 l'innovation"
+    },
+    {
+      "id": "prog-045",
+      "nom": "Programme Innovation 45",
+      "organisme": "CRSNG",
+      "niveau": "federal",
+      "type": "credit_impot",
+      "domaines": [
+        "biotech",
+        "manufacturier"
+      ],
+      "trl_cible": "1-8",
+      "client_cible": [
+        "PME"
+      ],
+      "financement_max": "698k$",
+      "conditions": [
+        "innovation",
+        "R&D"
+      ],
+      "collaboration_requise": true,
+      "description": "Programme de soutien \u00e0 l'innovation"
+    },
+    {
+      "id": "prog-046",
+      "nom": "Programme Innovation 46",
+      "organisme": "MEIE",
+      "niveau": "provincial",
+      "type": "financement mixte",
+      "domaines": [
+        "agriculture",
+        "biotech"
+      ],
+      "trl_cible": "2-9",
+      "client_cible": [
+        "PME"
+      ],
+      "financement_max": "682k$",
+      "conditions": [
+        "innovation",
+        "R&D"
+      ],
+      "collaboration_requise": false,
+      "description": "Programme de soutien \u00e0 l'innovation"
+    },
+    {
+      "id": "prog-047",
+      "nom": "Programme Innovation 47",
+      "organisme": "CRSNG",
+      "niveau": "provincial",
+      "type": "financement mixte",
+      "domaines": [
+        "\u00e9nergie",
+        "transport"
+      ],
+      "trl_cible": "4-6",
+      "client_cible": [
+        "PME"
+      ],
+      "financement_max": "850k$",
+      "conditions": [
+        "innovation",
+        "R&D"
+      ],
+      "collaboration_requise": true,
+      "description": "Programme de soutien \u00e0 l'innovation"
+    },
+    {
+      "id": "prog-048",
+      "nom": "Programme Innovation 48",
+      "organisme": "Mitacs",
+      "niveau": "federal",
+      "type": "financement mixte",
+      "domaines": [
+        "manufacturier",
+        "num\u00e9rique"
+      ],
+      "trl_cible": "1-5",
+      "client_cible": [
+        "PME"
+      ],
+      "financement_max": "2610k$",
+      "conditions": [
+        "innovation",
+        "R&D"
+      ],
+      "collaboration_requise": false,
+      "description": "Programme de soutien \u00e0 l'innovation"
+    },
+    {
+      "id": "prog-049",
+      "nom": "Programme Innovation 49",
+      "organisme": "MEIE",
+      "niveau": "provincial",
+      "type": "credit_impot",
+      "domaines": [
+        "foresterie",
+        "sant\u00e9"
+      ],
+      "trl_cible": "3-9",
+      "client_cible": [
+        "PME",
+        "grande entreprise"
+      ],
+      "financement_max": "2010k$",
+      "conditions": [
+        "innovation",
+        "R&D"
+      ],
+      "collaboration_requise": false,
+      "description": "Programme de soutien \u00e0 l'innovation"
+    },
+    {
+      "id": "prog-050",
+      "nom": "Programme Innovation 50",
+      "organisme": "CRSNG",
+      "niveau": "provincial",
+      "type": "subvention",
+      "domaines": [
+        "sant\u00e9",
+        "num\u00e9rique"
+      ],
+      "trl_cible": "4-8",
+      "client_cible": [
+        "PME",
+        "grande entreprise"
+      ],
+      "financement_max": "874k$",
+      "conditions": [
+        "innovation",
+        "R&D"
+      ],
+      "collaboration_requise": false,
+      "description": "Programme de soutien \u00e0 l'innovation"
+    },
+    {
+      "id": "prog-051",
+      "nom": "Programme Innovation 51",
+      "organisme": "CNRC",
+      "niveau": "federal",
+      "type": "subvention",
+      "domaines": [
+        "sant\u00e9",
+        "biotech"
+      ],
+      "trl_cible": "2-9",
+      "client_cible": [
+        "PME",
+        "startup"
+      ],
+      "financement_max": "2035k$",
+      "conditions": [
+        "innovation",
+        "R&D"
+      ],
+      "collaboration_requise": false,
+      "description": "Programme de soutien \u00e0 l'innovation"
+    },
+    {
+      "id": "prog-052",
+      "nom": "Programme Innovation 52",
+      "organisme": "CNRC",
+      "niveau": "provincial",
+      "type": "credit_impot",
+      "domaines": [
+        "\u00e9nergie",
+        "foresterie"
+      ],
+      "trl_cible": "4-8",
+      "client_cible": [
+        "PME"
+      ],
+      "financement_max": "371k$",
+      "conditions": [
+        "innovation",
+        "R&D"
+      ],
+      "collaboration_requise": false,
+      "description": "Programme de soutien \u00e0 l'innovation"
+    },
+    {
+      "id": "prog-053",
+      "nom": "Programme Innovation 53",
+      "organisme": "CNRC",
+      "niveau": "federal",
+      "type": "subvention",
+      "domaines": [
+        "biotech",
+        "transport"
+      ],
+      "trl_cible": "2-5",
+      "client_cible": [
+        "PME"
+      ],
+      "financement_max": "2243k$",
+      "conditions": [
+        "innovation",
+        "R&D"
+      ],
+      "collaboration_requise": true,
+      "description": "Programme de soutien \u00e0 l'innovation"
+    },
+    {
+      "id": "prog-054",
+      "nom": "Programme Innovation 54",
+      "organisme": "CRSNG",
+      "niveau": "federal",
+      "type": "subvention",
+      "domaines": [
+        "\u00e9nergie",
+        "IA"
+      ],
+      "trl_cible": "4-9",
+      "client_cible": [
+        "startup"
+      ],
+      "financement_max": "1920k$",
+      "conditions": [
+        "innovation",
+        "R&D"
+      ],
+      "collaboration_requise": true,
+      "description": "Programme de soutien \u00e0 l'innovation"
+    },
+    {
+      "id": "prog-055",
+      "nom": "Programme Innovation 55",
+      "organisme": "FRQ",
+      "niveau": "federal",
+      "type": "financement mixte",
+      "domaines": [
+        "sant\u00e9",
+        "\u00e9nergie"
+      ],
+      "trl_cible": "1-8",
+      "client_cible": [
+        "startup"
+      ],
+      "financement_max": "1684k$",
+      "conditions": [
+        "innovation",
+        "R&D"
+      ],
+      "collaboration_requise": true,
+      "description": "Programme de soutien \u00e0 l'innovation"
+    },
+    {
+      "id": "prog-056",
+      "nom": "Programme Innovation 56",
+      "organisme": "Mitacs",
+      "niveau": "provincial",
+      "type": "financement mixte",
+      "domaines": [
+        "num\u00e9rique",
+        "IA"
+      ],
+      "trl_cible": "2-6",
+      "client_cible": [
+        "PME",
+        "grande entreprise"
+      ],
+      "financement_max": "2318k$",
+      "conditions": [
+        "innovation",
+        "R&D"
+      ],
+      "collaboration_requise": false,
+      "description": "Programme de soutien \u00e0 l'innovation"
+    },
+    {
+      "id": "prog-057",
+      "nom": "Programme Innovation 57",
+      "organisme": "FRQ",
+      "niveau": "provincial",
+      "type": "subvention",
+      "domaines": [
+        "sant\u00e9",
+        "transport"
+      ],
+      "trl_cible": "3-6",
+      "client_cible": [
+        "PME",
+        "startup"
+      ],
+      "financement_max": "2179k$",
+      "conditions": [
+        "innovation",
+        "R&D"
+      ],
+      "collaboration_requise": true,
+      "description": "Programme de soutien \u00e0 l'innovation"
+    },
+    {
+      "id": "prog-058",
+      "nom": "Programme Innovation 58",
+      "organisme": "MEIE",
+      "niveau": "provincial",
+      "type": "subvention",
+      "domaines": [
+        "IA",
+        "biotech"
+      ],
+      "trl_cible": "3-7",
+      "client_cible": [
+        "startup"
+      ],
+      "financement_max": "1601k$",
+      "conditions": [
+        "innovation",
+        "R&D"
+      ],
+      "collaboration_requise": true,
+      "description": "Programme de soutien \u00e0 l'innovation"
+    },
+    {
+      "id": "prog-059",
+      "nom": "Programme Innovation 59",
+      "organisme": "Mitacs",
+      "niveau": "federal",
+      "type": "financement mixte",
+      "domaines": [
+        "biotech",
+        "agriculture"
+      ],
+      "trl_cible": "3-8",
+      "client_cible": [
+        "PME",
+        "grande entreprise"
+      ],
+      "financement_max": "2505k$",
+      "conditions": [
+        "innovation",
+        "R&D"
+      ],
+      "collaboration_requise": true,
+      "description": "Programme de soutien \u00e0 l'innovation"
+    },
+    {
+      "id": "prog-060",
+      "nom": "Programme Innovation 60",
+      "organisme": "Mitacs",
+      "niveau": "provincial",
+      "type": "credit_impot",
+      "domaines": [
+        "num\u00e9rique",
+        "IA"
+      ],
+      "trl_cible": "1-8",
+      "client_cible": [
+        "PME",
+        "startup"
+      ],
+      "financement_max": "1853k$",
+      "conditions": [
+        "innovation",
+        "R&D"
+      ],
+      "collaboration_requise": false,
+      "description": "Programme de soutien \u00e0 l'innovation"
+    },
+    {
+      "id": "prog-061",
+      "nom": "Programme Innovation 61",
+      "organisme": "MEIE",
+      "niveau": "provincial",
+      "type": "financement mixte",
+      "domaines": [
+        "biotech",
+        "sant\u00e9"
+      ],
+      "trl_cible": "3-5",
+      "client_cible": [
+        "PME"
+      ],
+      "financement_max": "1250k$",
+      "conditions": [
+        "innovation",
+        "R&D"
+      ],
+      "collaboration_requise": false,
+      "description": "Programme de soutien \u00e0 l'innovation"
+    },
+    {
+      "id": "prog-062",
+      "nom": "Programme Innovation 62",
+      "organisme": "CRSNG",
+      "niveau": "provincial",
+      "type": "financement mixte",
+      "domaines": [
+        "sant\u00e9",
+        "transport"
+      ],
+      "trl_cible": "4-7",
+      "client_cible": [
+        "PME"
+      ],
+      "financement_max": "2711k$",
+      "conditions": [
+        "innovation",
+        "R&D"
+      ],
+      "collaboration_requise": false,
+      "description": "Programme de soutien \u00e0 l'innovation"
+    },
+    {
+      "id": "prog-063",
+      "nom": "Programme Innovation 63",
+      "organisme": "CNRC",
+      "niveau": "provincial",
+      "type": "subvention",
+      "domaines": [
+        "transport",
+        "num\u00e9rique"
+      ],
+      "trl_cible": "2-9",
+      "client_cible": [
+        "startup"
+      ],
+      "financement_max": "1318k$",
+      "conditions": [
+        "innovation",
+        "R&D"
+      ],
+      "collaboration_requise": false,
+      "description": "Programme de soutien \u00e0 l'innovation"
+    },
+    {
+      "id": "prog-064",
+      "nom": "Programme Innovation 64",
+      "organisme": "CRSNG",
+      "niveau": "federal",
+      "type": "subvention",
+      "domaines": [
+        "sant\u00e9",
+        "num\u00e9rique"
+      ],
+      "trl_cible": "3-8",
+      "client_cible": [
+        "PME"
+      ],
+      "financement_max": "1980k$",
+      "conditions": [
+        "innovation",
+        "R&D"
+      ],
+      "collaboration_requise": true,
+      "description": "Programme de soutien \u00e0 l'innovation"
+    },
+    {
+      "id": "prog-065",
+      "nom": "Programme Innovation 65",
+      "organisme": "FRQ",
+      "niveau": "provincial",
+      "type": "financement mixte",
+      "domaines": [
+        "IA",
+        "manufacturier"
+      ],
+      "trl_cible": "1-7",
+      "client_cible": [
+        "PME",
+        "startup"
+      ],
+      "financement_max": "2894k$",
+      "conditions": [
+        "innovation",
+        "R&D"
+      ],
+      "collaboration_requise": true,
+      "description": "Programme de soutien \u00e0 l'innovation"
+    },
+    {
+      "id": "prog-066",
+      "nom": "Programme Innovation 66",
+      "organisme": "FRQ",
+      "niveau": "provincial",
+      "type": "subvention",
+      "domaines": [
+        "foresterie",
+        "transport"
+      ],
+      "trl_cible": "4-8",
+      "client_cible": [
+        "PME",
+        "startup"
+      ],
+      "financement_max": "2230k$",
+      "conditions": [
+        "innovation",
+        "R&D"
+      ],
+      "collaboration_requise": false,
+      "description": "Programme de soutien \u00e0 l'innovation"
+    },
+    {
+      "id": "prog-067",
+      "nom": "Programme Innovation 67",
+      "organisme": "Mitacs",
+      "niveau": "provincial",
+      "type": "subvention",
+      "domaines": [
+        "\u00e9nergie",
+        "manufacturier"
+      ],
+      "trl_cible": "4-5",
+      "client_cible": [
+        "PME",
+        "startup"
+      ],
+      "financement_max": "2086k$",
+      "conditions": [
+        "innovation",
+        "R&D"
+      ],
+      "collaboration_requise": true,
+      "description": "Programme de soutien \u00e0 l'innovation"
+    },
+    {
+      "id": "prog-068",
+      "nom": "Programme Innovation 68",
+      "organisme": "MEIE",
+      "niveau": "provincial",
+      "type": "subvention",
+      "domaines": [
+        "foresterie",
+        "agriculture"
+      ],
+      "trl_cible": "2-9",
+      "client_cible": [
+        "PME",
+        "grande entreprise"
+      ],
+      "financement_max": "2819k$",
+      "conditions": [
+        "innovation",
+        "R&D"
+      ],
+      "collaboration_requise": true,
+      "description": "Programme de soutien \u00e0 l'innovation"
+    },
+    {
+      "id": "prog-069",
+      "nom": "Programme Innovation 69",
+      "organisme": "FRQ",
+      "niveau": "federal",
+      "type": "credit_impot",
+      "domaines": [
+        "sant\u00e9",
+        "IA"
+      ],
+      "trl_cible": "2-5",
+      "client_cible": [
+        "PME"
+      ],
+      "financement_max": "1649k$",
+      "conditions": [
+        "innovation",
+        "R&D"
+      ],
+      "collaboration_requise": true,
+      "description": "Programme de soutien \u00e0 l'innovation"
+    },
+    {
+      "id": "prog-070",
+      "nom": "Programme Innovation 70",
+      "organisme": "CNRC",
+      "niveau": "provincial",
+      "type": "subvention",
+      "domaines": [
+        "\u00e9nergie",
+        "manufacturier"
+      ],
+      "trl_cible": "4-7",
+      "client_cible": [
+        "PME",
+        "grande entreprise"
+      ],
+      "financement_max": "2352k$",
+      "conditions": [
+        "innovation",
+        "R&D"
+      ],
+      "collaboration_requise": true,
+      "description": "Programme de soutien \u00e0 l'innovation"
+    },
+    {
+      "id": "prog-071",
+      "nom": "Programme Innovation 71",
+      "organisme": "Mitacs",
+      "niveau": "federal",
+      "type": "financement mixte",
+      "domaines": [
+        "\u00e9nergie",
+        "agriculture"
+      ],
+      "trl_cible": "4-7",
+      "client_cible": [
+        "PME",
+        "grande entreprise"
+      ],
+      "financement_max": "1833k$",
+      "conditions": [
+        "innovation",
+        "R&D"
+      ],
+      "collaboration_requise": true,
+      "description": "Programme de soutien \u00e0 l'innovation"
+    },
+    {
+      "id": "prog-072",
+      "nom": "Programme Innovation 72",
+      "organisme": "MEIE",
+      "niveau": "federal",
+      "type": "subvention",
+      "domaines": [
+        "num\u00e9rique",
+        "transport"
+      ],
+      "trl_cible": "1-9",
+      "client_cible": [
+        "startup"
+      ],
+      "financement_max": "2020k$",
+      "conditions": [
+        "innovation",
+        "R&D"
+      ],
+      "collaboration_requise": false,
+      "description": "Programme de soutien \u00e0 l'innovation"
+    },
+    {
+      "id": "prog-073",
+      "nom": "Programme Innovation 73",
+      "organisme": "MEIE",
+      "niveau": "provincial",
+      "type": "financement mixte",
+      "domaines": [
+        "num\u00e9rique",
+        "\u00e9nergie"
+      ],
+      "trl_cible": "1-7",
+      "client_cible": [
+        "PME",
+        "grande entreprise"
+      ],
+      "financement_max": "695k$",
+      "conditions": [
+        "innovation",
+        "R&D"
+      ],
+      "collaboration_requise": false,
+      "description": "Programme de soutien \u00e0 l'innovation"
+    },
+    {
+      "id": "prog-074",
+      "nom": "Programme Innovation 74",
+      "organisme": "MEIE",
+      "niveau": "federal",
+      "type": "subvention",
+      "domaines": [
+        "IA",
+        "transport"
+      ],
+      "trl_cible": "2-9",
+      "client_cible": [
+        "PME",
+        "grande entreprise"
+      ],
+      "financement_max": "730k$",
+      "conditions": [
+        "innovation",
+        "R&D"
+      ],
+      "collaboration_requise": true,
+      "description": "Programme de soutien \u00e0 l'innovation"
+    },
+    {
+      "id": "prog-075",
+      "nom": "Programme Innovation 75",
+      "organisme": "CRSNG",
+      "niveau": "federal",
+      "type": "financement mixte",
+      "domaines": [
+        "num\u00e9rique",
+        "agriculture"
+      ],
+      "trl_cible": "1-9",
+      "client_cible": [
+        "PME",
+        "grande entreprise"
+      ],
+      "financement_max": "2185k$",
+      "conditions": [
+        "innovation",
+        "R&D"
+      ],
+      "collaboration_requise": true,
+      "description": "Programme de soutien \u00e0 l'innovation"
+    },
+    {
+      "id": "prog-076",
+      "nom": "Programme Innovation 76",
+      "organisme": "CNRC",
+      "niveau": "federal",
+      "type": "financement mixte",
+      "domaines": [
+        "manufacturier",
+        "num\u00e9rique"
+      ],
+      "trl_cible": "1-7",
+      "client_cible": [
+        "PME",
+        "grande entreprise"
+      ],
+      "financement_max": "409k$",
+      "conditions": [
+        "innovation",
+        "R&D"
+      ],
+      "collaboration_requise": true,
+      "description": "Programme de soutien \u00e0 l'innovation"
+    },
+    {
+      "id": "prog-077",
+      "nom": "Programme Innovation 77",
+      "organisme": "Mitacs",
+      "niveau": "federal",
+      "type": "credit_impot",
+      "domaines": [
+        "transport",
+        "sant\u00e9"
+      ],
+      "trl_cible": "4-6",
+      "client_cible": [
+        "PME"
+      ],
+      "financement_max": "231k$",
+      "conditions": [
+        "innovation",
+        "R&D"
+      ],
+      "collaboration_requise": false,
+      "description": "Programme de soutien \u00e0 l'innovation"
+    },
+    {
+      "id": "prog-078",
+      "nom": "Programme Innovation 78",
+      "organisme": "FRQ",
+      "niveau": "federal",
+      "type": "subvention",
+      "domaines": [
+        "transport",
+        "manufacturier"
+      ],
+      "trl_cible": "4-5",
+      "client_cible": [
+        "PME"
+      ],
+      "financement_max": "2737k$",
+      "conditions": [
+        "innovation",
+        "R&D"
+      ],
+      "collaboration_requise": false,
+      "description": "Programme de soutien \u00e0 l'innovation"
+    },
+    {
+      "id": "prog-079",
+      "nom": "Programme Innovation 79",
+      "organisme": "MEIE",
+      "niveau": "provincial",
+      "type": "subvention",
+      "domaines": [
+        "num\u00e9rique",
+        "\u00e9nergie"
+      ],
+      "trl_cible": "3-7",
+      "client_cible": [
+        "PME",
+        "startup"
+      ],
+      "financement_max": "1853k$",
+      "conditions": [
+        "innovation",
+        "R&D"
+      ],
+      "collaboration_requise": true,
+      "description": "Programme de soutien \u00e0 l'innovation"
+    },
+    {
+      "id": "prog-080",
+      "nom": "Programme Innovation 80",
+      "organisme": "CRSNG",
+      "niveau": "federal",
+      "type": "subvention",
+      "domaines": [
+        "manufacturier",
+        "agriculture"
+      ],
+      "trl_cible": "3-5",
+      "client_cible": [
+        "PME",
+        "grande entreprise"
+      ],
+      "financement_max": "2693k$",
+      "conditions": [
+        "innovation",
+        "R&D"
+      ],
+      "collaboration_requise": false,
+      "description": "Programme de soutien \u00e0 l'innovation"
+    },
+    {
+      "id": "prog-081",
+      "nom": "Programme Innovation 81",
+      "organisme": "Mitacs",
+      "niveau": "provincial",
+      "type": "subvention",
+      "domaines": [
+        "sant\u00e9",
+        "num\u00e9rique"
+      ],
+      "trl_cible": "1-6",
+      "client_cible": [
+        "startup"
+      ],
+      "financement_max": "709k$",
+      "conditions": [
+        "innovation",
+        "R&D"
+      ],
+      "collaboration_requise": true,
+      "description": "Programme de soutien \u00e0 l'innovation"
+    },
+    {
+      "id": "prog-082",
+      "nom": "Programme Innovation 82",
+      "organisme": "CRSNG",
+      "niveau": "federal",
+      "type": "credit_impot",
+      "domaines": [
+        "\u00e9nergie",
+        "agriculture"
+      ],
+      "trl_cible": "4-9",
+      "client_cible": [
+        "PME"
+      ],
+      "financement_max": "2410k$",
+      "conditions": [
+        "innovation",
+        "R&D"
+      ],
+      "collaboration_requise": false,
+      "description": "Programme de soutien \u00e0 l'innovation"
+    },
+    {
+      "id": "prog-083",
+      "nom": "Programme Innovation 83",
+      "organisme": "FRQ",
+      "niveau": "provincial",
+      "type": "financement mixte",
+      "domaines": [
+        "manufacturier",
+        "IA"
+      ],
+      "trl_cible": "3-7",
+      "client_cible": [
+        "startup"
+      ],
+      "financement_max": "2246k$",
+      "conditions": [
+        "innovation",
+        "R&D"
+      ],
+      "collaboration_requise": true,
+      "description": "Programme de soutien \u00e0 l'innovation"
+    },
+    {
+      "id": "prog-084",
+      "nom": "Programme Innovation 84",
+      "organisme": "CNRC",
+      "niveau": "provincial",
+      "type": "subvention",
+      "domaines": [
+        "agriculture",
+        "transport"
+      ],
+      "trl_cible": "4-8",
+      "client_cible": [
+        "PME",
+        "grande entreprise"
+      ],
+      "financement_max": "1439k$",
+      "conditions": [
+        "innovation",
+        "R&D"
+      ],
+      "collaboration_requise": true,
+      "description": "Programme de soutien \u00e0 l'innovation"
+    }
+  ]
+}
