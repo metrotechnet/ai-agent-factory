@@ -19,6 +19,7 @@ collection = None
 
 # Initialize Vercel AI Gateway client (OpenAI-compatible)
 # See https://vercel.com/docs/ai-gateway/sdks-and-apis/openai-chat-completions
+from openai import OpenAI
 client = OpenAI(
     api_key=os.getenv("AI_GATEWAY_API_KEY"),
     base_url="https://ai-gateway.vercel.sh/v1"

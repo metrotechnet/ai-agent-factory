@@ -17,6 +17,7 @@ let userMessageDiv = document.createElement('div');
 let endPadding = 0;
 let currentAbortController = null;
 let currentReader = null;
+let prevMessageContent = null;
 
 // Rate limiting - Debouncing
 let lastRequestTime = 0;
@@ -375,6 +376,7 @@ function positionMessageAtBottom(chatContainer, userMessageDiv, messageDiv) {
                 const currentHeight = messageContent.offsetHeight;
                 // messageContent.style.minHeight = (currentHeight + endPadding) + 'px';
                 messageContent.style.marginBottom = (endPadding) + 'px';
+                // messageContent.style.border = 'solid 1px red'; // Force layout update
             }
         }
         
@@ -662,6 +664,11 @@ async function sendMessage() {
     userMessageDiv = addMessage(question, 'user');
     const messageDiv = createAssistantMessage();
     
+    if (prevMessageContent) {
+        prevMessageContent.style.marginBottom =  '0';
+    }
+    prevMessageContent = messageDiv.querySelector('.message-content');
+
     chatContainer.appendChild(userMessageDiv);
     chatContainer.appendChild(messageDiv);
 

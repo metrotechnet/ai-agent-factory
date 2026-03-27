@@ -24,8 +24,14 @@ GDRIVE_FOLDER_ID = os.getenv("GDRIVE_FOLDER_ID", "")
 GDRIVE_CREDENTIALS_PATH = os.getenv("GDRIVE_CREDENTIALS_PATH", "")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
-# Clients (initialized globally, paths determined per agent)
-client_openai = OpenAI(api_key=OPENAI_API_KEY)
+
+# Initialize Vercel AI Gateway client (OpenAI-compatible)
+# See https://vercel.com/docs/ai-gateway/sdks-and-apis/openai-chat-completions
+client = OpenAI(
+    api_key=os.getenv("AI_GATEWAY_API_KEY"),
+    base_url="https://ai-gateway.vercel.sh/v1"
+)
+
 
 def get_agent_paths(agent=None):
     """Get knowledge base paths for specific agent"""

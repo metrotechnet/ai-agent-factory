@@ -36,11 +36,14 @@ os.makedirs(DOCUMENTS_DIR, exist_ok=True)
 os.makedirs(EXTRACTED_DIR, exist_ok=True)
 os.makedirs(CHROMA_DB_DIR, exist_ok=True)
 
-# Clients
-client_openai = OpenAI(api_key=OPENAI_API_KEY)
+# Initialize Vercel AI Gateway client (OpenAI-compatible) for chat/text
+client = OpenAI(
+    api_key=os.getenv("AI_GATEWAY_API_KEY"),
+    base_url="https://ai-gateway.vercel.sh/v1"
+)
 
 ef = embedding_functions.OpenAIEmbeddingFunction(
-    api_key=OPENAI_API_KEY, model_name="text-embedding-3-large"
+    api_key=os.getenv("AI_GATEWAY_API_KEY"), model_name="text-embedding-3-large"
 )
 chroma_client = chromadb.PersistentClient(
     path=CHROMA_DB_DIR,

@@ -16,7 +16,6 @@ def scrape():
         page.wait_for_timeout(3000)
 
         links = page.query_selector_all("a")
-        print(f"[DEBUG] Nombre de liens trouvés : {len(links)}")
 
         urls = []
         for l in links:
@@ -25,7 +24,6 @@ def scrape():
                 urls.append(href)
 
         urls = list(set(urls))
-        print(f"[DEBUG] Nombre d'URLs de centres trouvées : {len(urls)}")
         #Clear json file if exists
         with open("cctt_dataset.json", "w", encoding="utf-8") as f:
             json.dump([], f)

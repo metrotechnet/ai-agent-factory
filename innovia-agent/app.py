@@ -83,7 +83,8 @@ app.include_router(tts.router, tags=["tts"])
 app.include_router(report.router, tags=["report"])
 app.include_router(config_routes.router, tags=["config"])
 app.include_router(sessions.router, tags=["sessions"])
- 
+app.include_router(translation.router, tags=["translation"])
+
 # =====================================================
 # Main Routes
 # =====================================================

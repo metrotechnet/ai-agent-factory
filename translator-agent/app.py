@@ -62,8 +62,6 @@ additional_origins = os.getenv("ADDITIONAL_CORS_ORIGINS", "")
 if additional_origins:
     allowed_origins.extend([origin.strip() for origin in additional_origins.split(",") if origin.strip()])
 
-print(f"[DEBUG] CORS allowed_origins: {allowed_origins}")
-
 app.add_middleware(
     CORSMiddleware,
     allow_origins=allowed_origins,

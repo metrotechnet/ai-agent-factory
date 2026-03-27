@@ -9,13 +9,11 @@ import tempfile
 from pathlib import Path
 from openai import OpenAI
 from dotenv import load_dotenv
-import google.generativeai as genai
 
 PROJECT_ROOT = Path(__file__).parent.parent
 load_dotenv(dotenv_path=PROJECT_ROOT / '.env')
 
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 
 # Supported translation languages
 SUPPORTED_LANGUAGES = {
@@ -66,7 +64,6 @@ def load_translator_prompts(language: str = "en") -> tuple:
         
         # Extract model configuration
         model_config = {
-            "supplier": prompts_data.get("model_supplier", "openai"),
             "name": prompts_data.get("model_name", "gpt-4o-mini")
         }
         
@@ -80,7 +77,6 @@ def load_translator_prompts(language: str = "en") -> tuple:
             "source_language_instruction": "The source language is {source_lang_name}."
         }
         default_model_config = {
-            "supplier": "openai",
             "name": "gpt-4o-mini"
         }
         return default_prompts, default_model_config
@@ -119,40 +115,23 @@ def translate_text_stream(text: str, target_language: str, source_language: str 
 
     # Get model configuration
     model_name = model_config.get('name', 'gpt-4o-mini')
-    model_supplier = model_config.get('supplier', 'openai')
     
-    if model_supplier == 'openai':
-        # OpenAI streaming
-        stream = client.chat.completions.create(
-            model=model_name,
-            messages=[
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": text}
-            ],
-            stream=True,
-            temperature=0.3,
-        )
+    # OpenAI streaming
+    stream = client.chat.completions.create(
+        model=model_name,
+        messages=[
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": text}
+        ],
+        stream=True,
+        temperature=0.3,
+    )
 
-        for chunk in stream:
-            if chunk.choices[0].delta.content:
-                yield chunk.choices[0].delta.content
+    for chunk in stream:
+        if chunk.choices[0].delta.content:
+            yield chunk.choices[0].delta.content
                 
-    elif model_supplier == 'gemini':
-        # Gemini streaming
-        model = genai.GenerativeModel(model_name, generation_config={
-            "temperature": 0.3
-        })
-        
-        # Combine system prompt and user text for Gemini
-        combined_prompt = f"{system_prompt}\n\n{text}"
-        response = model.generate_content(combined_prompt, stream=True)
-        
-        for chunk in response:
-            text_chunk = getattr(chunk, "text", None)
-            if text_chunk:
-                yield text_chunk
-    else:
-        yield f"Error: Model supplier '{model_supplier}' not supported. Use 'openai' or 'gemini'."
+  
 
 
 def transcribe_audio_whisper(audio_bytes: bytes, filename: str = "audio.webm", language: str = None) -> str:

@@ -2091,5 +2091,26 @@
     "response": "Error processing your question: 'documents'",
     "timestamp": "2026-03-26T14:28:50.507099",
     "comments": []
+  },
+  {
+    "question_id": "97dd6688-4140-4c77-b6f0-cc54f69c87c9",
+    "question": "Et il y aura deu exactement",
+    "response": "Error processing your question: 'documents'",
+    "timestamp": "2026-03-27T08:54:20.275063",
+    "comments": []
+  },
+  {
+    "question_id": "ffd3ff73-3257-4046-ac79-4be15c357cc8",
+    "question": "Recommande-moi des livres de science-fiction",
+    "response": "Error processing your question: 'documents'",
+    "timestamp": "2026-03-27T09:01:56.256936",
+    "comments": []
+  },
+  {
+    "question_id": "44a05c16-8417-44b1-ac7c-b6149bd65cfa",
+    "question": "Je veux découvrir des auteurs québécois",
+    "response": "Error processing your question: 'documents'",
+    "timestamp": "2026-03-27T09:02:39.047748",
+    "comments": []
   }
 ]

@@ -1,5 +1,7 @@
 """
-TTS Routes - Text-to-Speech endpoint
+tts.py
+Text-to-Speech endpoint for the Bibliosense agent API.
+Converts text to speech using OpenAI TTS API and streams audio responses.
 """
 from fastapi import APIRouter, Body, Request
 from fastapi.responses import Response, JSONResponse
@@ -7,10 +9,18 @@ import openai
 import os
 from slowapi import Limiter
 from slowapi.util import get_remote_address
+from openai import OpenAI
 
 router = APIRouter()
 limiter = Limiter(key_func=get_remote_address)
 
+
+# Initialize Vercel AI Gateway client (OpenAI-compatible)
+# See https://vercel.com/docs/ai-gateway/sdks-and-apis/openai-chat-completions
+client_openai = OpenAI(
+    api_key=os.getenv("AI_GATEWAY_API_KEY"),
+    base_url="https://ai-gateway.vercel.sh/v1"
+)
 
 @router.post("/api/tts")
 @limiter.limit("10/hour")  # Max 10 TTS requests per hour per IP (TTS is expensive)
@@ -24,7 +34,7 @@ async def text_to_speech(
     Returns audio/mpeg stream.
     """
     try:
-        client_openai = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+
         # Choose voice based on language
         voice = "nova" if language in ["fr", "es", "it", "pt", "ro"] else "alloy"
         response = client_openai.audio.speech.create(

@@ -13,16 +13,7 @@ from dotenv import load_dotenv
 PROJECT_ROOT = Path(__file__).parent.parent
 load_dotenv(dotenv_path=PROJECT_ROOT / '.env')
 
-# Initialize Vercel AI Gateway client (OpenAI-compatible) for chat/text
-client = OpenAI(
-    api_key=os.getenv("AI_GATEWAY_API_KEY"),
-    base_url="https://ai-gateway.vercel.sh/v1"
-)
-
-# Direct OpenAI client for audio APIs (Whisper, TTS) - not supported by Vercel AI Gateway
-client_audio = OpenAI(
-    api_key=os.getenv("OPENAI_API_KEY")
-)
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 # Supported translation languages
 SUPPORTED_LANGUAGES = {
@@ -73,7 +64,7 @@ def load_translator_prompts(language: str = "en") -> tuple:
         
         # Extract model configuration
         model_config = {
-            "name": prompts_data.get("model_name", "openai/gpt-4o-mini")
+            "name": prompts_data.get("model_name", "gpt-4o-mini")
         }
         
         lang_prompts = prompts_data.get(language, prompts_data.get("en", {}))
@@ -86,7 +77,7 @@ def load_translator_prompts(language: str = "en") -> tuple:
             "source_language_instruction": "The source language is {source_lang_name}."
         }
         default_model_config = {
-            "name": "openai/gpt-4o-mini"
+            "name": "gpt-4o-mini"
         }
         return default_prompts, default_model_config
 
@@ -123,8 +114,9 @@ def translate_text_stream(text: str, target_language: str, source_language: str 
     )
 
     # Get model configuration
-    model_name = model_config.get('name', 'openai/gpt-4o-mini')
+    model_name = model_config.get('name', 'gpt-4o-mini')
     
+    # OpenAI streaming
     stream = client.chat.completions.create(
         model=model_name,
         messages=[
@@ -138,6 +130,8 @@ def translate_text_stream(text: str, target_language: str, source_language: str 
     for chunk in stream:
         if chunk.choices[0].delta.content:
             yield chunk.choices[0].delta.content
+                
+  
 
 
 def transcribe_audio_whisper(audio_bytes: bytes, filename: str = "audio.webm", language: str = None) -> str:
@@ -170,7 +164,7 @@ def transcribe_audio_whisper(audio_bytes: bytes, filename: str = "audio.webm", l
                 params["language"] = language
                 print(f"Transcribing with language hint: {SUPPORTED_LANGUAGES.get(language, language)}")
             
-            transcript = client_audio.audio.transcriptions.create(**params)
+            transcript = client.audio.transcriptions.create(**params)
         return transcript.strip()
     finally:
         os.unlink(tmp_path)
@@ -195,7 +189,7 @@ def translate_audio_whisper(audio_bytes: bytes, filename: str = "audio.webm") ->
 
     try:
         with open(tmp_path, "rb") as audio_file:
-            translation = client_audio.audio.translations.create(
+            translation = client.audio.translations.create(
                 model="whisper-1",
                 file=audio_file,
                 response_format="text"

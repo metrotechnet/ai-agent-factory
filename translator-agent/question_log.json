@@ -285,5 +285,96 @@
     "response": "Automatic translation",
     "timestamp": "2026-03-26T14:36:54.475199",
     "comments": []
+  },
+  {
+    "question_id": "59ec7e8f-ab9d-4bb5-b008-eeb108d890b1",
+    "question": "[TRANSLATION fr→en] Traduction automatique.",
+    "response": "Automatic translation.",
+    "timestamp": "2026-03-27T09:10:13.129644",
+    "comments": []
+  },
+  {
+    "question_id": "7fd45b3b-cdc8-426b-9f51-fd2270dd459f",
+    "question": "[TRANSLATION fr→en] Traduction automatique.",
+    "response": "Automatic translation.",
+    "timestamp": "2026-03-27T09:11:32.099709",
+    "comments": []
+  },
+  {
+    "question_id": "b73a17c5-a997-488e-8bd0-43e43e4f02a1",
+    "question": "[TRANSLATION fr→en] U\nTraduction automatique.",
+    "response": "U  \nAutomatic translation.",
+    "timestamp": "2026-03-27T09:12:21.240884",
+    "comments": []
+  },
+  {
+    "question_id": "f9b35d48-a5d5-429b-a178-86544905b569",
+    "question": "[TRANSLATION fr→en] Traduction automatique.",
+    "response": "Automatic translation.",
+    "timestamp": "2026-03-27T09:24:30.318440",
+    "comments": []
+  },
+  {
+    "question_id": "958bca3a-e884-497d-b858-96e0039b1ade",
+    "question": "[TRANSLATION fr→en] Traduction automatique. Pou",
+    "response": "Automatic translation. For",
+    "timestamp": "2026-03-27T09:25:06.335596",
+    "comments": []
+  },
+  {
+    "question_id": "f4816111-0880-4677-ba9f-572a1495ca43",
+    "question": "[TRANSLATION fr→en] Note : Traduction automatique. Pour des documents officiels, consultez un traducteur professionnel.",
+    "response": "Note: Machine translation. For official documents, consult a professional translator.",
+    "timestamp": "2026-03-27T09:26:32.635350",
+    "comments": []
+  },
+  {
+    "question_id": "8bd51cd3-f5e6-407b-a5b6-0a0312cc8289",
+    "question": "[TRANSLATION fr→en] Note : Traduction automatique. Pour des documents officiels, consultez un traducteur professionnel.",
+    "response": "Note: Automatic translation. For official documents, consult a professional translator.",
+    "timestamp": "2026-03-27T09:28:22.190800",
+    "comments": []
+  },
+  {
+    "question_id": "744037f0-27c1-4b64-908d-bcad5a19a57d",
+    "question": "[TRANSLATION fr→en] Traduisez vos textes dans plus de 25 langues. L'agent supporte la traduction de texte et audio.",
+    "response": "Translate your texts into more than 25 languages. The agent supports text and audio translation.",
+    "timestamp": "2026-03-27T10:22:47.678500",
+    "comments": []
+  },
+  {
+    "question_id": "8259093f-3c37-4c44-82cf-e12c2fe9cc6c",
+    "question": "[TRANSLATION fr→en] Traduisez vos textes dans plus de 25 langues. L'agent supporte la traduction de texte et audio.",
+    "response": "Translate your texts into more than 25 languages. The agent supports text and audio translation.",
+    "timestamp": "2026-03-27T10:23:38.013247",
+    "comments": []
+  },
+  {
+    "question_id": "57332bb7-5f9d-4e41-a74a-20c3c453b2ee",
+    "question": "[TRANSLATION fr→en] Note : Traduction automatique. Pour des documents officiels, consultez un traducteur professionnel.",
+    "response": "Note: Machine translation. For official documents, consult a professional translator.",
+    "timestamp": "2026-03-27T10:25:05.409143",
+    "comments": []
+  },
+  {
+    "question_id": "44b1097f-c56a-40a4-bf11-bdea95f34cf7",
+    "question": "[TRANSLATION fr→en] Note : Traduction automatique. Pour des documents officiels, consultez un traducteur professionnel.",
+    "response": "Note: Automatic translation. For official documents, consult a professional translator.",
+    "timestamp": "2026-03-27T10:25:34.964119",
+    "comments": []
+  },
+  {
+    "question_id": "ada3621e-b507-4f34-b7a8-cc978c5812f4",
+    "question": "[TRANSLATION fr→en] Note : Traduction automatique. Pour des documents officiels, consultez un traducteur professionnel.",
+    "response": "Note: Machine translation. For official documents, consult a professional translator.",
+    "timestamp": "2026-03-27T10:30:10.507433",
+    "comments": []
+  },
+  {
+    "question_id": "0325a84d-60aa-4e63-a510-0979f9810c31",
+    "question": "[TRANSLATION fr→en] Traduisez vos textes dans plus de 25 langues. L'agent supporte la traduction de texte et audio.",
+    "response": "Translate your texts into more than 25 languages. The agent supports text and audio translation.",
+    "timestamp": "2026-03-27T10:32:57.880962",
+    "comments": []
   }
 ]

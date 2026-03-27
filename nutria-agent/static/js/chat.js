@@ -14,7 +14,7 @@ let userMessageDiv = document.createElement('div');
 let endPadding = 0;
 let currentAbortController = null;
 let currentReader = null;
-
+let prevMessageContent = null;
 // Rate limiting - Debouncing
 let lastRequestTime = 0;
 const MIN_REQUEST_INTERVAL = 2000; // 2 seconds minimum between requests
@@ -304,7 +304,6 @@ function positionMessageAtBottom(chatContainer, userMessageDiv, messageDiv) {
             const messageContent = messageDiv.querySelector('.message-content');
             if (messageContent) {
                 const currentHeight = messageContent.offsetHeight;
-                // messageContent.style.minHeight = (currentHeight + endPadding) + 'px';
                 messageContent.style.marginBottom = (endPadding) + 'px';
             }
         }
@@ -580,7 +579,11 @@ async function sendMessage() {
     
     userMessageDiv = addMessage(question, 'user');
     const messageDiv = createAssistantMessage();
-    
+    if (prevMessageContent) {
+        prevMessageContent.style.marginBottom =  '0';
+    }
+    prevMessageContent = messageDiv.querySelector('.message-content');
+
     chatContainer.appendChild(userMessageDiv);
     chatContainer.appendChild(messageDiv);
 

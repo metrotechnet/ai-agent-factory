@@ -153,7 +153,7 @@ def query_chromadb(project_name, collection_name=None, data=None):
         # 🔐 GET IAM TOKEN
         # =========================
         auth_req = google.auth.transport.requests.Request()
-
+        
         id_token = google.oauth2.id_token.fetch_id_token(
             auth_req,
             chromadb_url

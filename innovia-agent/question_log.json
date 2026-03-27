@@ -3694,5 +3694,89 @@
     "response": "Je suis là pour vous accompagner dans vos projets d'innovation au Québec. Pourriez-vous préciser le domaine ou le type de projet spécifique que vous souhaitez explorer? Cela me permettra de vous fournir des informations pertinentes et des partenaires adaptés.",
     "timestamp": "2026-03-26T14:14:24.304743",
     "comments": []
+  },
+  {
+    "question_id": "efedbc5e-e7ea-4537-bb3c-cb6a5a5cbce6",
+    "question": "projet en ia",
+    "response": "Quel est le secteur d'application ou l'objectif spécifique de votre projet en IA ?",
+    "timestamp": "2026-03-27T09:51:07.059189",
+    "comments": []
+  },
+  {
+    "question_id": "e3d3921a-70c1-40c1-a7e0-6f0366bbd8a7",
+    "question": "Je cherche des partenaires pour mon projet",
+    "response": "Quel est le domaine de votre projet ?",
+    "timestamp": "2026-03-27T09:54:55.180754",
+    "comments": []
+  },
+  {
+    "question_id": "6b32f7b5-0196-41a9-9fb2-d9fa4d247261",
+    "question": "Je cherche des partenaires pour mon projet",
+    "response": "Quel est le domaine de votre projet ?",
+    "timestamp": "2026-03-27T10:01:13.498587",
+    "comments": []
+  },
+  {
+    "question_id": "c73f94d5-97c1-4e62-87e4-298136ae8e76",
+    "question": "adsfa",
+    "response": "Il semble que votre message ne soit pas clair. Pour vous aider efficacement, pourriez-vous préciser le domaine de votre projet ou le type de partenariats que vous recherchez ? Cela me permettra de vous fournir des recommandations adaptées.",
+    "timestamp": "2026-03-27T10:01:30.440910",
+    "comments": []
+  },
+  {
+    "question_id": "6fc5c213-ed4d-4482-ad03-286448f9a131",
+    "question": "Je cherche des partenaires pour mon projet",
+    "response": "Quel est le domaine de votre projet ?",
+    "timestamp": "2026-03-27T10:01:56.631307",
+    "comments": []
+  },
+  {
+    "question_id": "151ec23a-abac-42ab-a706-b8fbae986eea",
+    "question": "adsfa",
+    "response": "Pour mieux vous accompagner, pourriez-vous préciser le domaine de votre projet ou le type de partenaires que vous recherchez ? Je suis là pour vous aider à identifier des ressources adaptées.",
+    "timestamp": "2026-03-27T10:02:14.121519",
+    "comments": []
+  },
+  {
+    "question_id": "0cbcb0f5-f946-4ee6-b835-45354e55a325",
+    "question": "projet en ia",
+    "response": "Quel est le secteur d'application de votre projet en IA ?",
+    "timestamp": "2026-03-27T10:02:21.151564",
+    "comments": []
+  },
+  {
+    "question_id": "28b01c68-4e58-47c2-9c21-6afb1c3ee670",
+    "question": "reconnaissance vocale",
+    "response": "Pour soutenir un projet de reconnaissance vocale au Québec, voici quelques CCTT qui pourraient vous intéresser :\n\n### Partenaires recommandés\n- ![CIMMI](https://reseaucctt.ca/medias/logos/centres/CIMMI-LogoHorizontal-RGB.png)\n  - **Nom** : CIMMI\n  - **Type** : CCTT\n  - **Website** : [cimmi.ca](https://cimmi.ca)\n  - **Secteurs** : Aérospatial, santé numérique, technologies numériques\n  - **Justification** : Le CIMMI offre une expertise en technologie numérique et en développement d'algorithmes qui pourraient être appliqués à la reconnaissance vocale.\n  - **Contacts** : \n    - Éric Harvey, ing., Ph.D. - 418 781-2464, poste 2551, eharvey@cimmi.qc.ca\n    - Nadia Bennaïli - 418 781-2464, poste 2566, nbennaili@cimmi.ca\n\n- ![JACOBB](https://reseaucctt.ca/medias/logos/centres/JACOBB.png)\n  - **Nom** : JACOBB\n  - **Type** : CCTT\n  - **Website** : [jacobb.ai](https://www.jacobb.ai)\n  - **Secteurs** : Intelligence artificielle, agriculture, agroalimentaire\n  - **Justification** : JACOBB se spécialise dans l'intégration de l'intelligence artificielle, ce qui est pertinent pour les technologies de reconnaissance vocale.\n  - **Contacts** : \n    - Renaud Bellemare - 514-332-3000, poste 7434, renaud.bellemare@jacobb.ai\n\n- ![CRVI](https://reseaucctt.ca/medias/logos/centres/CRVI.png)\n  - **Nom** : CRVI\n  - **Type** : CCTT\n  - **Website** : [crvi.ca](http://www.crvi.ca)\n  - **Secteurs** : Automatisation, robotique, vision artificielle\n  - **Justification** : Le CRVI se concentre sur les technologies de vision et pourrait apporter une expertise complémentaire en traitement de données pour la reconnaissance vocale.\n  - **Contacts** : \n    - Marie-Christine Ferland - 418 833-1965, poste 3261, marie-christine.ferland@cegeplevis.ca\n\n### Programmes de financement\n- **Recherche appliquée et développement (plus de 40 000 $)**\n  - ![Logo](https://cimmi.s3.bhs.io.cloud.ovh.net/2024/06/logo-srenc.svg)\n  - **Détails** : Contribution du client : 25 % de la subvention ; Montant maximal : 150 000 $ par an pour un maximum de 3 ans ; Délai de réponse : 6 à 7 mois.\n\n- **Recherche appliquée et développement (moins de 40 000 $)**\n  - ![Logo](https://cimmi.s3.bhs.io.cloud.ovh.net/2024/06/logo-srenc.svg)\n  - **Détails** : Contribution du client : 25 % de la subvention ; Montant maximal : 40 000 $ par an pour un maximum de 3 ans ; Délai de réponse : 5 à 9 semaines.\n\nN'hésitez pas à contacter ces ressources pour discuter de votre projet et des possibilités de collaboration.",
+    "timestamp": "2026-03-27T10:03:14.729226",
+    "comments": []
+  },
+  {
+    "question_id": "587feab8-f2af-4b12-8d84-29dcb29a7faa",
+    "question": "Je cherche des partenaires pour mon projet",
+    "response": "Quel est le domaine de votre projet ?",
+    "timestamp": "2026-03-27T10:04:36.706151",
+    "comments": []
+  },
+  {
+    "question_id": "6faa34a8-abd2-48e0-affb-92b0ffbc198c",
+    "question": "Je cherche des partenaires pour mon projet",
+    "response": "Quel est le domaine de votre projet ?",
+    "timestamp": "2026-03-27T10:07:17.814950",
+    "comments": []
+  },
+  {
+    "question_id": "6b0a9ee4-5a36-4895-8dd9-405289d063c4",
+    "question": "test",
+    "response": "Je suis ici pour vous accompagner dans la recherche de partenaires, de financement ou d’appui pour des projets d’innovation au Québec. Si vous avez un projet spécifique en tête, n'hésitez pas à préciser le domaine ou les besoins afin que je puisse vous orienter vers les partenaires ou les programmes de financement adaptés.",
+    "timestamp": "2026-03-27T10:07:36.497381",
+    "comments": []
+  },
+  {
+    "question_id": "c1cc91eb-045c-4031-99f7-dcc04e6aa5e0",
+    "question": "oui mais",
+    "response": "Quel est le domaine spécifique de votre projet ou question?",
+    "timestamp": "2026-03-27T10:07:48.807097",
+    "comments": []
   }
 ]
