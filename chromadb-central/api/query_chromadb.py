@@ -79,3 +79,11 @@ def query_vector_db(project_name, collection_name, query):
     return {"project": project_name, "question": query, "result": "(vector search result here)"}
 
 
+def extract_entities(results):
+    entities = []
+
+    for meta in results.get("metadatas", [[]])[0]:
+        if "name" in meta:
+            entities.append(meta["name"])
+
+    return list(set(entities))

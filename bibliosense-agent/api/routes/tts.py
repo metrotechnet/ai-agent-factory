@@ -17,10 +17,7 @@ limiter = Limiter(key_func=get_remote_address)
 
 # Initialize Vercel AI Gateway client (OpenAI-compatible)
 # See https://vercel.com/docs/ai-gateway/sdks-and-apis/openai-chat-completions
-client_openai = OpenAI(
-    api_key=os.getenv("AI_GATEWAY_API_KEY"),
-    base_url="https://ai-gateway.vercel.sh/v1"
-)
+client_openai = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 @router.post("/api/tts")
 @limiter.limit("10/hour")  # Max 10 TTS requests per hour per IP (TTS is expensive)

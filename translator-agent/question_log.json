@@ -376,5 +376,12 @@
     "response": "Translate your texts into more than 25 languages. The agent supports text and audio translation.",
     "timestamp": "2026-03-27T10:32:57.880962",
     "comments": []
+  },
+  {
+    "question_id": "6fe4bb1c-893e-4121-893a-bfede81190d0",
+    "question": "[TRANSLATION fr→en] Note : Traduction automatique. Pour des documents officiels, consultez un traducteur professionnel.",
+    "response": "Note: Machine translation. For official documents, consult a professional translator.",
+    "timestamp": "2026-03-27T11:23:27.668825",
+    "comments": []
   }
 ]

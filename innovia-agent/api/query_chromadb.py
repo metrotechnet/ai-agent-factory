@@ -161,6 +161,7 @@ def format_context(documents, metadatas_list):
         }
         context.append(f"```\n{json.dumps(entry, ensure_ascii=False, indent=2)}\n```")
     return context
+
 def query_chromadb(project_name, collection_name=None, data=None):
     try:
         chromadb_url = os.getenv("CHROMADB_CENTRAL_URL")
@@ -189,10 +190,13 @@ def query_chromadb(project_name, collection_name=None, data=None):
         payload = {
             "project_name": project_name,
             "collection_name": collection_name,
+            "nodes": ["domain", "cctt"],
+            "edges": ["eligible_for_funding"],
             "query": data
         }
 
         url = f"{chromadb_url}/query"
+        # url = f"{chromadb_url}/smart_query"
 
         # =========================
         # 🚀 REQUEST
@@ -263,8 +267,8 @@ def extract_pmids_from_text(text):
 
 def analyze_query_llm(query: str, history_text: str):
 
-    print(f"[analyze_query_llm] Analyzing query: '{query}' ", flush=True)
-    print(f"[analyze_query_llm] History text: {history_text}", flush=True)
+    # print(f"[analyze_query_llm] Analyzing query: '{query}' ", flush=True)
+    # print(f"[analyze_query_llm] History text: {history_text}", flush=True)
     prompt = f"""
     Tu es un expert en innovation et financement R&D au Québec.
 
@@ -488,7 +492,7 @@ def ask_question_stream(question, language="fr", timezone="UTC", locale="fr-FR",
     try:
         # Détecter si la question est trop vague et nécessite clarification
         result  = analyze_query_llm(question,history_text)
-        print(f"[ask_question_stream] Query analysis result: {result}", flush=True)
+        # print(f"[ask_question_stream] Query analysis result: {result}", flush=True)
         if result and result.get("clarity_score") < 0.5 and result.get("reply_question"):
             # Vérifie si la reply_question a déjà été posée dans l'historique
             if not is_question_already_asked(result.get("reply_question"), conversation_history):
@@ -500,8 +504,11 @@ def ask_question_stream(question, language="fr", timezone="UTC", locale="fr-FR",
 
 
         print(f"[ask_question_stream] Question contexte: {result.get('contexte')}", flush=True)
-        question_data = "domain: " + result.get("domain", "") + "\ncontext: " + result.get("contexte", "")
-  
+        print(f"[ask_question_stream] Question domaines: {result.get('domaines')}", flush=True)
+
+        domaines_str = ", ".join(result.get("domaines", [])) if isinstance(result.get("domaines", []), list) else str(result.get("domaines", ""))
+        question_data = "domaines: " + domaines_str + "\ncontexte: " + result.get("contexte", "")
+        
         # Get embedding for the reformulated question
         query_emb = client.embeddings.create(
             model="text-embedding-3-small",  # 3072 dimensions, supported by OpenAI/Vercel
@@ -524,6 +531,7 @@ def ask_question_stream(question, language="fr", timezone="UTC", locale="fr-FR",
         if not cctt_results['documents'] or not cctt_results['documents'][0]:
             yield "No relevant information found. Please make sure you have indexed some transcripts."
             return
+        # print(f"[ask_question_stream] ChromaDB results: {cctt_results['documents'][0]} documents found", flush=True)
         context = "\n\n**CONTEXT_CENTER**:".join(format_context(cctt_results['documents'][0], cctt_results.get('metadatas', [[]])[0]))
 
 
@@ -534,6 +542,8 @@ def ask_question_stream(question, language="fr", timezone="UTC", locale="fr-FR",
             "include": ['documents', 'metadatas']
         }
         funding_results = query_chromadb("innovia","funding",funding_query_params)
+        # print(f"[ask_question_stream] ChromaDB results: {funding_results['documents'][0]} documents found", flush=True)
+
         if(funding_results):
             context += "\n\n**CONTEXT_FUNDING**:".join(format_context(funding_results['documents'][0], funding_results.get('metadatas', [[]])[0]))
 
