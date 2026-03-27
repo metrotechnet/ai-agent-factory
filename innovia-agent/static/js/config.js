@@ -187,32 +187,32 @@ function populateSuggestionCards(lang) {
             card.appendChild(description);
             
             // Add click event listener
-            card.addEventListener('click', async function() {
-                console.log('Suggestion clicked:', suggestion);
-                if (suggestion.event && suggestion.event.startsWith('display:')) {
-                    const displayText = suggestion.event.split(':')[1] || suggestion.event.replace('display:', '').trim();
-                    const inputBox = document.getElementById('input-box');
-                    if (inputBox && displayText) {
-                        inputBox.value = displayText;
-                        console.log(`Displaying text: ${displayText}`);
-                        // Trigger input event to adjust textarea height
-                        inputBox.dispatchEvent(new Event('input', { bubbles: true }));
-                        inputBox.focus();
-                    }
-                } else if (suggestion.event && suggestion.event.startsWith('switch:')) {
-                    const agentName = suggestion.event.split(':')[1] || suggestion.event.replace('switch:', '').trim();
-                    if (agentName && typeof switchAgent === 'function') {
-                        const agentSelector = document.getElementById('agent-selector');
-                        if (agentSelector) {
-                            agentSelector.value = agentName;
-                        }
-                        console.log(`Switching agent to: ${agentName}`);
-                        await switchAgent(agentName, true);
-                    }
-                } else {
-                    console.log('No action for suggestion event:', suggestion.event);
-                }
-            });
+            // card.addEventListener('click', async function() {
+            //     console.log('Suggestion clicked:', suggestion);
+            //     if (suggestion.event && suggestion.event.startsWith('display:')) {
+            //         const displayText = suggestion.event.split(':')[1] || suggestion.event.replace('display:', '').trim();
+            //         const inputBox = document.getElementById('input-box');
+            //         if (inputBox && displayText) {
+            //             inputBox.value = displayText;
+            //             console.log(`Displaying text: ${displayText}`);
+            //             // Trigger input event to adjust textarea height
+            //             inputBox.dispatchEvent(new Event('input', { bubbles: true }));
+            //             inputBox.focus();
+            //         }
+            //     } else if (suggestion.event && suggestion.event.startsWith('switch:')) {
+            //         const agentName = suggestion.event.split(':')[1] || suggestion.event.replace('switch:', '').trim();
+            //         if (agentName && typeof switchAgent === 'function') {
+            //             const agentSelector = document.getElementById('agent-selector');
+            //             if (agentSelector) {
+            //                 agentSelector.value = agentName;
+            //             }
+            //             console.log(`Switching agent to: ${agentName}`);
+            //             await switchAgent(agentName, true);
+            //         }
+            //     } else {
+            //         console.log('No action for suggestion event:', suggestion.event);
+            //     }
+            // });
             
             suggestionsContainer.appendChild(card);
         });
