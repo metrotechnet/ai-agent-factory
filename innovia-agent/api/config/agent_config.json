@@ -51,7 +51,7 @@
     },
     "intro": {
       "title": "Looking for innovation resources?",
-      "description": "Describe your business or innovation challenge, and I'll help you discover research resources in Quebec (CCTT, universities, research institutions, etc.) that can support you.",
+      "description": "Describe your business or innovation challenge, and I'll help you discover research resources in Quebec (CCTT) that can support you.",
       "disclaimer": "Note: Recommendations are based on catalogs available in our databases.",
       "profileAlt": "InnovIA Agent",
       "profileImage": "/static/logos/logo-innovia.png"
@@ -60,7 +60,7 @@
       {
         "id": "partners",
         "title": "🎓 Find Partners",
-        "description": "Identify research or innovation partners (CCTT, universities, centers, etc.) for your projects.",
+        "description": "Identify research or innovation partners (CCTT) for your projects.",
         "event": "display: I'm looking for partners for my project",
         "color": "#e1f5fe"
       },
