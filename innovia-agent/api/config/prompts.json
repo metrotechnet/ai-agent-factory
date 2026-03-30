@@ -45,8 +45,7 @@
     "output_format": {
       "title": "FORMAT DE SORTIE POUR LES RECOMMANDATIONS",
       "format_rules": [
-        "N'inclus jamais d'étapes de projet, de plan d'action ou de phases dans la réponse. Concentre-toi uniquement sur les partenaires et les programmes de financement.",
-        "Commence ta réponse par une introduction professionnelle, résumant la problématique et les pistes de solutions.",
+        "Commence ta réponse par une introduction professionnelle, résumant la problématique, les défis et les pistes stratégiques.",
         "Retourne la liste des partenaires recommandés (au moins 3, sinon plus si possible) (uniquement dans CONTEXT_CENTER) sous forme de liste à puces en Markdown, chaque partenaire étant structuré ainsi :",
         "  - [URL du logo]",
         "  - **Nom** : [Nom du partenaire]",
@@ -106,8 +105,7 @@
     "output_format": {
       "title": "OUTPUT FORMAT FOR RECOMMENDATIONS",
       "format_rules": [
-        "Never include project steps, action plans, or phases in the answer. Focus only on partners and funding programs.",
-        "Start your response with a professional introduction summarizing the issue and possible solutions.",
+        "Start your response with a professional introduction summarizing the issue, the challenges, and possible strategic solutions.",
         "Return the list of recommended partners (at least 3 if possible) (only in CONTEXT_CENTER) as a Markdown bullet list, each partner structured as follows:",
         "  - [Logo URL]",
         "  - **Name**: [Partner name]",
