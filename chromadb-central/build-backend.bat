@@ -86,6 +86,17 @@ if %ERRORLEVEL% NEQ 0 (
 )
 echo Permissions granted successfully.
 
+REM Copy credentials file into build context
+for /f "tokens=1,* delims==" %%a in ('findstr /b "GDRIVE_CREDENTIALS_PATH=" .env') do set GDRIVE_CREDENTIALS_PATH=%%b
+if not "%GDRIVE_CREDENTIALS_PATH%"=="" (
+    if exist "%GDRIVE_CREDENTIALS_PATH%" (
+        echo Copying credentials file for Docker build...
+        copy "%GDRIVE_CREDENTIALS_PATH%" credentials.json >nul
+    ) else (
+        echo WARNING: GDRIVE_CREDENTIALS_PATH file not found: %GDRIVE_CREDENTIALS_PATH%
+    )
+)
+
 echo [4/4] Building with Google Cloud Build...
 gcloud builds submit --tag %GCP_IMAGE_NAME% --timeout=20m --machine-type=e2-highcpu-8 --project=%GCP_PROJECT_ID%
 set BUILD_STATUS=%ERRORLEVEL%

@@ -9,5 +9,9 @@ node_modules/
 *.bat
 *.md
 
+# Override .gitignore: include files needed for Cloud Build
+!knowledge-base/
+!credentials.json
+
 
 

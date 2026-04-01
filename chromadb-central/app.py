@@ -3,6 +3,8 @@ from fastapi import Body
 from api.query_chromadb import get_collection
 from api.orchestrator import smart_query
 from api.graph_layer import preload_graphs
+from api.routes import query, update
+from api.update_gdrive import authenticate_gdrive
 
 """
 ChromaDB Central API
@@ -38,6 +40,8 @@ async def lifespan(app: FastAPI):
     except Exception as e:
         print(f"⚠️  Warning: Failed to preload ChromaDB: {str(e)}", flush=True)
         print(f"   Database will be loaded on first query", flush=True)
+    # Authenticate Google Drive for update pipeline
+    authenticate_gdrive()
     print("=" * 60, flush=True)
     print("✅ Application startup complete", flush=True)
     print("=" * 60, flush=True)
@@ -47,85 +51,26 @@ async def lifespan(app: FastAPI):
 app = FastAPI(title="IMX Agent Factory - ChromaDB Central API", lifespan=lifespan)
 
 
-# Root endpoint
+# =====================================================
+# Include API Routes
+# =====================================================
+app.include_router(query.router, tags=["query"])
+app.include_router(update.router, tags=["update"])
+
+# =====================================================
+# Main Routes
+# =====================================================
 @app.get("/")
-def root():
-    return {"message": "ChromaDB Central API is running."}
+def home():
+    """API root endpoint - frontend is hosted on Firebase"""
+    return {"status": "ok", "message": "ChromaDB Central API is running."}
 
 
-@app.post("/query")
-async def generic_query_post(
-    payload: dict = Body(...)
-):
-    """
-    Expects JSON body with:
-      - project_name: str
-      - collection_name: str (optional)
-      - query: dict (requête ChromaDB)
-    """
-    print (f"Received query for project '{payload.get('project_name')}' collection '{payload.get('collection_name')}' ", flush=True)
-    project_name = payload.get("project_name")
-    collection_name = payload.get("collection_name")
-    data = payload.get("query")
+@app.get("/health")
+def health():
+    """Health check endpoint"""
+    return {"status": "ok"}
 
-    result = query_vector_db(project_name, collection_name, data)
-    # print(f"Query result: {result}", flush=True)
-    return JSONResponse(content=result)
-
-@app.post("/smart_query")
-async def smart_query_post(
-    payload: dict = Body(...)
-):
-    """
-    Endpoint intelligent combinant:
-    - vector search (Chroma)
-    - graph reasoning
-    - fusion des résultats
-
-    Input:
-    {
-        "project_name": "innovia",
-        "collection_name": "cctt",
-        "query": "chimie verte bois"
-    }
-    """
-
-    print(f"[SMART QUERY] Project='{payload.get('project_name')}' Collection='{payload.get('collection_name')}'", flush=True)
-
-    project_name = payload.get("project_name")
-    collection_name = payload.get("collection_name")
-    nodes = payload.get("nodes")
-    edges = payload.get("edges")
-    query = payload.get("query")
-
-    # =========================
-    # 🔍 GET COLLECTION
-    # =========================
-    # collection = get_collection(project_name, collection_name)
-
-    # if collection is None:
-    #     return JSONResponse(content={
-    #         "error": f"Collection '{collection_name}' not found for project '{project_name}'"
-    #     })
-
-    try:
-        # =========================
-        # 🧠 SMART QUERY
-        # =========================
-        result = smart_query(project_name, collection_name, nodes, edges, query)
-
-        return JSONResponse(content=result)
-
-    except Exception as e:
-        return JSONResponse(content={
-            "error": "Smart query failed",
-            "details": str(e)
-        })
-    
-@app.get("/graph")
-def get_graph():
-    from api.graph_layer import load_graph
-    return load_graph()
 
 # =====================================================
 # Run Application

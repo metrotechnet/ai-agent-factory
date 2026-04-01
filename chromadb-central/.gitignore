@@ -5,5 +5,7 @@ chromadb-database/
 node_modules/
 .backend-url.tmp
 .env
+credentials.json
+env-vars.yaml
 
 

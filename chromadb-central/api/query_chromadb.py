@@ -3,9 +3,18 @@ Minimal ChromaDB access layer for central API.
 """
 import os
 from chromadb.config import Settings
+from chromadb.utils import embedding_functions
 import chromadb
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+OPENAI_API_KEY = os.getenv("AI_GATEWAY_API_KEY") or os.getenv("OPENAI_API_KEY")
+
+# Embedding model per project (innovia uses small, others use large)
+_EMBEDDING_MODELS = {
+    "innovia": "text-embedding-3-small",
+}
+_DEFAULT_EMBEDDING_MODEL = "text-embedding-3-large"
 
 
 # Global cache for preloaded collections
@@ -36,11 +45,16 @@ def preload_all_collections(project_names=[]):
             client = chromadb.PersistentClient(path=kb_path, settings=Settings(anonymized_telemetry=False, allow_reset=False))
             all_collections = client.list_collections()
 
+            model_name = _EMBEDDING_MODELS.get(project_name, _DEFAULT_EMBEDDING_MODEL)
+            ef = embedding_functions.OpenAIEmbeddingFunction(
+                api_key=OPENAI_API_KEY, model_name=model_name
+            )
+
             if all_collections:
                 # Retourner la première collection trouvée
                 for col in all_collections:
                     print(f"[Preload] Found collection for {project_name}: {col.name}")
-                    collection = client.get_collection(name=col.name)
+                    collection = client.get_collection(name=col.name, embedding_function=ef)
                     if project_name not in _PRELOADED_COLLECTIONS:
                         _PRELOADED_COLLECTIONS[project_name] = {}
                     _PRELOADED_COLLECTIONS[project_name][col.name] = collection

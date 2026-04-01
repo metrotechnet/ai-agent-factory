@@ -22,6 +22,11 @@ for /f "tokens=1,2 delims==" %%a in ('findstr /b "GCP_CPU=" .env') do set GCP_CP
 for /f "tokens=1,2 delims==" %%a in ('findstr /b "GCP_MAX_INSTANCES=" .env') do set GCP_MAX_INSTANCES=%%b
 for /f "tokens=1,2 delims==" %%a in ('findstr /b "GCP_MIN_INSTANCES=" .env') do set GCP_MIN_INSTANCES=%%b
 
+REM Load app environment variables for Cloud Run
+for /f "tokens=1,2 delims==" %%a in ('findstr /b "OPENAI_API_KEY=" .env') do set OPENAI_API_KEY=%%b
+for /f "tokens=1,2 delims==" %%a in ('findstr /b "AI_GATEWAY_API_KEY=" .env') do set AI_GATEWAY_API_KEY=%%b
+
+
 REM Validate configuration
 if "%GCP_PROJECT_ID%"=="" (
     echo ERROR: GCP_PROJECT_ID not found in .env file!
@@ -51,7 +56,7 @@ echo Service: %GCP_SERVICE_NAME%
 echo.
 
 echo Deploying to Cloud Run...
-gcloud run deploy %GCP_SERVICE_NAME% --image %GCP_IMAGE_NAME% --region %GCP_REGION% --platform managed --no-allow-unauthenticated --project=%GCP_PROJECT_ID% --memory=%GCP_MEMORY% --cpu=%GCP_CPU% --max-instances=%GCP_MAX_INSTANCES% --min-instances=%GCP_MIN_INSTANCES%
+gcloud run deploy %GCP_SERVICE_NAME% --image %GCP_IMAGE_NAME% --region %GCP_REGION% --platform managed --no-allow-unauthenticated --project=%GCP_PROJECT_ID% --memory=%GCP_MEMORY% --cpu=%GCP_CPU% --max-instances=%GCP_MAX_INSTANCES% --min-instances=%GCP_MIN_INSTANCES% --set-env-vars="OPENAI_API_KEY=%OPENAI_API_KEY%,AI_GATEWAY_API_KEY=%AI_GATEWAY_API_KEY%"
 set DEPLOY_STATUS=%ERRORLEVEL%
 if %DEPLOY_STATUS% NEQ 0 (
     echo.

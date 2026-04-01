@@ -2,9 +2,6 @@ from google.oauth2 import service_account
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaIoBaseDownload
 from openai import OpenAI
-import chromadb
-from chromadb.config import Settings
-from chromadb.utils import embedding_functions
 import json
 import os
 import io
@@ -45,8 +42,10 @@ def get_agent_paths(agent=None):
         'chroma_db_dir': str(kb_path / "chroma_db")
     }
 
-def get_chroma_collection(agent=None):
+def get_chroma_collection(agent=None, collection_name="gdrive_documents"):
     """Get or create ChromaDB collection for specific agent"""
+    from api.query_chromadb import get_collection
+
     paths = get_agent_paths(agent)
     
     # Setup folders
@@ -54,19 +53,9 @@ def get_chroma_collection(agent=None):
     os.makedirs(paths['extracted_dir'], exist_ok=True)
     os.makedirs(paths['chroma_db_dir'], exist_ok=True)
     
-    ef = embedding_functions.OpenAIEmbeddingFunction(
-        api_key=OPENAI_API_KEY, model_name="text-embedding-3-large"
-    )
-    chroma_client = chromadb.PersistentClient(
-        path=paths['chroma_db_dir'],
-        settings=Settings(
-            anonymized_telemetry=False,
-            allow_reset=False
-        )
-    )
-    collection = chroma_client.get_or_create_collection(
-        name="gdrive_documents", embedding_function=ef
-    )
+    collection = get_collection(agent, collection_name)
+    if collection is None:
+        raise ValueError(f"Collection '{collection_name}' not found for agent '{agent}'. Ensure it is preloaded at startup.")
     return collection, paths
 
 # Google Drive authentication
@@ -79,14 +68,22 @@ def authenticate_gdrive():
     try:
         print(f"Attempting Google Drive authentication...")
         
-        if not GDRIVE_CREDENTIALS_PATH or not os.path.exists(GDRIVE_CREDENTIALS_PATH):
-            print(f"❌ Credentials file not found: {GDRIVE_CREDENTIALS_PATH}")
-            return False
+        credentials = None
         
-        credentials = service_account.Credentials.from_service_account_file(
-            GDRIVE_CREDENTIALS_PATH,
-            scopes=['https://www.googleapis.com/auth/drive.readonly']
-        )
+        # Option 1: Credentials file path (for local dev)
+        if GDRIVE_CREDENTIALS_PATH and os.path.exists(GDRIVE_CREDENTIALS_PATH):
+            credentials = service_account.Credentials.from_service_account_file(
+                GDRIVE_CREDENTIALS_PATH,
+                scopes=['https://www.googleapis.com/auth/drive.readonly']
+            )
+            print(f"Using credentials from file: {GDRIVE_CREDENTIALS_PATH}")
+        else:
+            # Option 2: Application Default Credentials (Cloud Run service account)
+            import google.auth
+            credentials, _ = google.auth.default(
+                scopes=['https://www.googleapis.com/auth/drive.readonly']
+            )
+            print("Using Application Default Credentials (Cloud Run service account)")
         
         drive_service = build('drive', 'v3', credentials=credentials)
         
@@ -272,13 +269,14 @@ def process_document(file_info, collection, paths):
     print(f"✅ Indexed {len(chunks)} chunks from {file_name}")
     return True
 
-def run_pipeline(limit=None, folder_id=None, agent=None):
+def run_pipeline(limit=None, folder_id=None, agent=None, collection_name="gdrive_documents"):
     """Main pipeline: list, download, extract, and index documents from Google Drive
     
     Args:
         limit: Maximum number of files to process
         folder_id: Google Drive folder ID (default from env)
         agent: Agent/knowledge base identifier (default from env)
+        collection_name: ChromaDB collection name (default: 'gdrive_documents')
     """
     if not gdrive_authenticated:
         print("❌ Cannot run pipeline: Google Drive authentication required but failed")
@@ -296,8 +294,8 @@ def run_pipeline(limit=None, folder_id=None, agent=None):
     
     # Get collection and paths for this agent
     kb_name = agent 
-    print(f"📦 Processing for knowledge base: {kb_name}")
-    collection, paths = get_chroma_collection(agent)
+    print(f"📦 Processing for knowledge base: {kb_name}, collection: {collection_name}")
+    collection, paths = get_chroma_collection(agent, collection_name=collection_name)
     
     # List files
     files = list_files_in_folder(folder_id, limit)

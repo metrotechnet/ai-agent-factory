@@ -2,3 +2,9 @@ fastapi
 uvicorn
 chromadb
 python-dotenv
+google-auth
+google-api-python-client
+openai
+PyPDF2
+python-docx
+tqdm
