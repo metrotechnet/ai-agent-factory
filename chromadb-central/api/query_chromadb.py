@@ -9,6 +9,7 @@ import chromadb
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 OPENAI_API_KEY = os.getenv("AI_GATEWAY_API_KEY") or os.getenv("OPENAI_API_KEY")
+OPENAI_API_BASE = os.getenv("AI_GATEWAY_BASE_URL", "https://ai-gateway.vercel.sh/v1")
 
 # Embedding model per project (innovia uses small, others use large)
 _EMBEDDING_MODELS = {
@@ -47,20 +48,55 @@ def preload_all_collections(project_names=[]):
 
             model_name = _EMBEDDING_MODELS.get(project_name, _DEFAULT_EMBEDDING_MODEL)
             ef = embedding_functions.OpenAIEmbeddingFunction(
-                api_key=OPENAI_API_KEY, model_name=model_name
+                api_key=OPENAI_API_KEY, model_name=model_name,
+                api_base=OPENAI_API_BASE,
             )
 
             if all_collections:
                 # Retourner la première collection trouvée
                 for col in all_collections:
                     print(f"[Preload] Found collection for {project_name}: {col.name}")
-                    collection = client.get_collection(name=col.name, embedding_function=ef)
+                    collection = client.get_collection(name=col.name)
+                    # Assign the correct EF after loading to avoid conflict with persisted config
+                    collection._embedding_function = ef
                     if project_name not in _PRELOADED_COLLECTIONS:
                         _PRELOADED_COLLECTIONS[project_name] = {}
                     _PRELOADED_COLLECTIONS[project_name][col.name] = collection
 
         except Exception as e:
             print(f"[Preload] Failed to preload collection for {project_name}: {e}")
+
+
+def reload_project_collections(project_name,collection_name=None):
+    """Reload collections for a single project after an update/re-index."""
+    try:
+        kb_path = os.path.join(PROJECT_ROOT, "knowledge-base", project_name, "chroma_db")
+        client = chromadb.PersistentClient(path=kb_path, settings=Settings(anonymized_telemetry=False, allow_reset=False))
+        all_collections = client.list_collections()
+
+        model_name = _EMBEDDING_MODELS.get(project_name, _DEFAULT_EMBEDDING_MODEL)
+        ef = embedding_functions.OpenAIEmbeddingFunction(
+            api_key=OPENAI_API_KEY, model_name=model_name,
+            api_base=OPENAI_API_BASE,
+        )
+
+        _PRELOADED_COLLECTIONS.setdefault(project_name, {})
+        if collection_name:
+            # Reload only the specified collection
+            collection = client.get_collection(name=collection_name)
+            collection._embedding_function = ef
+            _PRELOADED_COLLECTIONS[project_name][collection_name] = collection
+            print(f"[Reload] Refreshed collection for {project_name}: {collection_name} ({collection.count()} items)")
+        else:
+            # Reload all collections
+            _PRELOADED_COLLECTIONS[project_name] = {}
+            for col in all_collections:
+                collection = client.get_collection(name=col.name)
+                collection._embedding_function = ef
+                _PRELOADED_COLLECTIONS[project_name][col.name] = collection
+                print(f"[Reload] Refreshed collection for {project_name}: {col.name} ({collection.count()} items)")
+    except Exception as e:
+        print(f"[Reload] Failed to reload collections for {project_name}: {e}")
 
 
 # Example query function (to be adapted for your schema)
@@ -88,6 +124,8 @@ def query_vector_db(project_name, collection_name, query):
             results = collection.query(**query_args)
             return results
         except Exception as e:
+            import traceback
+            traceback.print_exc()
             return {"error": f"Invalid vector search payload or ChromaDB error: {str(e)}"}
     # Else, treat as simple question string
     return {"project": project_name, "question": query, "result": "(vector search result here)"}

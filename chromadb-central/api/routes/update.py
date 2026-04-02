@@ -8,7 +8,7 @@ from datetime import datetime
 
 
 router = APIRouter()
-from api.update_gdrive import run_pipeline
+from api.update_chromadb import run_update_pipeline
 
 
 @router.post("/update")
@@ -21,42 +21,35 @@ def update_pipeline(
     """
     Trigger the Google Drive document indexing pipeline.
 
+    Downloads all files from the GDrive folder, extracts text, generates
+    transcripts_chromadb.json, then runs the project's index_chromadb_json.py
+    to rebuild the ChromaDB collection.
+
     This endpoint is typically called by Cloud Scheduler daily at 3 AM.
-
-    Args:
-        request (Request): FastAPI request object.
-        project_name (str): Project/knowledge base identifier.
-        collection_name (str): ChromaDB collection name to update.
-        folder_id (str): Google Drive folder ID to index.
-
-    Returns:
-        dict: Status and message about the pipeline execution.
     """
     try:
         print(f"[{datetime.now().isoformat()}] Pipeline update triggered for project: {project_name}, collection: {collection_name}, folder: {folder_id}")
         print(f"User-Agent: {request.headers.get('user-agent', 'Unknown')}")
-        result = run_pipeline(agent=project_name, collection_name=collection_name, folder_id=folder_id)
+        result = run_update_pipeline(project_name=project_name, collection_name=collection_name, folder_id=folder_id)
         if result.get("error"):
-            print(f"\u274c Pipeline error: {result['error']}")
+            print(f"❌ Pipeline error: {result['error']}")
             return {
                 "status": "error",
                 "message": result['error'],
                 "authenticated": result.get("authenticated", False)
             }
-        processed = result.get("processed", 0)
-        total = result.get("total", 0)
-        print(f"\u2705 Pipeline completed for {project_name}/{collection_name}: {processed}/{total} documents processed")
+        print(f"✅ Pipeline completed for {project_name}: downloaded={result.get('downloaded')}, extracted={result.get('extracted')}, indexed={result.get('indexed')}")
         return {
             "status": "success",
-            "message": f"Pipeline executed successfully for {project_name}/{collection_name}",
+            "message": f"Pipeline executed successfully for {project_name}",
             "project_name": project_name,
-            "collection_name": collection_name,
-            "processed": processed,
-            "total": total,
+            "downloaded": result.get("downloaded", 0),
+            "extracted": result.get("extracted", 0),
+            "indexed": result.get("indexed", False),
             "timestamp": datetime.now().isoformat()
         }
     except Exception as e:
-        print(f"\u274c Pipeline exception: {str(e)}")
+        print(f"❌ Pipeline exception: {str(e)}")
         return {
             "status": "error",
             "message": f"Pipeline failed: {str(e)}",

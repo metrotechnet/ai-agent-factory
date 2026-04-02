@@ -165,7 +165,7 @@ def format_context(documents, metadatas_list):
 def query_chromadb(project_name, collection_name=None, data=None):
     try:
         chromadb_url = os.getenv("CHROMADB_CENTRAL_URL")
-
+        print(f"[Query] Using CHROMADB_CENTRAL_URL: {chromadb_url}")
         if not chromadb_url:
             raise ValueError("Missing CHROMADB_CENTRAL_URL")
 
@@ -531,26 +531,13 @@ def ask_question_stream(question, language="fr", timezone="UTC", locale="fr-FR",
         if not cctt_results['documents'] or not cctt_results['documents'][0]:
             yield "No relevant information found. Please make sure you have indexed some transcripts."
             return
-        # print(f"[ask_question_stream] ChromaDB results: {cctt_results['documents'][0]} documents found", flush=True)
+        # print(f"[ask_question_stream] ChromaDB results: {cctt_results['metadatas'][0]} ", flush=True)
         context = "\n\n**CONTEXT_CENTER**:".join(format_context(cctt_results['documents'][0], cctt_results.get('metadatas', [[]])[0]))
         #print nom des 5 premiers documents pour debug
         for i, doc in enumerate(cctt_results['documents'][0][:5]):
             metadata = cctt_results.get('metadatas', [[]])[0][i] if i < len(cctt_results.get('metadatas', [[]])[0]) else {}
-            doc_id = metadata.get('name', 'unknown_id')
+            doc_id = metadata.get('nom') or metadata.get('name', 'unknown_id')
             print(f"[ask_question_stream] CCTT {i}: ID={doc_id}", flush=True)
-
-
-        # #Get funding info from the same collection
-        # funding_query_params = {
-        #     "query_embedding": query_emb,
-        #     "n_results": 100,
-        #     "include": ['documents', 'metadatas']
-        # }
-        # funding_results = query_chromadb("innovia","funding",funding_query_params)
-        # # print(f"[ask_question_stream] ChromaDB results: {funding_results['documents'][0]} documents found", flush=True)
-
-        # if(funding_results):
-        #     context += "\n\n**CONTEXT_FUNDING**:".join(format_context(funding_results['documents'][0], funding_results.get('metadatas', [[]])[0]))
 
         # Build prompt using template from JSON
         prompt, model_config = build_prompt_from_template(language, context, question, history_text, agent=agent)

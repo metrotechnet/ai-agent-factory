@@ -24,7 +24,7 @@ async def lifespan(app: FastAPI):
     print("=" * 60, flush=True)
     try:
         preload_all_collections(["bibliosense", "nutria", "innovia"])
-        preload_graphs(["bibliosense", "nutria", "innovia"])
+        # preload_graphs(["bibliosense", "nutria", "innovia"])
         from api.query_chromadb import list_collections
         for db in ["bibliosense", "nutria", "innovia"]:
             collections = list_collections(db)
@@ -40,8 +40,7 @@ async def lifespan(app: FastAPI):
     except Exception as e:
         print(f"⚠️  Warning: Failed to preload ChromaDB: {str(e)}", flush=True)
         print(f"   Database will be loaded on first query", flush=True)
-    # Authenticate Google Drive for update pipeline
-    authenticate_gdrive()
+
     print("=" * 60, flush=True)
     print("✅ Application startup complete", flush=True)
     print("=" * 60, flush=True)

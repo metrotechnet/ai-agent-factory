@@ -116,6 +116,8 @@ def list_files_in_folder(folder_id=None, limit=None):
             'application/pdf',
             'application/vnd.google-apps.document',
             'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'application/json',
+            '*/*',
             'text/plain'
         ]
         
