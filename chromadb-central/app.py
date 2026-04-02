@@ -3,7 +3,7 @@ from fastapi import Body
 from api.query_chromadb import get_collection
 from api.orchestrator import smart_query
 from api.graph_layer import preload_graphs
-from api.routes import query, update
+from api.routes import query, update, datasets
 from api.update_gdrive import authenticate_gdrive
 
 """
@@ -13,6 +13,8 @@ Provides access to multiple project vector databases (Bibliosense, Nutria, Trans
 
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.concurrency import asynccontextmanager
 from api.query_chromadb import list_collections, query_vector_db, preload_all_collections
 
@@ -49,12 +51,20 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="IMX Agent Factory - ChromaDB Central API", lifespan=lifespan)
 
+# CORS for Firebase-hosted frontend
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # =====================================================
 # Include API Routes
 # =====================================================
 app.include_router(query.router, tags=["query"])
 app.include_router(update.router, tags=["update"])
+app.include_router(datasets.router, tags=["datasets"])
 
 # =====================================================
 # Main Routes
@@ -72,10 +82,19 @@ def health():
 
 
 # =====================================================
+# Static files (Dataset Editor frontend)
+# =====================================================
+import os
+from pathlib import Path
+_public_dir = Path(__file__).parent / "public"
+if _public_dir.exists():
+    app.mount("/static", StaticFiles(directory=str(_public_dir / "static")), name="static")
+    app.mount("/editor", StaticFiles(directory=str(_public_dir), html=True), name="editor")
+
+# =====================================================
 # Run Application
 # =====================================================
 if __name__ == "__main__":
     import uvicorn
-    import os
     port = int(os.environ.get("PORT", 2000))
     uvicorn.run(app, host="0.0.0.0", port=port)

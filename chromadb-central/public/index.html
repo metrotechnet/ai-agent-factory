@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dataset Editor — Agent Factory</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <header>
+    <h1>🗃️ Dataset Editor</h1>
+    <p class="subtitle">Agent Factory — ChromaDB Central</p>
+  </header>
+
+  <!-- ==================== PROJECT LIST VIEW ==================== -->
+  <main id="project-list-view">
+    <div class="toolbar">
+      <h2>Projects</h2>
+      <div class="toolbar-actions">
+        <button id="btn-add-project" class="btn btn-primary" title="Create new project">+ New Project</button>
+      </div>
+    </div>
+
+    <div id="projects-container" class="card-grid">
+      <!-- Project cards rendered here -->
+    </div>
+  </main>
+
+  <!-- ==================== DATASET EDITOR VIEW ==================== -->
+  <main id="editor-view" class="hidden">
+    <div class="toolbar">
+      <button id="btn-back" class="btn btn-ghost">← Back</button>
+      <h2 id="editor-title">Project / file.json</h2>
+      <div class="toolbar-actions">
+        <button id="btn-undo" class="btn" title="Undo (Ctrl+Z)" disabled>↩ Undo</button>
+        <button id="btn-redo" class="btn" title="Redo (Ctrl+Y)" disabled>↪ Redo</button>
+        <button id="btn-save" class="btn btn-primary" title="Save (Ctrl+S)" disabled>💾 Save</button>
+      </div>
+    </div>
+
+    <div class="table-controls">
+      <input id="search-input" type="text" placeholder="Search rows..." />
+      <button id="btn-add-row" class="btn btn-small">+ Add Row</button>
+      <button id="btn-delete-rows" class="btn btn-small btn-danger" disabled>🗑 Delete Selected</button>
+    </div>
+
+    <div id="table-container">
+      <!-- Editable table rendered here -->
+    </div>
+
+    <div id="editor-status" class="status-bar"></div>
+  </main>
+
+  <!-- ==================== DIALOGS ==================== -->
+  <dialog id="dialog-add-project">
+    <form method="dialog">
+      <h3>Create New Project</h3>
+      <label>
+        Project name
+        <input id="input-project-name" type="text" pattern="[a-z0-9_\-]+" placeholder="e.g. my-project" required />
+      </label>
+      <div class="dialog-actions">
+        <button type="button" class="btn" onclick="document.getElementById('dialog-add-project').close()">Cancel</button>
+        <button type="submit" class="btn btn-primary">Create</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="dialog-add-file">
+    <form method="dialog">
+      <h3>Add Dataset File</h3>
+      <label>
+        File name
+        <input id="input-file-name" type="text" placeholder="e.g. my_dataset.json" required />
+      </label>
+      <div class="dialog-actions">
+        <button type="button" class="btn" onclick="document.getElementById('dialog-add-file').close()">Cancel</button>
+        <button type="submit" class="btn btn-primary">Create</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="dialog-confirm">
+    <form method="dialog">
+      <h3 id="confirm-title">Confirm</h3>
+      <p id="confirm-message"></p>
+      <div class="dialog-actions">
+        <button value="cancel" class="btn">Cancel</button>
+        <button value="ok" class="btn btn-danger">Delete</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="dialog-array-editor">
+    <h3 id="array-editor-title">Edit Array</h3>
+    <ul id="array-items-list" class="arr-list"></ul>
+    <div class="dialog-actions">
+      <button type="button" id="arr-add-item" class="btn btn-small">+ Add Item</button>
+      <span style="flex:1"></span>
+      <button type="button" id="arr-cancel" class="btn">Cancel</button>
+      <button type="button" id="arr-save" class="btn btn-primary">Apply</button>
+    </div>
+  </dialog>
+
+  <div id="toast" class="toast hidden"></div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
