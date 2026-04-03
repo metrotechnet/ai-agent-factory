@@ -234,22 +234,35 @@ def extract_pmids_from_text(text):
     return re.findall(r'PMID:\s*\d+', text)
 
 def get_links_from_contexts(contexts, metadatas=None, agent=None):
-    """Extract PMID references from chunk metadata's 'references' field."""
+    """Extract links from contexts and metadata.
+    
+    Priority:
+    1. Check metadatas for 'links' field (new ChromaDB format)
+    2. Extract from matched chunks text (fallback)
+    3. Look up chunk_0 of source documents (last resort)
+    """
     links = set()
-
+    
+    # Priority 1: Check metadatas for direct link references (new format)
     if metadatas:
         for meta in metadatas:
-            if not isinstance(meta, dict):
-                continue
-            refs_str = meta.get("references", "")
-            if refs_str:
-                try:
-                    refs = json.loads(refs_str)
-                    for pmid in refs.get("pmids", []):
-                        links.add(f"PMID: {pmid}")
-                except (json.JSONDecodeError, TypeError):
-                    pass
-
+            if isinstance(meta, dict) and 'links' in meta and meta['links']:
+                # Links are stored as comma-separated string
+                link_list = meta['links'].split(',')
+                for link in link_list:
+                    link = link.strip()
+                    if link:
+                        links.add(f"PMID: {link}")
+                        print(f"[Metadata] Found link in metadata: PMID: {link}")
+    
+    # If we found links in metadata, return them immediately
+    if links:
+        return list(links)
+    
+    # Priority 2: Fallback - check the matched chunks text themselves
+    for doc in contexts:
+        links.update(extract_pmids_from_text(doc))
+     
     return list(links)
 
 

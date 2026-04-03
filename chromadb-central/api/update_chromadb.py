@@ -11,6 +11,7 @@ Usage (called from the /update route or directly):
 """
 
 import os
+import subprocess
 from pathlib import Path
 from tqdm import tqdm
 
@@ -21,7 +22,6 @@ from api.update_gdrive import (
     get_agent_paths,
     gdrive_authenticated,
 )
-from api.index_chromadb import index_project
 from api.query_chromadb import reload_project_collections
 
 PROJECT_ROOT = Path(__file__).parent.parent
@@ -86,8 +86,17 @@ def run_update_pipeline(project_name, collection_name, folder_id, limit=None):
     if not downloaded:
         return {"error": "No files downloaded", "authenticated": True, "downloaded": 0}
 
-    # Step 2: Index with the general indexer
-    result = index_project(project_name, collection_name)
+    # Step 2: Run build-database.bat to re-index
+    bat_file = Path(kb_path) / "build-database.bat"
+    if not bat_file.exists():
+        return {"error": f"build-database.bat not found in {project_name}", "authenticated": True, "downloaded": len(downloaded)}
+
+    result = subprocess.run(
+        [str(bat_file)],
+        cwd=str(bat_file.parent),
+        stdin=subprocess.DEVNULL,
+        timeout=600,
+    )
 
     # Step 3: Reload preloaded collection cache so queries use the new data
     reload_project_collections(project_name, collection_name)
@@ -95,6 +104,5 @@ def run_update_pipeline(project_name, collection_name, folder_id, limit=None):
     return {
         "authenticated": True,
         "downloaded": len(downloaded),
-        "indexed": result.get("indexed", False),
-        "documents": result.get("documents", 0),
+        "indexed": result.returncode == 0,
     }

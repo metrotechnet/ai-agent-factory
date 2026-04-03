@@ -149,18 +149,36 @@ def save_dataset(project_name: str, filename: str, records: list = Body(...)):
 # =====================================================
 @router.post("/{project_name}/reindex")
 def reindex_project(project_name: str):
-    """Re-index a project's documents into ChromaDB."""
-    try:
-        from api.index_chromadb import index_project
-        from api.query_chromadb import reload_project_collections
+    """Re-index a project by running its build-database.bat script."""
+    import subprocess
 
-        result = index_project(project_name, collection_name="gdrive_documents")
+    project_dir = _project_dir(project_name)
+    bat_file = project_dir / "build-database.bat"
+
+    if not bat_file.exists():
+        raise HTTPException(404, f"build-database.bat not found in {project_name}")
+
+    try:
+        result = subprocess.run(
+            [str(bat_file)],
+            cwd=str(project_dir),
+            stdin=subprocess.DEVNULL,
+            capture_output=True,
+            text=True,
+            timeout=600,
+        )
+
+        from api.query_chromadb import reload_project_collections
         reload_project_collections(project_name)
 
         return {
-            "status": "success",
+            "status": "success" if result.returncode == 0 else "error",
             "project": project_name,
-            "indexed": result.get("total_documents", 0) if isinstance(result, dict) else True,
+            "returncode": result.returncode,
+            "stdout": result.stdout[-2000:] if result.stdout else "",
+            "stderr": result.stderr[-2000:] if result.stderr else "",
         }
+    except subprocess.TimeoutExpired:
+        raise HTTPException(504, "Build script timed out (600s)")
     except Exception as e:
         raise HTTPException(500, f"Re-index failed: {str(e)}")

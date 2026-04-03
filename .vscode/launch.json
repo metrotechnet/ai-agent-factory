@@ -79,7 +79,7 @@
             "console": "integratedTerminal"
         },
         {
-            "name": "chromadb-central - FastAPI",
+            "name": "IMX - Chromadb Central - FastAPI",
             "type": "debugpy",
             "request": "launch",
             "module": "uvicorn",
