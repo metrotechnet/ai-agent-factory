@@ -5,6 +5,7 @@ from api.orchestrator import smart_query
 from api.graph_layer import preload_graphs
 from api.routes import query, update, datasets
 from api.update_gdrive import authenticate_gdrive
+import os
 
 """
 ChromaDB Central API
@@ -80,16 +81,6 @@ def health():
     """Health check endpoint"""
     return {"status": "ok"}
 
-
-# =====================================================
-# Static files (Dataset Editor frontend)
-# =====================================================
-import os
-from pathlib import Path
-_public_dir = Path(__file__).parent / "public"
-if _public_dir.exists():
-    app.mount("/static", StaticFiles(directory=str(_public_dir / "static")), name="static")
-    app.mount("/editor", StaticFiles(directory=str(_public_dir), html=True), name="editor")
 
 # =====================================================
 # Run Application
