@@ -1,58 +1,61 @@
 """
 Update API Routes
 
-This module defines endpoints for triggering the Google Drive document indexing pipeline.
+This module defines endpoints for reloading ChromaDB collections from GCS bucket.
 """
 from fastapi import APIRouter, Request, Query
 from datetime import datetime
-
+import os
 
 router = APIRouter()
-from api.update_chromadb import run_update_pipeline
+from api.query_chromadb import (
+    _download_chroma_db_from_bucket,
+    _discover_projects_from_bucket,
+    reload_project_collections,
+    PROJECT_ROOT,
+)
 
 
-@router.post("/update")
-def update_pipeline(
+@router.post("/reload")
+def reload_from_bucket(
     request: Request,
-    project_name: str = Query(..., description="Project/knowledge base name to update"),
-    collection_name: str = Query(..., description="ChromaDB collection name to update"),
-    folder_id: str = Query(..., description="Google Drive folder ID to index"),
+    project_name: str = Query(None, description="Project name to reload. If omitted, reloads all projects from bucket."),
 ):
     """
-    Trigger the Google Drive document indexing pipeline.
-
-    Downloads all files from the GDrive folder, extracts text, generates
-    transcripts_chromadb.json, then runs the project's index_chromadb_json.py
-    to rebuild the ChromaDB collection.
-
-    This endpoint is typically called by Cloud Scheduler daily at 3 AM.
+    Download chroma_db from GCS bucket and reload collections into memory.
+    If project_name is provided, reloads only that project.
+    If omitted, discovers all projects from the bucket and reloads them all.
     """
     try:
-        print(f"[{datetime.now().isoformat()}] Pipeline update triggered for project: {project_name}, collection: {collection_name}, folder: {folder_id}")
-        print(f"User-Agent: {request.headers.get('user-agent', 'Unknown')}")
-        result = run_update_pipeline(project_name=project_name, collection_name=collection_name, folder_id=folder_id)
-        if result.get("error"):
-            print(f"❌ Pipeline error: {result['error']}")
-            return {
-                "status": "error",
-                "message": result['error'],
-                "authenticated": result.get("authenticated", False)
-            }
-        print(f"✅ Pipeline completed for {project_name}: downloaded={result.get('downloaded')}, extracted={result.get('extracted')}, indexed={result.get('indexed')}")
+        kb_root = os.path.join(PROJECT_ROOT, "knowledge-base")
+
+        if project_name:
+            projects = [project_name]
+        else:
+            projects = _discover_projects_from_bucket()
+            if not projects:
+                return {"status": "error", "message": "No projects found in bucket."}
+
+        results = {}
+        for project in projects:
+            try:
+                _download_chroma_db_from_bucket(project, kb_root)
+                reload_project_collections(project)
+                results[project] = "ok"
+            except Exception as e:
+                results[project] = f"error: {str(e)}"
+
         return {
             "status": "success",
-            "message": f"Pipeline executed successfully for {project_name}",
-            "project_name": project_name,
-            "downloaded": result.get("downloaded", 0),
-            "extracted": result.get("extracted", 0),
-            "indexed": result.get("indexed", False),
-            "timestamp": datetime.now().isoformat()
+            "message": f"Reloaded {len(projects)} project(s) from bucket.",
+            "projects": results,
+            "timestamp": datetime.now().isoformat(),
         }
     except Exception as e:
-        print(f"❌ Pipeline exception: {str(e)}")
+        print(f"❌ Reload exception: {str(e)}")
         return {
             "status": "error",
-            "message": f"Pipeline failed: {str(e)}",
-            "timestamp": datetime.now().isoformat()
+            "message": f"Reload failed: {str(e)}",
+            "timestamp": datetime.now().isoformat(),
         }
 

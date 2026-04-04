@@ -4,7 +4,6 @@ from api.query_chromadb import get_collection
 from api.orchestrator import smart_query
 from api.graph_layer import preload_graphs
 from api.routes import query, update, datasets
-from api.update_gdrive import authenticate_gdrive
 import os
 
 """
@@ -26,10 +25,9 @@ async def lifespan(app: FastAPI):
     print("🚀 Starting IMX Agent Factory...", flush=True)
     print("=" * 60, flush=True)
     try:
-        preload_all_collections(["bibliosense", "nutria", "innovia"])
-        # preload_graphs(["bibliosense", "nutria", "innovia"])
-        from api.query_chromadb import list_collections
-        for db in ["bibliosense", "nutria", "innovia"]:
+        preload_all_collections()  # Auto-discovers projects from GCS bucket
+        from api.query_chromadb import list_collections, _PRELOADED_COLLECTIONS
+        for db in _PRELOADED_COLLECTIONS:
             collections = list_collections(db)
             if collections:
                 print(f"✅ ChromaDB loaded successfully!", flush=True)

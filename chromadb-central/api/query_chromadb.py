@@ -2,14 +2,18 @@
 Minimal ChromaDB access layer for central API.
 """
 import os
+import subprocess
 from chromadb.config import Settings
 from chromadb.utils import embedding_functions
 import chromadb
+from google.cloud import storage
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 OPENAI_API_KEY = os.getenv("AI_GATEWAY_API_KEY") or os.getenv("OPENAI_API_KEY")
 OPENAI_API_BASE = os.getenv("AI_GATEWAY_BASE_URL", "https://ai-gateway.vercel.sh/v1")
+
+GCS_BUCKET_NAME = os.getenv("GCS_BUCKET_NAME", "agent-factory-database")
 
 # Embedding model per project (innovia uses small, others use large)
 _EMBEDDING_MODELS = {
@@ -39,10 +43,33 @@ def get_collection(project_name, collection_name=None):
     return None
 
 # Preload all collections (to be called at startup)
-def preload_all_collections(project_names=[]):
+def preload_all_collections(project_names=None):
+    """
+    Download chroma_db folders from GCS bucket and load all collections.
+    If project_names is None, auto-discover projects from bucket folder names.
+    """
+    kb_root = os.path.join(PROJECT_ROOT, "knowledge-base")
+
+    # --- Step 1: Discover projects from GCS bucket ---
+    if project_names is None:
+        project_names = _discover_projects_from_bucket()
+        print(f"[Preload] Discovered projects from bucket: {project_names}", flush=True)
+
+    # --- Step 2: Download chroma_db from bucket for each project ---
     for project_name in project_names:
         try:
-            kb_path = os.path.join(PROJECT_ROOT, "knowledge-base", project_name, "chroma_db")
+            _download_chroma_db_from_bucket(project_name, kb_root)
+        except Exception as e:
+            print(f"[Preload] Failed to download chroma_db for {project_name}: {e}", flush=True)
+
+    # --- Step 3: Load collections into memory ---
+    for project_name in project_names:
+        try:
+            kb_path = os.path.join(kb_root, project_name, "chroma_db")
+            if not os.path.exists(kb_path):
+                print(f"[Preload] No chroma_db folder for {project_name}, skipping.", flush=True)
+                continue
+
             client = chromadb.PersistentClient(path=kb_path, settings=Settings(anonymized_telemetry=False, allow_reset=False))
             all_collections = client.list_collections()
 
@@ -53,18 +80,61 @@ def preload_all_collections(project_names=[]):
             )
 
             if all_collections:
-                # Retourner la première collection trouvée
                 for col in all_collections:
-                    print(f"[Preload] Found collection for {project_name}: {col.name}")
+                    print(f"[Preload] Found collection for {project_name}: {col.name}", flush=True)
                     collection = client.get_collection(name=col.name)
-                    # Assign the correct EF after loading to avoid conflict with persisted config
                     collection._embedding_function = ef
                     if project_name not in _PRELOADED_COLLECTIONS:
                         _PRELOADED_COLLECTIONS[project_name] = {}
                     _PRELOADED_COLLECTIONS[project_name][col.name] = collection
 
         except Exception as e:
-            print(f"[Preload] Failed to preload collection for {project_name}: {e}")
+            print(f"[Preload] Failed to preload collection for {project_name}: {e}", flush=True)
+
+
+def _discover_projects_from_bucket():
+    """List top-level folders in the GCS bucket to discover project names."""
+    try:
+        client = storage.Client()
+        bucket = client.bucket(GCS_BUCKET_NAME)
+        # List top-level prefixes (folders)
+        blobs = client.list_blobs(bucket, delimiter="/")
+        # Must consume the iterator to populate prefixes
+        _ = list(blobs)
+        projects = [p.rstrip("/") for p in blobs.prefixes]
+        return projects
+    except Exception as e:
+        print(f"[Discover] Failed to list projects from bucket: {e}", flush=True)
+        return []
+
+
+def _download_chroma_db_from_bucket(project_name, kb_root):
+    """Download chroma_db folder from GCS bucket to local knowledge-base."""
+    gcs_prefix = f"{project_name}/chroma_db/"
+    local_dir = os.path.join(kb_root, project_name, "chroma_db")
+    os.makedirs(local_dir, exist_ok=True)
+
+    client = storage.Client()
+    bucket = client.bucket(GCS_BUCKET_NAME)
+    blobs = list(client.list_blobs(bucket, prefix=gcs_prefix))
+
+    if not blobs:
+        print(f"[Download] No files found in gs://{GCS_BUCKET_NAME}/{gcs_prefix}", flush=True)
+        return
+
+    count = 0
+    for blob in blobs:
+        # Skip "directory" markers
+        if blob.name.endswith("/"):
+            continue
+        # Preserve folder structure relative to chroma_db/
+        relative_path = blob.name[len(gcs_prefix):]
+        local_path = os.path.join(local_dir, relative_path.replace("/", os.sep))
+        os.makedirs(os.path.dirname(local_path), exist_ok=True)
+        blob.download_to_filename(local_path)
+        count += 1
+
+    print(f"[Download] Downloaded {count} files for {project_name}/chroma_db", flush=True)
 
 
 def reload_project_collections(project_name,collection_name=None):
