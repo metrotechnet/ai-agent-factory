@@ -25,7 +25,12 @@ async def lifespan(app: FastAPI):
     print("🚀 Starting IMX Agent Factory...", flush=True)
     print("=" * 60, flush=True)
     try:
-        preload_all_collections()  # Auto-discovers projects from GCS bucket
+        if os.getenv("K_SERVICE"):
+            # Deployed on Cloud Run: download from GCS bucket and load
+            preload_all_collections()
+        else:
+            # Local dev: load from local knowledge-base/ only
+            preload_all_collections(local_only=True)
         from api.query_chromadb import list_collections, _PRELOADED_COLLECTIONS
         for db in _PRELOADED_COLLECTIONS:
             collections = list_collections(db)

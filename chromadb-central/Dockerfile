@@ -11,7 +11,6 @@ RUN pip install --no-cache-dir --upgrade pip \
 # Copy project files
 COPY api/ api/
 COPY app.py .
-COPY knowledge-base/ knowledge-base/
 
 # Expose port
 EXPOSE 8080

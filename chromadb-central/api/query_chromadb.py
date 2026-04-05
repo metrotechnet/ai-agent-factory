@@ -3,12 +3,14 @@ Minimal ChromaDB access layer for central API.
 """
 import os
 import subprocess
+from dotenv import load_dotenv
 from chromadb.config import Settings
 from chromadb.utils import embedding_functions
 import chromadb
 from google.cloud import storage
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+load_dotenv(os.path.join(PROJECT_ROOT, ".env"), override=True)
 
 OPENAI_API_KEY = os.getenv("AI_GATEWAY_API_KEY") or os.getenv("OPENAI_API_KEY")
 OPENAI_API_BASE = os.getenv("AI_GATEWAY_BASE_URL", "https://ai-gateway.vercel.sh/v1")
@@ -43,24 +45,35 @@ def get_collection(project_name, collection_name=None):
     return None
 
 # Preload all collections (to be called at startup)
-def preload_all_collections(project_names=None):
+def preload_all_collections(project_names=None, local_only=False):
     """
-    Download chroma_db folders from GCS bucket and load all collections.
-    If project_names is None, auto-discover projects from bucket folder names.
+    Load all ChromaDB collections.
+    - local_only=True: load from local knowledge-base/ folders only (no GCS download).
+    - local_only=False: download chroma_db from GCS bucket first, then load.
+    If project_names is None, auto-discover from bucket (or local folders if local_only).
     """
     kb_root = os.path.join(PROJECT_ROOT, "knowledge-base")
 
-    # --- Step 1: Discover projects from GCS bucket ---
+    # --- Step 1: Discover projects ---
     if project_names is None:
-        project_names = _discover_projects_from_bucket()
-        print(f"[Preload] Discovered projects from bucket: {project_names}", flush=True)
+        if local_only:
+            # Discover from local knowledge-base/ subfolders
+            project_names = [
+                d for d in os.listdir(kb_root)
+                if os.path.isdir(os.path.join(kb_root, d, "chroma_db"))
+            ] if os.path.isdir(kb_root) else []
+            print(f"[Preload] Local projects found: {project_names}", flush=True)
+        else:
+            project_names = _discover_projects_from_bucket()
+            print(f"[Preload] Discovered projects from bucket: {project_names}", flush=True)
 
-    # --- Step 2: Download chroma_db from bucket for each project ---
-    for project_name in project_names:
-        try:
-            _download_chroma_db_from_bucket(project_name, kb_root)
-        except Exception as e:
-            print(f"[Preload] Failed to download chroma_db for {project_name}: {e}", flush=True)
+    # --- Step 2: Download from bucket (skip if local_only) ---
+    if not local_only:
+        for project_name in project_names:
+            try:
+                _download_chroma_db_from_bucket(project_name, kb_root)
+            except Exception as e:
+                print(f"[Preload] Failed to download chroma_db for {project_name}: {e}", flush=True)
 
     # --- Step 3: Load collections into memory ---
     for project_name in project_names:
