@@ -4,7 +4,8 @@ knowledge-base/
 node_modules/
 .backend-url.tmp
 .env
-
+.firebase
+public/
 
 
 
