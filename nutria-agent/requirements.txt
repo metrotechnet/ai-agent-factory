@@ -10,6 +10,7 @@ openai
 python-multipart
 pydantic
 python-dotenv
+google-cloud-storage
 jinja2
 PyPDF2
 chromadb

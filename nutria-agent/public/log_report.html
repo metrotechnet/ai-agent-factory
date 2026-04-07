@@ -34,8 +34,8 @@
     </div>
     <script>
     // Backend URL: injected at deploy time, or auto-detect for local dev
-    const BACKEND_URL = '{{BACKEND_URL}}' !== '' && !('{{BACKEND_URL}}'.includes('{{')) 
-        ? '{{BACKEND_URL}}' 
+    const BACKEND_URL = 'https://imx-nutria-r7ud57ydna-uk.a.run.app' !== '' && !('https://imx-nutria-r7ud57ydna-uk.a.run.app'.includes('{{')) 
+        ? 'https://imx-nutria-r7ud57ydna-uk.a.run.app' 
         : (window.location.hostname === 'localhost' && window.location.port === '3000' ? 'http://localhost:8080' : '');
 
     async function fetchLog(key) {

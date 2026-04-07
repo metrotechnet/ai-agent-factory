@@ -16,6 +16,10 @@
     ],
     "rewrites": [
       {
+        "source": "/log_report",
+        "destination": "/log_report.html"
+      },
+      {
         "source": "**",
         "destination": "/index.html"
       }

@@ -96,6 +96,11 @@ if !errorlevel! neq 0 (
     echo ERROR: Failed to copy index.html
     exit /b 1
 )
+copy /Y "templates\log_report.html" "public\log_report.html" >nul
+if !errorlevel! neq 0 (
+    echo ERROR: Failed to copy log_report.html
+    exit /b 1
+)
 
 REM Inject Firebase configuration into HTML
 echo Injecting Firebase configuration...
@@ -114,6 +119,9 @@ if !errorlevel! neq 0 (
 
 powershell -Command "(Get-Content 'public\index.html') -replace '/static/', 'static/' | Set-Content 'public\index.html'"
 echo window.BACKEND_URL = '!BACKEND_URL!'; > "public\static\js\backend-url.js"
+
+REM Inject backend URL into log_report.html
+powershell -Command "(Get-Content 'public\log_report.html') -replace '{{BACKEND_URL}}', '!BACKEND_URL!' | Set-Content 'public\log_report.html'"
 
 
 echo Files prepared successfully!

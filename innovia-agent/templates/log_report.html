@@ -33,8 +33,13 @@
         </div>
     </div>
     <script>
+    // Backend URL: injected at deploy time, or auto-detect for local dev
+    const BACKEND_URL = '{{BACKEND_URL}}' !== '' && !('{{BACKEND_URL}}'.includes('{{')) 
+        ? '{{BACKEND_URL}}' 
+        : (window.location.hostname === 'localhost' && window.location.port === '3000' ? 'http://localhost:8080' : '');
+
     async function fetchLog(key) {
-        const res = await fetch(`/api/download_log?key=${encodeURIComponent(key)}`);
+        const res = await fetch(`${BACKEND_URL}/api/download_log?key=${encodeURIComponent(key)}`);
         if (!res.ok) throw new Error('Failed to fetch log');
         return await res.json();
     }
@@ -137,7 +142,7 @@
                     const newComments = textarea.value.split('\n').map(s => s.trim()).filter(Boolean);
                     for (const c of newComments) {
                         if (c) {
-                            await fetch('/api/add_comment', {
+                            await fetch(`${BACKEND_URL}/api/add_comment`, {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json' },
                                 body: JSON.stringify({ question_id: id, comment: c })
@@ -167,7 +172,7 @@
                 if (comment && comment.trim()) {
                     Swal.showLoading();
                     try {
-                        const res = await fetch('/api/add_comment', {
+                        const res = await fetch(`${BACKEND_URL}/api/add_comment`, {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ question_id: questionId, comment: comment.trim() })

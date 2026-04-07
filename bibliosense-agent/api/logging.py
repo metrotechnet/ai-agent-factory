@@ -6,11 +6,14 @@ Thread-safe file operations and disclaimer detection helpers.
 from pathlib import Path
 from datetime import datetime
 import json
+import os
 import threading
 
 PROJECT_ROOT = Path(__file__).parent.parent
 QUESTION_LOG_PATH = PROJECT_ROOT / "question_log.json"
 question_log_lock = threading.Lock()
+
+GCS_LOG_BLOB_NAME = "question_log.json"
 
 
 def contains_medical_disclaimer(response_text):
@@ -71,7 +74,7 @@ def contains_medical_disclaimer(response_text):
 
 def save_question_response(question_id, question, response):
     """
-    Save a question and its response to the log file.
+    Save a question and its response to GCS.
     """
     entry = {
         "question_id": question_id,
@@ -81,17 +84,75 @@ def save_question_response(question_id, question, response):
         "comments": []
     }
     with question_log_lock:
+        data = _download_log_from_gcs()
+        data.append(entry)
+        _upload_log_to_gcs(data)
+
+
+def _upload_log_to_gcs(data):
+    """Upload question log data to GCS bucket (server) or local file (local dev)."""
+    if not os.getenv("K_SERVICE"):
+        with open(QUESTION_LOG_PATH, 'w', encoding='utf-8') as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
+        return
+    try:
+        from google.cloud import storage
+        gcs_path = os.getenv("GCS_BUCKET_NAME")
+        if not gcs_path:
+            print("[GCS Upload] GCS_BUCKET_NAME not set, skipping upload", flush=True)
+            return
+        parts = gcs_path.strip().split("/", 1)
+        bucket_name = parts[0]
+        prefix = parts[1] + "/" if len(parts) > 1 else ""
+        blob_path = f"{prefix}{GCS_LOG_BLOB_NAME}"
+        print(f"[GCS Upload] Uploading to gs://{bucket_name}/{blob_path} ({len(data)} entries)", flush=True)
+        client = storage.Client()
+        bucket = client.bucket(bucket_name)
+        blob = bucket.blob(blob_path)
+        blob.upload_from_string(
+            json.dumps(data, ensure_ascii=False, indent=2),
+            content_type="application/json"
+        )
+        print(f"[GCS Upload] Success", flush=True)
+    except Exception as e:
+        import logging as std_logging
+        std_logging.getLogger(__name__).error(f"Failed to upload log to GCS: {e}")
+
+
+def _download_log_from_gcs():
+    """Download question log from GCS bucket (server) or local file (local dev)."""
+    if not os.getenv("K_SERVICE"):
         try:
             if QUESTION_LOG_PATH.exists():
                 with open(QUESTION_LOG_PATH, 'r', encoding='utf-8') as f:
-                    data = json.load(f)
-            else:
-                data = []
+                    return json.load(f)
         except Exception:
-            data = []
-        data.append(entry)
-        with open(QUESTION_LOG_PATH, 'w', encoding='utf-8') as f:
-            json.dump(data, f, ensure_ascii=False, indent=2)
+            pass
+        return []
+    try:
+        from google.cloud import storage
+        gcs_path = os.getenv("GCS_BUCKET_NAME")
+        if not gcs_path:
+            print("[GCS Download] GCS_BUCKET_NAME not set", flush=True)
+            return []
+        parts = gcs_path.strip().split("/", 1)
+        bucket_name = parts[0]
+        prefix = parts[1] + "/" if len(parts) > 1 else ""
+        blob_path = f"{prefix}{GCS_LOG_BLOB_NAME}"
+        print(f"[GCS Download] Downloading gs://{bucket_name}/{blob_path}", flush=True)
+        client = storage.Client()
+        bucket = client.bucket(bucket_name)
+        blob = bucket.blob(blob_path)
+        if not blob.exists():
+            print("[GCS Download] Blob not found", flush=True)
+            return []
+        data = json.loads(blob.download_as_text())
+        print(f"[GCS Download] Success ({len(data)} entries)", flush=True)
+        return data
+    except Exception as e:
+        import logging as std_logging
+        std_logging.getLogger(__name__).error(f"Failed to download log from GCS: {e}")
+        return []
 
 
 def add_comment_to_question(question_id, comment):
@@ -99,23 +160,16 @@ def add_comment_to_question(question_id, comment):
     Add a comment to a question by its identifier.
     """
     with question_log_lock:
-        try:
-            if QUESTION_LOG_PATH.exists():
-                with open(QUESTION_LOG_PATH, 'r', encoding='utf-8') as f:
-                    data = json.load(f)
-            else:
-                return False
-        except Exception:
+        data = _download_log_from_gcs()
+        if not data:
             return False
         for entry in data:
             if entry.get("question_id") == question_id:
-                # Replace all comments with the new comment
                 entry["comments"] = [{
                     "comment": comment,
                     "timestamp": datetime.now().isoformat()
                 }]
-                with open(QUESTION_LOG_PATH, 'w', encoding='utf-8') as f:
-                    json.dump(data, f, ensure_ascii=False, indent=2)
+                _upload_log_to_gcs(data)
                 return True
         return False
 
@@ -123,22 +177,15 @@ def add_comment_to_question(question_id, comment):
 def add_like_to_question(question_id: str, like: bool):
     """Add or update a like/dislike vote for a question. Replaces any previous vote."""
     with question_log_lock:
-        try:
-            if QUESTION_LOG_PATH.exists():
-                with open(QUESTION_LOG_PATH, 'r', encoding='utf-8') as f:
-                    data = json.load(f)
-            else:
-                return {"status": "error", "message": "Log file not found"}
-        except Exception:
-            return {"status": "error", "message": "Could not read log file"}
-        
+        data = _download_log_from_gcs()
+        if not data:
+            return {"status": "error", "message": "Log not found"}
         for entry in data:
             if entry.get("question_id") == question_id:
                 entry["likes"] = {
                     "like": like,
                     "timestamp": datetime.now().isoformat()
                 }
-                with open(QUESTION_LOG_PATH, 'w', encoding='utf-8') as f:
-                    json.dump(data, f, ensure_ascii=False, indent=2)
+                _upload_log_to_gcs(data)
                 return {"status": "success", "message": "Vote recorded"}
         return {"status": "error", "message": "Question ID not found"}

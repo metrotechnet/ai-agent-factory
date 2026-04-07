@@ -95,6 +95,11 @@ if !errorlevel! neq 0 (
     echo ERROR: Failed to copy index.html
     exit /b 1
 )
+copy /Y "templates\log_report.html" "public\log_report.html" >nul
+if !errorlevel! neq 0 (
+    echo ERROR: Failed to copy log_report.html
+    exit /b 1
+)
 REM Inject Firebase configuration into HTML
 echo Injecting Firebase configuration...
 powershell -Command "(Get-Content 'public\index.html') -replace '{{FIREBASE_PROJECT_ID}}', '!FIREBASE_PROJECT!' -replace '{{FIREBASE_API_KEY}}', '!FIREBASE_API_KEY!' -replace '{{FIREBASE_AUTH_DOMAIN}}', '!FIREBASE_AUTH_DOMAIN!' -replace '{{FIREBASE_STORAGE_BUCKET}}', '!FIREBASE_STORAGE_BUCKET!' -replace '{{FIREBASE_MESSAGING_SENDER_ID}}', '!FIREBASE_MESSAGING_SENDER_ID!' -replace '{{FIREBASE_APP_ID}}', '!FIREBASE_APP_ID!' -replace '{{FIREBASE_MEASUREMENT_ID}}', '!FIREBASE_MEASUREMENT_ID!' -replace '{{RECAPTCHA_SITE_KEY}}', '!RECAPTCHA_SITE_KEY!' -replace '{{APP_CHECK_ENABLED}}', '!APP_CHECK_ENABLED!' -replace '{{APP_CHECK_DEBUG_TOKEN}}', '!APP_CHECK_DEBUG_TOKEN!' | Set-Content 'public\index.html'"
@@ -112,6 +117,9 @@ if !errorlevel! neq 0 (
 
 powershell -Command "(Get-Content 'public\index.html') -replace '/static/', 'static/' | Set-Content 'public\index.html'"
 echo window.BACKEND_URL = '!BACKEND_URL!'; > "public\static\js\backend-url.js"
+
+REM Inject backend URL into log_report.html
+powershell -Command "(Get-Content 'public\log_report.html') -replace '{{BACKEND_URL}}', '!BACKEND_URL!' | Set-Content 'public\log_report.html'"
 
 echo Files prepared successfully!
 echo.
