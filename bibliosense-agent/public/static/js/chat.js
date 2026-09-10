@@ -570,7 +570,6 @@ async function handleStreamingResponse(question, contentDiv, actionsDiv) {
                 
                 try {
                     const data = JSON.parse(rawData);
-
                     // Handle errors
                     if (data.error) {
                         console.error('Stream error:', data.error);
