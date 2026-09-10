@@ -298,7 +298,7 @@ function positionMessageAtBottom(chatContainer, userMessageDiv, messageDiv) {
         
         // Calculate padding needed to push content to bottom
         const endPadding = containerHeight - userMessageHeight - messageDivHeight - 50;
-        console.log('Needed padding to position message at bottom:', endPadding);
+        // console.log('Needed padding to position message at bottom:', endPadding);
 
         if (endPadding > 0) {
             const messageContent = messageDiv.querySelector('.message-content');

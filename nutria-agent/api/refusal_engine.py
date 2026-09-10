@@ -37,9 +37,19 @@ def load_refusal_responses():
         return _refusal_responses_cache
     
     try:
-        with open(PROJECT_ROOT / 'knowledge-base' / 'common' / 'refusal_responses.json', 'r', encoding='utf-8') as f:
-            _refusal_responses_cache = json.load(f)
-        return _refusal_responses_cache
+        candidate_paths = [
+            PROJECT_ROOT / 'api' / 'config' / 'refusal_responses.json',
+            PROJECT_ROOT / 'knowledge-base' / 'common' / 'refusal_responses.json',
+        ]
+        for path in candidate_paths:
+            if path.exists():
+                with open(path, 'r', encoding='utf-8') as f:
+                    _refusal_responses_cache = json.load(f)
+                return _refusal_responses_cache
+
+        raise FileNotFoundError(
+            "refusal_responses.json not found in any expected location"
+        )
     except Exception as e:
         raise Exception(f"Error loading refusal responses: {e}")
 

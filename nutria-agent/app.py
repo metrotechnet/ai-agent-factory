@@ -89,7 +89,7 @@ app.include_router(update.router, tags=["update"])
 @app.get("/")
 def home():
     """API root endpoint - frontend is hosted on Firebase"""
-    return {"status": "ok", "message": "IMX Agent Factory API"}
+    return {"status": "ok", "message": "IMX Agent Factory API version 2"}
 
 
 @app.get("/health")

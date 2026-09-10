@@ -12,6 +12,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy application files explicitly
 COPY api/ api/
+COPY knowledge-base/ knowledge-base/
 COPY app.py .
 COPY startup.sh .
 

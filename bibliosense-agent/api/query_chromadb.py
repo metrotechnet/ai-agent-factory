@@ -5,17 +5,19 @@ import random
 from pathlib import Path
 from dotenv import load_dotenv
 from openai import OpenAI
-import requests
-import google.auth.transport.requests
-import google.oauth2.id_token
+import chromadb
+from chromadb.config import Settings
 
 # Get project root directory
 PROJECT_ROOT = Path(__file__).parent.parent
 load_dotenv(dotenv_path=PROJECT_ROOT / '.env')
 
 # Initialize ChromaDB client (local storage)
-chroma_client = None
-collection = None
+_COLLECTION_CACHE = {}
+
+DEFAULT_PROJECT_NAME = os.getenv("KNOWLEDGE_BASE_NAME", "bibliosense")
+DEFAULT_COLLECTION_NAME = os.getenv("DEFAULT_COLLECTION_NAME", "gdrive_documents")
+VECTOR_DB_DIRNAME = os.getenv("VECTOR_DB_DIRNAME", "chroma_db")
 
 # Initialize Vercel AI Gateway client (OpenAI-compatible)
 # See https://vercel.com/docs/ai-gateway/sdks-and-apis/openai-chat-completions
@@ -142,64 +144,81 @@ def build_prompt_from_template(language, context, question, history_text="", age
     return prompt, model_config
 
 
+def _resolve_kb_root() -> Path:
+    """Resolve the local knowledge-base root for this project."""
+    override = os.getenv("KNOWLEDGE_BASE_ROOT")
+    if override:
+        return Path(override)
+    return PROJECT_ROOT / "knowledge-base"
+
+
+def _get_local_collection(project_name: str, collection_name: str):
+    """Return a local persisted ChromaDB collection."""
+    cache_key = f"{project_name}:{collection_name}"
+    if cache_key in _COLLECTION_CACHE:
+        return _COLLECTION_CACHE[cache_key]
+
+    kb_root = _resolve_kb_root()
+    db_path = kb_root / project_name / VECTOR_DB_DIRNAME
+    if not db_path.exists():
+        raise FileNotFoundError(f"Local ChromaDB folder not found: {db_path}")
+
+    local_client = chromadb.PersistentClient(
+        path=str(db_path),
+        settings=Settings(anonymized_telemetry=False, allow_reset=False),
+    )
+    local_collection = local_client.get_collection(name=collection_name)
+    _COLLECTION_CACHE[cache_key] = local_collection
+    return local_collection
+
+
 def query_chromadb(project_name, collection_name=None, data=None):
     try:
-        chromadb_url = os.getenv("CHROMADB_CENTRAL_URL")
+        project_name = project_name or DEFAULT_PROJECT_NAME
+        collection_name = collection_name or DEFAULT_COLLECTION_NAME
+        payload = data or {}
 
-        if not chromadb_url:
-            raise ValueError("Missing CHROMADB_CENTRAL_URL")
+        if not isinstance(payload, dict):
+            return {
+                "error": "Invalid query payload",
+                "details": "Expected a dict with query_embedding and query options.",
+            }
 
-        # =========================
-        # 🔐 GET IAM TOKEN
-        # =========================
-        auth_req = google.auth.transport.requests.Request()
-        
-        id_token = google.oauth2.id_token.fetch_id_token(
-            auth_req,
-            chromadb_url
-        )
+        query_embedding = payload.get("query_embedding")
+        if query_embedding is None:
+            return {
+                "error": "Invalid query payload",
+                "details": "Missing required field: query_embedding",
+            }
 
-        headers = {
-            "Authorization": f"Bearer {id_token}",
-            "Content-Type": "application/json"
+        if hasattr(query_embedding, "tolist"):
+            query_embedding = query_embedding.tolist()
+
+        if not hasattr(query_embedding, "__len__") or len(query_embedding) == 0:
+            return {
+                "error": "Invalid query payload",
+                "details": "query_embedding must be a non-empty list-like vector",
+            }
+
+        local_collection = _get_local_collection(project_name, collection_name)
+
+        query_args = {
+            "query_embeddings": [query_embedding],
+            "n_results": int(payload.get("n_results", 10)),
+            "include": payload.get("include", ["documents", "metadatas"]),
         }
+        if payload.get("where") is not None:
+            query_args["where"] = payload.get("where")
 
-        # =========================
-        # 📦 PAYLOAD
-        # =========================
-        payload = {
-            "project_name": project_name,
-            "collection_name": collection_name,
-            "query": data
-        }
-
-        url = f"{chromadb_url}/query"
-
-        # =========================
-        # 🚀 REQUEST
-        # =========================
-        resp = requests.post(
-            url,
-            json=payload,
-            headers=headers,
-            timeout=30
-        )
-
-        resp.raise_for_status()
-
-        return resp.json()
-
-    except requests.exceptions.HTTPError as e:
-        return {
-            "error": "HTTP error",
-            "status_code": resp.status_code if 'resp' in locals() else None,
-            "details": str(e)
-        }
+        return local_collection.query(**query_args)
 
     except Exception as e:
         return {
-            "error": "Failed to query central ChromaDB",
-            "details": str(e)
+            "error": "Failed to query local ChromaDB",
+            "details": str(e),
+            "project_name": project_name,
+            "collection_name": collection_name,
+            "knowledge_base_root": str(_resolve_kb_root()),
         }
     
 
@@ -457,12 +476,22 @@ def ask_question_stream(question, language="fr", timezone="UTC", locale="fr-FR",
         # Ensure query_params is JSON serializable
         query_params = json.loads(json.dumps(query_params, default=str))
         results = query_chromadb(project_name="bibliosense", collection_name="gdrive_documents", data=query_params)
-        
-        if not results['documents'] or not results['documents'][0]:
+
+        if not isinstance(results, dict):
+            yield "Knowledge base query returned an unexpected response format."
+            return
+
+        if results.get("error"):
+            details = results.get("details", "")
+            yield f"Knowledge base query failed: {details or results['error']}"
+            return
+
+        documents_root = results.get("documents")
+        if not documents_root or not isinstance(documents_root, list) or not documents_root[0]:
             yield "No relevant information found. Please make sure you have indexed some transcripts."
             return
-        
-        documents = results['documents'][0]
+
+        documents = documents_root[0]
         metadatas_list = results.get('metadatas', [[]])[0]
 
         # Filtrer pour limiter le nombre de livres par auteur (max 2)
