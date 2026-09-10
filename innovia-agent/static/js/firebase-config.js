@@ -135,7 +135,7 @@ async function getAppCheckToken() {
     }
 
     try {
-        console.log('[App Check] Requesting token...');
+        //console.log('[App Check] Requesting token...');
         
         let token = null;
         try {
